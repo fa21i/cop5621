@@ -1,36 +1,48 @@
 %{
 int count = 1;
+int token = 0;
+int token_not_defined=0;
 %}
 
 %%
-print 	{printf("line %d: program entry:\t\t%s\n", count,yytext);}
-[)]   	{printf("line %d: right paranthesis:\t%s\n", count,yytext);}
-[(]   	{printf("line %d: left paranthesis:\t%s\n", count,yytext);}
-[a-z]+ 	{printf("line %d: variable/function:\t%s\n", count,yytext);}
-[0-9]+ 	{printf("line %d: integer constant:\t%s\n", count,yytext);}
-[+] 	{printf("line %d: arithmetic constant:  %s\n", count,yytext);}
-[<|>|<=|>=|=] {printf("line %d: arithmetic comparison:\t\t%s\n", count,yytext);}
+;.* {;}
+[-]*[0-9]+ {printf("line %d: arithmetic const:\t\t%s\n", count,yytext); token++;}
+[<|>|<=|>=|=] {printf("line %d: arithmetic comparison:\t\t%s\n", count,yytext);token++;}
+[\+|\-|\*]|mod|div 	{printf("line %d: arithmetic operation:\t\t%s\n", count,yytext);token++;}
+define-fun	{printf("line %d: function definition keyword:\t%s\n", count,yytext);token++;}
+get-int|get-bool 	{printf("line %d: predefined functions:\t\t%s\n", count,yytext);token++;}
+true|false 	{printf("line %d: boolean constants:\t\t\t%s\n", count,yytext);token++;}
+and|or|not 	{printf("line %d: boolean operator:\t\t%s\n", count,yytext);token++;}
+if	{printf("line %d: conditional operator:\t\t%s\n", count,yytext);token++;}
+let 	{printf("line %d: local variable declaration:\t\t%s\n", count,yytext);token++;}
+int|bool 	{printf("line %d: variable/function types:\t%s\n", count,yytext);token++;}
+print 	{printf("line %d: program entry:\t\t\t%s\n", count,yytext);token++;}
+[a-z|A-Z]+ 	{printf("line %d: variable/function name:\t\t%s\n", count,yytext);token++;}
+[)]   	{printf("line %d: right paranthesis:\t\t%s\n", count,yytext);token++;}
+[(]   	{printf("line %d: left paranthesis:\t\t%s\n", count,yytext);token++;}
 \n    	{count++;}
+" "	{;}
+\"	{;}
+\t	{;}
+. 	{token_not_defined = 1; return 0;}
 %%
 
 int yywrap(){}
-int main(){
-
-// Explanation:
-// yywrap() - wraps the above rule section
-/* yyin - takes the file pointer which contains the input*/
-/* yylex() - this is the main flex function which runs the Rule Section*/
-// yytext is the text in the buffer
+int main(int argc, char *argv[]){
 
 FILE *fp;
 char filename[50];
-//printf("Enter the filename: \n");
-//scanf("%s",filename);
-fp = fopen("D:\\Education\\fsu mscs\\Compiler construction\\Assign 2 scanner\\sample.txt","r");
+
+fp = fopen(argv[1],"r");
 yyin = fp;
 
 yylex();
-printf("\nNumber of lines - %d\n", count);
+if(token_not_defined==1){
+	printf("\nError message: Token cannot be recognized\n");
+}
+if(token==0){
+	printf("\nError message: No token can be recognized\n");
+}
 
 return 0;
 }
