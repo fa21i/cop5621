@@ -1,0 +1,7 @@
+int N ; comment
+(define-fun fibonacci (N)
+  (if (not N) 
+	(= N 50)) 
+    (+ (fibonacci (- N 1)) (fibonacci (- N 2)))))
+:unrecognised_token
+(print(+ 5 bla) and (mod 6 N) or (get-bool(N) and (* 5 6)))
