@@ -6,8 +6,8 @@ int token_not_defined=0;
 
 %%
 ;.* {;}
-[-]*[0-9]+ {printf("line %d: arithmetic const:\t\t%s\n", count,yytext); token++;}
-[<|>|<=|>=|=] {printf("line %d: arithmetic comparison:\t\t%s\n", count,yytext);token++;}
+[-]?[0-9]+ 	{printf("line %d: arithmetic const:\t\t%s\n", count,yytext); token++;}
+[<|>|<=|>=|=] 	{printf("line %d: arithmetic comparison:\t\t%s\n", count,yytext);token++;}
 [\+|\-|\*]|mod|div 	{printf("line %d: arithmetic operation:\t\t%s\n", count,yytext);token++;}
 define-fun	{printf("line %d: function definition keyword:\t%s\n", count,yytext);token++;}
 get-int|get-bool 	{printf("line %d: predefined functions:\t\t%s\n", count,yytext);token++;}
@@ -17,7 +17,7 @@ if	{printf("line %d: conditional operator:\t\t%s\n", count,yytext);token++;}
 let 	{printf("line %d: local variable declaration:\t\t%s\n", count,yytext);token++;}
 int|bool 	{printf("line %d: variable/function types:\t%s\n", count,yytext);token++;}
 print 	{printf("line %d: program entry:\t\t\t%s\n", count,yytext);token++;}
-[a-z|A-Z]+ 	{printf("line %d: variable/function name:\t\t%s\n", count,yytext);token++;}
+[a-zA-Z][a-zA-Z0-9]*	{printf("line %d: variable/function name:\t\t%s\n", count,yytext);token++;}
 [)]   	{printf("line %d: right paranthesis:\t\t%s\n", count,yytext);token++;}
 [(]   	{printf("line %d: left paranthesis:\t\t%s\n", count,yytext);token++;}
 \n    	{count++;}
@@ -28,12 +28,12 @@ print 	{printf("line %d: program entry:\t\t\t%s\n", count,yytext);token++;}
 %%
 
 int yywrap(){}
-int main(int argc, char *argv[]){
+int main(){
 
 FILE *fp;
 char filename[50];
 
-fp = fopen(argv[1],"r");
+fp = fopen("sample6.txt","r");
 yyin = fp;
 
 yylex();
