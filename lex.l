@@ -10,7 +10,8 @@ int token_not_defined=0;
 ;.* {;}
 [-]?[0-9]+ 	{printf("line %d: arithmetic const:\t\t%s\n", count,yytext); token++; yylval.str = yytext; return CONST;}
 [<|>|<=|>=|=] 	{printf("line %d: arithmetic comparison:\t\t%s\n", count,yytext);token++; return COMPARATOR;}
-[\+|\-|\*]|mod|div 	{printf("line %d: arithmetic operation:\t\t%s\n", count,yytext);token++; return OPERATOR;}
+[\+|\-] 	{printf("line %d: arithmetic operation:\t\t%s\n", count,yytext);token++; return ADDOP;}
+\*|mod|div 	{printf("line %d: arithmetic operation:\t\t%s\n", count,yytext);token++; return MULTOP;}
 define-fun	{printf("line %d: function definition keyword:\t%s\n", count,yytext);token++; return DEFINE;}
 get-int|get-bool 	{printf("line %d: predefined functions:\t\t%s\n", count,yytext);token++; return FUNCTION;}
 true|false 	{printf("line %d: boolean constants:\t\t\t%s\n", count,yytext);token++; return BOOLCONST;}
@@ -28,23 +29,3 @@ print 	{printf("line %d: program entry:\t\t\t%s\n", count,yytext);token++; retur
 \t	{;}
 . 	{token_not_defined = 1; return 0;}
 %%
-
-int yywrap(){}
-int main(){
-
-FILE *fp;
-char filename[50];
-
-fp = fopen("sample6.txt","r");
-yyin = fp;
-
-yylex();
-if(token_not_defined==1){
-	printf("\nError message: Token cannot be recognized\n");
-}
-if(token==0){
-	printf("\nError message: No token can be recognized\n");
-}
-
-return 0;
-}
