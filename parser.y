@@ -2,9 +2,6 @@
         #include <stdio.h>
         void yyerror(char *s);
         int yylex();
-        FILE *fp;
-        fp = fpopen("parse_tree.dot", "w");
-        fprintf(fp, "diagraph print {\n");
 
         int glob = 0;
 %}
@@ -12,7 +9,7 @@
 %union {int val; char* str;}
 %start program
 %token<str> CONST DEFINE FUNCTION BOOLCONST BOOLOP IF LET TYPE PRINT NAME RPAREN LPAREN
-%token<val> COMPARATOR OPERATOR
+%token<val> COMPARATOR MULTOP ADDOP
 
 %%
 program :       LPAREN DEFINE NAME type expr RPAREN program {glob++;}
@@ -20,29 +17,30 @@ program :       LPAREN DEFINE NAME type expr RPAREN program {glob++;}
         |       LPAREN DEFINE NAME LPAREN NAME type RPAREN LPAREN NAME type RPAREN type expr RPAREN program
         |       LPAREN PRINT expr RPAREN
         ;
-type    :       TYPE {fprintf(fp, "%d [label=%s ordering=\"out\"]\n", glob, $1);}
+type    :       TYPE {fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob, $1);}
         ;
 expr    :       term
         |       fla
         ;
-term    :       CONST   {fprintf(fp, "%d [label=%s ordering=\"out\"]\n", glob, $1);}
+term    :       CONST   {fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob, $1);}
         //|       NAME
         |       LPAREN FUNCTION RPAREN
-        |       LPAREN OPERATOR term term RPAREN
+        |       LPAREN ADDOP term term RPAREN
+        |       LPAREN MULTOP term term RPAREN
         |       LPAREN IF fla term term RPAREN
         |       LPAREN NAME RPAREN
         |       LPAREN NAME expr RPAREN
         |       LPAREN NAME expr expr RPAREN
         |       LPAREN LET LPAREN NAME expr RPAREN term RPAREN
         ;
-fla     :       BOOLCONST       {fprint(fp, "%d [label=%s ordering=\"out\"]\n", glob, $1);}
-        |       NAME            {fprint(fp, "%d [label=%s ordering=\"out\"]\n", glob, $1);}
-        |       LPAREN FUNCTION RPAREN  {fprint(fp, "%d [label=%s ordering=\"out\"]\n", glob, $1); fprint(fp, "%d [label=%s ordering=\"out\"]\n", glob, $2); fprint(fp, "%d [label=%s ordering=\"out\"]\n", glob, $3);}
+fla     :       BOOLCONST       {fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob, $1);}
+        |       NAME            {fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob, $1);}
+        |       LPAREN FUNCTION RPAREN  {fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob, $1); fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob, $2); fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob, $3);}
         |       LPAREN COMPARATOR term term RPAREN
         |       LPAREN BOOLOP fla RPAREN
         |       LPAREN BOOLOP fla fla RPAREN
         |       LPAREN IF fla fla fla RPAREN
-        |       LPAREN NAME RPAREN      {fprint(fp, "%d [label=%s ordering=\"out\"]\n", glob, $1); fprint(fp, "%d [label=%s ordering=\"out\"]\n", glob, $2); fprint(fp, "%d [label=%s ordering=\"out\"]\n", glob, $3);}
+        |       LPAREN NAME RPAREN      {fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob, $1); fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob, $2); fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob, $3);}
         |       LPAREN NAME expr RPAREN
         |       LPAREN NAME expr expr RPAREN
         |       LPAREN LET LPAREN NAME expr RPAREN fla RPAREN
@@ -56,11 +54,30 @@ void yyerror(char * s)
         fprintf (stderr, "%s\n", s);
 }
 
-int main()
+int main(int argc, char* argv[])
 {
+
+        FILE *fdot = fopen("parse_tree.dot", "w");
+        fprintf(fdot, "diagraph print {\n");
+
+        if(argc > 1)
+	{
+		FILE *fp = fopen(argv[1], "r");
+		if(fp)
+			yyin = fp;
+	}
+	yylex();
+
+	if(token_not_defined == 1)
+	{
+		printf("Scanner aborted, invalid input");
+	}
+
+        
+
         yyparse();
 
-        fprintf(fp, "}\n");
-        fclose(fp); 
+        //fprintf(fp, "}\n");
+        fclose(fdot); 
         return 0;
 }
