@@ -8,7 +8,7 @@ int token_not_defined=0;
 
 %%
 ;.* {;}
-[-]?[0-9]+ 	{printf("line %d: arithmetic const:\t\t%s\n", count,yytext); token++; return NUMBER;}
+[-]?[0-9]+ 	{printf("line %d: arithmetic const:\t\t%s\n", count,yytext); token++; yylval.str = yytext; return CONST;}
 [<|>|<=|>=|=] 	{printf("line %d: arithmetic comparison:\t\t%s\n", count,yytext);token++; return COMPARATOR;}
 [\+|\-|\*]|mod|div 	{printf("line %d: arithmetic operation:\t\t%s\n", count,yytext);token++; return OPERATOR;}
 define-fun	{printf("line %d: function definition keyword:\t%s\n", count,yytext);token++; return DEFINE;}

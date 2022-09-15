@@ -1,61 +1,66 @@
 %{
-    #include <ctype.h>
-    #include <stdio.h>
-    #define YYSTYPE double /* double type for yacc stack */
+        #include <stdio.h>
+        void yyerror(char *s);
+        int yylex();
+        FILE *fp;
+        fp = fpopen("parse_tree.dot", "w");
+        fprintf(fp, "diagraph print {\n");
+
+        int glob = 0;
 %}
 
-%token NUMBER, COMPARATOR, OPERATOR, DEFINE, FUNCTION, BOOLCONST, BOOLOP, IF, LET, TYPE, PRINT, NAME, RPAREN, LPAREN
+%union {int val; char* str;}
 %start program
+%token<str> CONST DEFINE FUNCTION BOOLCONST BOOLOP IF LET TYPE PRINT NAME RPAREN LPAREN
+%token<val> COMPARATOR OPERATOR
 
 %%
-program :   LPAREN DEFINE fun LPAREN var type RPAREN type expr RPAREN program 
-        |   LPAREN PRINT EXPR RPAREN
+program :       LPAREN DEFINE NAME type expr RPAREN program {glob++;}
+        |       LPAREN DEFINE NAME LPAREN NAME type RPAREN type expr RPAREN program
+        |       LPAREN DEFINE NAME LPAREN NAME type RPAREN LPAREN NAME type RPAREN type expr RPAREN program
+        |       LPAREN PRINT expr RPAREN
         ;
-type    :   int
-        |   bool
+type    :       TYPE {fprintf(fp, "%d [label=%s ordering=\"out\"]\n", glob, $1);}
         ;
-expr    :   term
-        |   fla
+expr    :       term
+        |       fla
         ;
-term    :   const
-        |   var
-        |   '(' get-int ')'
-        |   '(' '+' term term ')'
-        |   '(' '*' term term ')'
-        |   '(' '-' term term ')'
-        |   '(' div term term ')'
-        |   '(' mod term term ')'
-        |   '(' if fla term term ')'
-        |   '(' fun expr ')'
-        |   '(' let '(' var expr ')' term ')'
+term    :       CONST   {fprintf(fp, "%d [label=%s ordering=\"out\"]\n", glob, $1);}
+        //|       NAME
+        |       LPAREN FUNCTION RPAREN
+        |       LPAREN OPERATOR term term RPAREN
+        |       LPAREN IF fla term term RPAREN
+        |       LPAREN NAME RPAREN
+        |       LPAREN NAME expr RPAREN
+        |       LPAREN NAME expr expr RPAREN
+        |       LPAREN LET LPAREN NAME expr RPAREN term RPAREN
         ;
-fla     :   true 
-        |   false
-        |   var
-        |   '(' get-bool ')'
-        |   '(' '=' term term ')'
-        |   '(' '<' term term ')'
-        |   '(' '<=' term term ')'
-        |   '(' '>' term term ')'
-        |   '(' '>=' term term ')'
-        |   '(' not fla ')'
-        |   '(' and fla fla ')'
-        |   '(' or fla fla ')'
-        |   '(' if fla fla fla ')'
-        |   '(' fun expr ')'
-        |   '(' let '(' var expr ')' fla ')'
+fla     :       BOOLCONST       {fprint(fp, "%d [label=%s ordering=\"out\"]\n", glob, $1);}
+        |       NAME            {fprint(fp, "%d [label=%s ordering=\"out\"]\n", glob, $1);}
+        |       LPAREN FUNCTION RPAREN  {fprint(fp, "%d [label=%s ordering=\"out\"]\n", glob, $1); fprint(fp, "%d [label=%s ordering=\"out\"]\n", glob, $2); fprint(fp, "%d [label=%s ordering=\"out\"]\n", glob, $3);}
+        |       LPAREN COMPARATOR term term RPAREN
+        |       LPAREN BOOLOP fla RPAREN
+        |       LPAREN BOOLOP fla fla RPAREN
+        |       LPAREN IF fla fla fla RPAREN
+        |       LPAREN NAME RPAREN      {fprint(fp, "%d [label=%s ordering=\"out\"]\n", glob, $1); fprint(fp, "%d [label=%s ordering=\"out\"]\n", glob, $2); fprint(fp, "%d [label=%s ordering=\"out\"]\n", glob, $3);}
+        |       LPAREN NAME expr RPAREN
+        |       LPAREN NAME expr expr RPAREN
+        |       LPAREN LET LPAREN NAME expr RPAREN fla RPAREN
         ;
 %%
 
 #include "lex.yy.c"
 
 void yyerror(char * s)
-/* yacc error handler */
 {  
-    fprintf (stderr, "%s\n", s);
+        fprintf (stderr, "%s\n", s);
 }
 
-int main(void)
+int main()
 {
-    return yyparse();
+        yyparse();
+
+        fprintf(fp, "}\n");
+        fclose(fp); 
+        return 0;
 }
