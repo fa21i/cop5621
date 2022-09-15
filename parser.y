@@ -5,10 +5,11 @@
 %}
 
 %token NUMBER, COMPARATOR, OPERATOR, DEFINE, FUNCTION, BOOLCONST, BOOLOP, IF, LET, TYPE, PRINT, NAME, RPAREN, LPAREN
+%start program
 
 %%
-program :   LPAREN define-fun fun '(' var type ')' type expr ')' program 
-        |   (print expr)
+program :   LPAREN DEFINE fun LPAREN var type RPAREN type expr RPAREN program 
+        |   LPAREN PRINT EXPR RPAREN
         ;
 type    :   int
         |   bool
@@ -44,17 +45,6 @@ fla     :   true
         |   '(' fun expr ')'
         |   '(' let '(' var expr ')' fla ')'
         ;
-
-
-
-
-Lines :  Lines S '\n' { printf("OK \n"); }
-    |  S '\n’
-    |  error '\n' {yyerror("Error: reenter last line:");
-                    yyerrok; };
-S     :  '(' S ')’
-    |  '[' S ']’
-    |   /* empty */    ;
 %%
 
 #include "lex.yy.c"
