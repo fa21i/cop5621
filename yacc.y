@@ -17,11 +17,22 @@
 
 %%
 
-prog  : op {glob++;fprintf(fdot, "%d [label=op ordering=\"out\"]\n%d -> %d\n", glob,glob,$1);};
+prog  : op {glob++;fprintf(fdot, "%d [label=op ordering=\"out\"]\n", glob);
+                while(!isempty()){
+                        fprintf(fdot,"%d -> %d\n",glob,pop());
+                }};
 op : arg {glob++;fprintf(fdot, "%d [label=arg ordering=\"out\"]\n%d -> %d\n",glob,glob,$1);$$=glob;};
-op : arg PLUS op {glob++;fprintf(fdot, "%d [label=arg ordering=\"out\"]\n%d -> %d\n", glob,glob,$1);
-                glob++;fprintf(fdot, "%d [label=\"+\" ordering=\"out\"]\n", glob);
-                glob++;fprintf(fdot, "%d [label=op ordering=\"out\"]\n%d -> %d\n", glob,glob,$3);$$=glob;};
+op : arg PLUS op {
+                while(!isempty()){
+                        int x = pop();
+                        if(x==$3){}
+                        else{
+                                fprintf(fdot,"%d -> %d\n",$3,x);
+                        }
+                }
+                push(++glob);fprintf(fdot, "%d [label=arg ordering=\"out\"]\n%d -> %d\n", glob,glob,$1);
+                push(++glob);fprintf(fdot, "%d [label=\"+\" ordering=\"out\"]\n", glob);
+                push(++glob);fprintf(fdot, "%d [label=op ordering=\"out\"]\n%d -> %d\n", glob,glob,$3);$$=glob;};
 arg : ID {glob++;fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob, $1);$$=glob;};
 arg: CONST {glob++;fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob, $1);$$=glob;};
 
