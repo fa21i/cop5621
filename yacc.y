@@ -33,7 +33,7 @@ void yyerror(char *s)
         fprintf (stdout, "%s:\n", s);
 }
 
-int main(int argc, char* argv[])
+int main()
 {
         fdot = fopen("parse_tree.dot", "w+");
         fprintf(fdot, "digraph print {\n");

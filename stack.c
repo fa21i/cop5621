@@ -45,8 +45,3 @@ int push(int data) {
       printf("StackOverFlow\n");
    }
 }
-
-int main() {
-
-   return 0;
-}
