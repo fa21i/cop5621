@@ -1,0 +1,25 @@
+digraph print {
+0 [label=1 ordering="out"];
+1 [label=term ordering="out"];
+1 -> 0
+2 [label=2 ordering="out"];
+3 [label=term ordering="out"];
+3 -> 2
+4 [label="(" ordering="out"];
+5 [label="+" ordering="out"];
+6 [label=")" ordering="out"];
+7 [label=term ordering="out"];
+7 -> 4
+7 -> 1
+7 -> 5
+7 -> 3
+7 -> 6
+8 [label="(" ordering="out"];
+9 [label=print ordering="out"];
+10 [label=")" ordering="out"];
+11 [label=program ordering="out"];
+11 -> 8
+11 -> 9
+11 -> 7
+11 -> 10
+}
