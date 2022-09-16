@@ -6,25 +6,24 @@
         FILE *fdot;
 	void yyerror(char *s);
         int glob = 0;
-        int chars=0;
 
 %}
 
 %union {int val; char* str;}
 %start prog
-%token<str> CONST ID PLUS
-%type <str> arg op
+%token<str> CONST ID 
+%token<val> PLUS
+%type <val> arg op
 
 %%
 
-prog  : op {fprintf(fdot, "%d [label=prog ordering=\"out\"]\n%d [label=op ordering=\"out\"]\n", chars++,chars++);};
-op : arg {fprintf(fdot, "%d [label=arg ordering=\"out\"]\n", chars++);};
-op : arg PLUS op {fprintf(fdot, "%d [label=op ordering=\"out\"]\n", chars++, $1); 
-                fprintf(fdot, "%d [label=\"+\" ordering=\"out\"]\n", chars++, $1);
-                fprintf(fdot, "%d [label=arg ordering=\"out\"]\n", chars++, $1);
-                $$=glob;};
-arg : ID {fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", chars++, $1); $$=glob;};
-arg: CONST {fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", chars++, $1);$$=glob;};
+prog  : op {glob++;fprintf(fdot, "%d [label=op ordering=\"out\"]\n%d -> %d\n", glob,glob,$1);};
+op : arg {glob++;fprintf(fdot, "%d [label=arg ordering=\"out\"]\n%d -> %d\n",glob,glob,$1);$$=glob;};
+op : arg PLUS op {glob++;fprintf(fdot, "%d [label=arg ordering=\"out\"]\n%d -> %d\n", glob,glob,$1);
+                glob++;fprintf(fdot, "%d [label=\"+\" ordering=\"out\"]\n", glob);
+                glob++;fprintf(fdot, "%d [label=op ordering=\"out\"]\n%d -> %d\n", glob,glob,$3);$$=glob;};
+arg : ID {glob++;fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob, $1);$$=glob;};
+arg: CONST {glob++;fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob, $1);$$=glob;};
 
 %%
 
