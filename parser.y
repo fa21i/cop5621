@@ -2,6 +2,7 @@
         #include <stdio.h>
         void yyerror(char *s);
         int yylex();
+        FILE *fdot;
 
         int glob = 0;
 %}
@@ -10,6 +11,7 @@
 %start program
 %token<str> CONST DEFINE FUNCTION BOOLCONST BOOLOP IF LET TYPE PRINT NAME RPAREN LPAREN
 %token<val> COMPARATOR MULTOP ADDOP
+%type <str> program type expr term fla
 
 %%
 program :       LPAREN DEFINE NAME type expr RPAREN program {glob++;}
@@ -56,25 +58,13 @@ void yyerror(char * s)
 
 int main(int argc, char* argv[])
 {
-
-        FILE *fdot = fopen("parse_tree.dot", "w");
-        fprintf(fdot, "diagraph print {\n");
-
-        if(argc > 1)
-	{
-		FILE *fp = fopen(argv[1], "r");
-		if(fp)
-			yyin = fp;
-	}
-	yylex();
-
 	if(token_not_defined == 1)
 	{
 		printf("Scanner aborted, invalid input");
 	}
 
-        
-
+        fdot = fopen("parse_tree.dot", "w+");
+        fprintf(fdot, "diagraph print {\n");
         yyparse();
 
         //fprintf(fp, "}\n");
