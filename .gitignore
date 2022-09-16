@@ -4,3 +4,4 @@ lex.yy.c
 y.tab.c
 y.tab.h
 y.tab.h.gch
+parse_tree.dot
