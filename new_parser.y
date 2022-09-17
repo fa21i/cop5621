@@ -6,7 +6,6 @@
 	void yyerror(char *s);
         int glob = 0;
         int arr[50];
-        extern FILE *yyin;
 %}
 
 %union {int val; char* str;}
@@ -76,7 +75,7 @@ program :   LPAREN DEFINE NAME type expr RPAREN program  {
                 insert(++glob);fprintf(fdot, "%d [label=type ordering=\"out\"]\n%d -> %d\n", glob,glob,$12);                
                 insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,$13);
                 insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
-                insert(prog_pros);
+                insert(prog_pos);
                 insert(++glob);fprintf(fdot, "%d [label=program ordering=\"out\"]\n", glob);
                 while(!isEmpty()){
                         int x = removeData();
@@ -131,7 +130,7 @@ term    :   CONST {insert(++glob);fprintf(fdot, "%d [label=%s ordering=\"out\"]\
         };
         |   LPAREN ADDOP term term RPAREN {
                 insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=\"+-\" ordering=\"out\"]\n", glob);
+                insert(++glob);fprintf(fdot, "%d [label=\"+\" ordering=\"out\"]\n", glob);
                 insert(++glob);fprintf(fdot, "%d [label=term ordering=\"out\"]\n%d -> %d\n", glob,glob,$3);
                 insert(++glob);fprintf(fdot, "%d [label=term ordering=\"out\"]\n%d -> %d\n", glob,glob,$4);
                 insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);$$=glob;
@@ -260,6 +259,7 @@ fla     :   BOOLCONST {++glob;fprintf(fdot, "%d [label=const ordering=\"out\"]\n
 /*arg : ID {glob ++; printf("id: %s, %d\n", $1, glob); $$ = glob; }
 | CONST {glob ++; printf("const: %s, %d\n", $1, glob); $$ = glob; };
 */
+#include "lex.yy.c"
 
 void yyerror(char * s)
 {  
@@ -272,15 +272,7 @@ int main(int argc, char* argv[])
 
         fdot = fopen("parse_tree.dot", "w+");
         fprintf(fdot, "digraph print {\n");     
-        yyin=fopen("sample.txt","r+");
-        if(yyin==NULL)
-        {
-                return 0;
-        }
-        else 
-        {
-                yyparse();
-        }
+        yyparse();
         fprintf(fdot, "}\n");
         fclose(fdot); 
         return 0;
