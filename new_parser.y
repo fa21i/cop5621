@@ -6,7 +6,7 @@
 	void yyerror(char *s);
         int glob = 0;
         int arr[50];
-        //extern FILE *yyin;
+        extern FILE *yyin;
 %}
 
 %union {int val; char* str;}
@@ -19,13 +19,14 @@
 %%
 program :   LPAREN DEFINE NAME type expr RPAREN program  {
                 $$=glob;
-                insert(++glob);fprintf(fdot, "%d [label=program ordering=\"out\"]\n", glob);
+                int prog_pos = glob;
                 insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
                 insert(++glob);fprintf(fdot, "%d [label=DEFINE ordering=\"out\"]\n", glob);
                 insert(++glob);fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n", glob);
                 insert(++glob);fprintf(fdot, "%d [label=type ordering=\"out\"]\n%d -> %d\n", glob,glob,$4);
                 insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,$5);
                 insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
+                insert(prog_pos);
                 insert(++glob);fprintf(fdot, "%d [label=program ordering=\"out\"]\n", glob);
                 while(!isEmpty()){
                         int x = removeData();
@@ -36,6 +37,7 @@ program :   LPAREN DEFINE NAME type expr RPAREN program  {
                 };
         |   LPAREN DEFINE NAME LPAREN NAME type RPAREN type expr RPAREN program{
                 $$=glob;
+                int prog_pos = glob;
                 insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
                 insert(++glob);fprintf(fdot, "%d [label=DEFINE ordering=\"out\"]\n", glob);
                 insert(++glob);fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n", glob);
@@ -46,6 +48,7 @@ program :   LPAREN DEFINE NAME type expr RPAREN program  {
                 insert(++glob);fprintf(fdot, "%d [label=type ordering=\"out\"]\n%d -> %d\n", glob,glob,$8);                
                 insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,$9);
                 insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
+                insert(prog_pos);
                 insert(++glob);fprintf(fdot, "%d [label=program ordering=\"out\"]\n", glob);
                 while(!isEmpty()){
                         int x = removeData();
@@ -58,6 +61,7 @@ program :   LPAREN DEFINE NAME type expr RPAREN program  {
         |   LPAREN DEFINE NAME LPAREN NAME type RPAREN LPAREN NAME type RPAREN type expr RPAREN program{
 
                 $$=glob;
+                int prog_pos = glob;
                 insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
                 insert(++glob);fprintf(fdot, "%d [label=DEFINE ordering=\"out\"]\n", glob);
                 insert(++glob);fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n", glob);
@@ -72,6 +76,7 @@ program :   LPAREN DEFINE NAME type expr RPAREN program  {
                 insert(++glob);fprintf(fdot, "%d [label=type ordering=\"out\"]\n%d -> %d\n", glob,glob,$12);                
                 insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,$13);
                 insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
+                insert(prog_pros);
                 insert(++glob);fprintf(fdot, "%d [label=program ordering=\"out\"]\n", glob);
                 while(!isEmpty()){
                         int x = removeData();
@@ -96,7 +101,7 @@ program :   LPAREN DEFINE NAME type expr RPAREN program  {
                 }
                 };
         ;
-type    :   TYPE {++glob;fprintf(fdot, "%d [label=type ordering=\"out\"]\n", glob);$$=glob;};
+type    :   TYPE {++glob;fprintf(fdot, "%d [label=TYPE ordering=\"out\"]\n", glob);$$=glob;};
         ;
 expr    :   term {
                 insert(++glob);fprintf(fdot, "%d [label=term ordering=\"out\"]\n", glob);$$=glob;
@@ -108,7 +113,7 @@ expr    :   term {
                 }
                 };
         |   fla {
-                ++glob;fprintf(fdot, "%d [label=fla ordering=\"out\"]\n%d -> %d\n", glob,glob,$1);$$=glob;
+                insert(++glob);fprintf(fdot, "%d [label=fla ordering=\"out\"]\n%d -> %d\n", glob,glob,$1);$$=glob;
                 while(!isEmpty()){
                         int x = removeData();
                         if(x!=glob){
@@ -117,8 +122,8 @@ expr    :   term {
                 }
                 };
         ;
-term    :   CONST {++glob;fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob, $1);$$=glob;};
-        |   NAME {++glob;fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob, $1);$$=glob;};
+term    :   CONST {insert(++glob);fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob, $1);$$=glob;};
+        |   NAME {insert(++glob);fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob, $1);$$=glob;};
         |   LPAREN FUNCTION RPAREN{
                 insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
                 insert(++glob);fprintf(fdot, "%d [label=\"FUNCTION\" ordering=\"out\"]\n", glob);
@@ -255,7 +260,6 @@ fla     :   BOOLCONST {++glob;fprintf(fdot, "%d [label=const ordering=\"out\"]\n
 /*arg : ID {glob ++; printf("id: %s, %d\n", $1, glob); $$ = glob; }
 | CONST {glob ++; printf("const: %s, %d\n", $1, glob); $$ = glob; };
 */
-#include "lex.yy.c"
 
 void yyerror(char * s)
 {  
@@ -268,8 +272,7 @@ int main(int argc, char* argv[])
 
         fdot = fopen("parse_tree.dot", "w+");
         fprintf(fdot, "digraph print {\n");     
-        yyparse();
-        /*yyin=fopen("sample.txt","r+");
+        yyin=fopen("sample.txt","r+");
         if(yyin==NULL)
         {
                 return 0;
@@ -277,7 +280,7 @@ int main(int argc, char* argv[])
         else 
         {
                 yyparse();
-        }*/
+        }
         fprintf(fdot, "}\n");
         fclose(fdot); 
         return 0;
