@@ -42,40 +42,40 @@
      NAME = 258,
      CONST = 259,
      BOOLCONST = 260,
-     MULTOP = 261,
-     COMPARATOR = 262,
-     ADDOP = 263,
-     MINOP = 264,
-     DEFINE = 265,
-     FUNCTION = 266,
-     BOOLOP = 267,
-     IF = 268,
-     LET = 269,
-     TYPE = 270,
-     PRINT = 271,
-     RPAREN = 272,
-     LPAREN = 273,
-     NOT = 274
+     COMPARATOR = 261,
+     ADDOP = 262,
+     MINOP = 263,
+     DEFINE = 264,
+     FUNCTION = 265,
+     BOOLOP = 266,
+     IF = 267,
+     LET = 268,
+     TYPE = 269,
+     PRINT = 270,
+     RPAREN = 271,
+     LPAREN = 272,
+     NOT = 273,
+     MULTOP = 274
    };
 #endif
 /* Tokens.  */
 #define NAME 258
 #define CONST 259
 #define BOOLCONST 260
-#define MULTOP 261
-#define COMPARATOR 262
-#define ADDOP 263
-#define MINOP 264
-#define DEFINE 265
-#define FUNCTION 266
-#define BOOLOP 267
-#define IF 268
-#define LET 269
-#define TYPE 270
-#define PRINT 271
-#define RPAREN 272
-#define LPAREN 273
-#define NOT 274
+#define COMPARATOR 261
+#define ADDOP 262
+#define MINOP 263
+#define DEFINE 264
+#define FUNCTION 265
+#define BOOLOP 266
+#define IF 267
+#define LET 268
+#define TYPE 269
+#define PRINT 270
+#define RPAREN 271
+#define LPAREN 272
+#define NOT 273
+#define MULTOP 274
 
 
 
