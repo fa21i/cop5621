@@ -71,7 +71,7 @@ term    :   CONST {++glob;fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob
         |   LPAREN IF fla term term RPAREN
         |   LPAREN NAME RPAREN {
                 insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob, $1);
-                insert(++glob);fprintf(fdot, "%d [label=\"%s\" ordering=\"out\"]\n", glob, $2);
+                insert(++glob);fprintf(fdot, "%d [label=\"%s\" ordering=\"out\"]\n", glob, strtok($2, " )"));
                 insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob, $3);$$=glob;
                 }
         |   LPAREN NAME expr RPAREN
