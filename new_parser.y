@@ -12,7 +12,7 @@
 %union {int val; char* str;}
 %start program
 %token <str> NAME
-%token <val> COMPARATOR MULTOP ADDOP DEFINE FUNCTION BOOLCONST BOOLOP IF LET TYPE PRINT RPAREN LPAREN NOT CONST
+%token <val> COMPARATOR MULTOP ADDOP MINOP DEFINE FUNCTION BOOLCONST BOOLOP IF LET TYPE PRINT RPAREN LPAREN NOT CONST
 %type <val> program type expr term fla 
 
 
@@ -155,6 +155,7 @@ term    :   CONST {++glob;fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob
                 insert(++glob);fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n",glob);
                 insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,$3);                
                 insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob, $3);$$=glob;
+                
                 }
         |   LPAREN NAME expr expr RPAREN{
                 insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
