@@ -6,7 +6,6 @@
 	void yyerror(char *s);
         int glob = 0;
         int arr[50];
-        extern FILE *yyin;
 %}
 
 %union {int val; char* str;}
@@ -131,7 +130,7 @@ term    :   CONST {++glob;fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob
         };
         |   LPAREN ADDOP term term RPAREN {
                 insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=\"+-\" ordering=\"out\"]\n", glob);
+                insert(++glob);fprintf(fdot, "%d [label=\"+\" ordering=\"out\"]\n", glob);
                 insert(++glob);fprintf(fdot, "%d [label=term ordering=\"out\"]\n%d -> %d\n", glob,glob,$3);
                 insert(++glob);fprintf(fdot, "%d [label=term ordering=\"out\"]\n%d -> %d\n", glob,glob,$4);
                 insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);$$=glob;
@@ -260,6 +259,7 @@ fla     :   BOOLCONST {++glob;fprintf(fdot, "%d [label=const ordering=\"out\"]\n
 /*arg : ID {glob ++; printf("id: %s, %d\n", $1, glob); $$ = glob; }
 | CONST {glob ++; printf("const: %s, %d\n", $1, glob); $$ = glob; };
 */
+#include "lex.yy.c"
 
 void yyerror(char *s)
 {  
