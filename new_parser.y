@@ -7,6 +7,8 @@
         FILE *fdot;
 	void yyerror(char *s);
         int glob = 0;
+        int arr[50];
+        //extern FILE *yyin;
 %}
 
 %union {int val; char* str;}
@@ -205,11 +207,22 @@ void yyerror(char * s)
 
 int main(int argc, char* argv[])
 {
-        fdot = fopen("parse_tree.dot", "w+");
-        fprintf(fdot, "digraph print {\n");
-        yyparse();
+        char filename[50];
 
+        fdot = fopen("parse_tree.dot", "w+");
+        fprintf(fdot, "digraph print {\n");     
+        yyparse();
+        /*yyin=fopen("sample.txt","r+");
+        if(yyin==NULL)
+        {
+                return 0;
+        }
+        else 
+        {
+                yyparse();
+        }*/
         fprintf(fdot, "}\n");
         fclose(fdot); 
         return 0;
+        
 }
