@@ -1,6 +1,1 @@
-int N ; comment
-(define-fun fibonacci (N)
-  (if (not N) 
-	(= N 50)) 
-    (+ (fibonacci (- N 1)) (fibonacci (- N 2)))))
-(print(+ 5 bla) and (mod 6 N) or (get-bool(N) and (* 5 6)))
+(define-fun v1(v2 bool)(v3 int)bool false)(print 1)
