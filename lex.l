@@ -10,10 +10,16 @@ int yywrap(){return 1;}
 
 %%
 ;.* {;}
+\n    	{count++;}
+" "	{;}
+\"	{;}
+\t	{;}
 [-]?[0-9]+ 	{/*printf("line %d: arithmetic const:\t\t%s\n", count,yytext); token++;*/ yylval.str = yytext; return CONST;}
 [<|>|<=|>=|=] 	{/*printf("line %d: arithmetic comparison:\t\t%s\n", count,yytext);token++;*/yylval.str = yytext; return COMPARATOR;}
-[\+|\-] 	{/*printf("line %d: arithmetic operation:\t\t%s\n", count,yytext);token++;*/yylval.str = yytext; return ADDOP;}
-\*|mod|div 	{/*printf("line %d: arithmetic operation:\t\t%s\n", count,yytext);token++;*/yylval.str = yytext; return MULTOP;}
+\+ 	{/*printf("line %d: arithmetic operation:\t\t%s\n", count,yytext);token++;*/yylval.str = yytext; return ADDOP;}
+\- 	{/*printf("line %d: arithmetic operation:\t\t%s\n", count,yytext);token++;*/yylval.str = yytext; return MINOP;}
+\*	{/*printf("line %d: arithmetic operation:\t\t%s\n", count,yytext);token++;*/yylval.str = yytext; return MULTOP;}
+mod|div 	{/*printf("line %d: arithmetic operation:\t\t%s\n", count,yytext);token++;*/yylval.str = yytext; return DIVOP;}
 define-fun	{/*printf("line %d: function definition keyword:\t%s\n", count,yytext);token++;*/yylval.str = yytext; return DEFINE;}
 get-int|get-bool 	{/*printf("line %d: predefined functions:\t\t%s\n", count,yytext);token++;*/yylval.str = yytext; return FUNCTION;}
 true|false 	{/*printf("line %d: boolean constants:\t\t\t%s\n", count,yytext);token++;*/yylval.str = yytext; return BOOLCONST;}
@@ -26,9 +32,5 @@ print 	{/*printf("line %d: program entry:\t\t\t%s\n", count,yytext);token++;*/yy
 [a-zA-Z][a-zA-Z0-9]*	{/*printf("line %d: variable/function name:\t\t%s\n", count,yytext);token++;*/yylval.str = yytext; return NAME;}
 [)]   	{/*printf("line %d: right paranthesis:\t\t%s\n", count,yytext);token++;*/yylval.str = yytext; return RPAREN;}
 [(]   	{/*printf("line %d: left paranthesis:\t\t%s\n", count,yytext);token++;*/yylval.str = yytext; return LPAREN;}
-\n    	{count++;}
-" "	{;}
-\"	{;}
-\t	{;}
 . 	{;}
 %%
