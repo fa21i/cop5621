@@ -85,8 +85,8 @@ term    :   CONST {++glob;fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob
         |   LPAREN NAME expr expr RPAREN
         |   LPAREN LET LPAREN NAME expr RPAREN term RPAREN
         ;
-fla     :   BOOLCONST {++glob;fprintf(fdot, "%d [label=const ordering=\"out\"]\n", glob);$$=glob;};
-        |   NAME {++glob;fprintf(fdot, "%d [label=const ordering=\"out\"]\n", glob);$$=glob;};
+fla     :   BOOLCONST {++glob;fprintf(fdot, "%d [label=\"%s\" ordering=\"out\"]\n", glob, $1);$$=glob;};
+        |   NAME {++glob;fprintf(fdot, "%d [label=\"%s\" ordering=\"out\"]\n", glob $1);$$=glob;};
         |   LPAREN FUNCTION RPAREN
         |   LPAREN COMPARATOR term term RPAREN
         |   LPAREN NOT fla RPAREN
