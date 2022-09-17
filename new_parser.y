@@ -76,7 +76,7 @@ program :   LPAREN DEFINE NAME type expr RPAREN program  {
                 insert(++glob);fprintf(fdot, "%d [label=type ordering=\"out\"]\n%d -> %d\n", glob,glob,$12);                
                 insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,$13);
                 insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
-                insert(prog_pros);
+                insert(prog_pos);
                 insert(++glob);fprintf(fdot, "%d [label=program ordering=\"out\"]\n", glob);
                 while(!isEmpty()){
                         int x = removeData();
@@ -113,7 +113,7 @@ expr    :   term {
                 }
                 };
         |   fla {
-                insert(++glob);fprintf(fdot, "%d [label=fla ordering=\"out\"]\n%d -> %d\n", glob,glob,$1);$$=glob;
+                insert(++glob);fprintf(fdot, "%d [label=fla ordering=\"out\"]\n", glob);$$=glob;
                 while(!isEmpty()){
                         int x = removeData();
                         if(x!=glob){
@@ -122,8 +122,8 @@ expr    :   term {
                 }
                 };
         ;
-term    :   CONST {insert(++glob);fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob, $1);$$=glob;};
-        |   NAME {insert(++glob);fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob, $1);$$=glob;};
+term    :   CONST {++glob;fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob, $1);$$=glob;};
+        |   NAME {++glob;fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob, $1);$$=glob;};
         |   LPAREN FUNCTION RPAREN{
                 insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
                 insert(++glob);fprintf(fdot, "%d [label=\"FUNCTION\" ordering=\"out\"]\n", glob);
@@ -200,8 +200,8 @@ fla     :   BOOLCONST {++glob;fprintf(fdot, "%d [label=const ordering=\"out\"]\n
         |   LPAREN COMPARATOR term term RPAREN{
                 insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
                 insert(++glob);fprintf(fdot, "%d [label=COMPARATOR ordering=\"out\"]\n",glob);
-                insert(++glob);fprintf(fdot, "%d [label=term ordering=\"out\"]\n%d -> %d\n", glob,glob,$3);                             
-                insert(++glob);fprintf(fdot, "%d [label=term ordering=\"out\"]\n%d -> %d\n", glob,glob,$4);                             
+                insert(++glob);fprintf(fdot, "%d [label=term ordering=\"out\"]\n%d -> %d\n", glob,glob,$3);                            
+                insert(++glob);fprintf(fdot, "%d [label=term ordering=\"out\"]\n%d -> %d\n", glob,glob,$4);                            
                 insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);$$=glob;
                 };
         |   LPAREN NOT fla RPAREN{
@@ -261,7 +261,7 @@ fla     :   BOOLCONST {++glob;fprintf(fdot, "%d [label=const ordering=\"out\"]\n
 | CONST {glob ++; printf("const: %s, %d\n", $1, glob); $$ = glob; };
 */
 
-void yyerror(char * s)
+void yyerror(char *s)
 {  
         fprintf (stdout, "%s\n", s);
 }
@@ -272,7 +272,7 @@ int main(int argc, char* argv[])
 
         fdot = fopen("parse_tree.dot", "w+");
         fprintf(fdot, "digraph print {\n");     
-        yyin=fopen("sample.txt","r+");
+        yyin=fopen(argv[1],"r+");
         if(yyin==NULL)
         {
                 return 0;

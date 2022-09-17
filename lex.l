@@ -3,7 +3,7 @@ int count = 1;
 int token = 0;
 int token_not_defined=0;
 #include <stdio.h>
-#include "y.tab.h"
+#include "new_parser.tab.h"
 int yylex();
 int yywrap(){return 1;}
 %}
@@ -11,7 +11,7 @@ int yywrap(){return 1;}
 %%
 ;.* {;}
 [-]?[0-9]+ 	{yylval.str = yytext; return CONST;}
-[<|>|<=|>=|=] 	{yylval.str = yytext; return COMPARATOR;}
+(<|>|<=|>=|=) 	{yylval.str = yytext; return COMPARATOR;}
 \+ 	{return ADDOP;}
 \- 	{return MINOP;}
 \*|mod|div 	{yylval.str = yytext; return MULTOP;}
