@@ -12,7 +12,7 @@
 %union {int val; char* str;}
 %start program
 %token <str> NAME CONST 
-%token <val> COMPARATOR ADDOP MINOP DEFINE GET-INT GET-BOOL AND OR IF LET INTTYPE BOOLTYPE PRINT RPAREN LPAREN NOT MULTOP TRUECONST FALSECONST
+%token <val> COMPARATOR ADDOP MINOP DEFINE GETINT GETBOOL AND OR IF LET INTTYPE BOOLTYPE PRINT RPAREN LPAREN NOT MULTOP TRUECONST FALSECONST
 
 %type <val> program type expr term fla 
 
@@ -46,7 +46,7 @@ program :   LPAREN DEFINE NAME type expr RPAREN program  {
                 insert(++glob);fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n", glob);
                 insert(++glob);fprintf(fdot, "%d [label=type ordering=\"out\"]\n%d -> %d\n", glob,glob,$6);
                 insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=type ordering=\"out\"]\n%d -> %d\n", glob,glob,$8);                
+                insert(++glob);fprintf(fdot, "%d [label=type ordering=\"out\"]\n%d -> %d\n", glob,glob,$8);            
                 insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,$9);removeData();
                 insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
                 insert(prog_pos);
@@ -74,16 +74,17 @@ program :   LPAREN DEFINE NAME type expr RPAREN program  {
                 insert(++glob);fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n", glob);
                 insert(++glob);fprintf(fdot, "%d [label=type ordering=\"out\"]\n%d -> %d\n", glob,glob,$10);
                 insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=type ordering=\"out\"]\n%d -> %d\n", glob,glob,$12);                
+                insert(++glob);fprintf(fdot, "%d [label=type ordering=\"out\"]\n%d -> %d\n", glob,glob,$12);               
                 insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,$13);removeData();
                 insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
                 insert(prog_pos);
                 insert(++glob);fprintf(fdot, "%d [label=program ordering=\"out\"]\n", glob);
-                int x;
-                do{
-                        x = removeData();
-                        fprintf(fdot,"%d -> %d\n",glob,x);
-                }while(x!=$1&&x!=0);
+                while(!isEmpty()){
+                        int x = removeData();
+                        if(x!=glob){
+                                fprintf(fdot,"%d -> %d\n",glob,x);
+                        }
+                }
                 };
         |   LPAREN PRINT expr RPAREN {
                 
@@ -105,7 +106,7 @@ type    :       INTTYPE {++glob;fprintf(fdot, "%d [label=int ordering=\"out\"]\n
         |       BOOLTYPE {++glob;fprintf(fdot, "%d [label=bool ordering=\"out\"]\n", glob);$$=glob;};
         ;
 expr    :   term {
-                insert(++glob);fprintf(fdot, "%d [label=term ordering=\"out\"]\n", glob);$$=glob;
+                insert(++glob);fprintf(fdot, "%d [label=term ordering=\"out\"]%d\n", glob,$1);$$=glob;
                 int x;
                 do{
                         x = removeData();
@@ -123,9 +124,9 @@ expr    :   term {
         ;
 term    :   CONST {insert(++glob);fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob, $1);$$=glob;};
         |   NAME {insert(++glob);fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob,$1);$$=glob;};
-        |   LPAREN GET-INT RPAREN{
+        |   LPAREN GETINT RPAREN{
                 insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=get-int ordering=\"out\"]\n", glob);
+                insert(++glob);fprintf(fdot, "%d [label=get_int ordering=\"out\"]\n", glob);
                 insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);$$=glob;
         };
         |   LPAREN ADDOP term term RPAREN {
@@ -239,7 +240,7 @@ term    :   CONST {insert(++glob);fprintf(fdot, "%d [label=%s ordering=\"out\"]\
 fla     :   TRUECONST {insert(++glob);fprintf(fdot, "%d [label=true ordering=\"out\"]\n", glob,$1);$$=glob;};
         |   FALSECONST {insert(++glob);fprintf(fdot, "%d [label=false ordering=\"out\"]\n", glob,$1);$$=glob;};
         |   NAME {insert(++glob);fprintf(fdot, "%d [label=\"%s\" ordering=\"out\"]\n", glob,$1);$$=glob;};
-        |   LPAREN GET-BOOL RPAREN{
+        |   LPAREN GETBOOL RPAREN{
                 insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
                 insert(++glob);fprintf(fdot, "%d [label=get-bool ordering=\"out\"]\n",glob);
                 insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);$$=glob;

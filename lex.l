@@ -16,8 +16,8 @@ int yywrap(){return 1;}
 \- 	{yylval.str = yytext; return MINOP;}
 \*|mod|div 	{yylval.str = yytext; return MULTOP;}
 define-fun	{yylval.str = yytext; return DEFINE;}
-get-int     {yylval.str = yytext; return GET-INT;}
-get-bool 	{yylval.str = yytext; return GET-BOOL;}
+get-int     {yylval.str = yytext; return GETINT;}
+get-bool 	{yylval.str = yytext; return GETBOOL;}
 true        {yylval.str = yytext; return TRUECONST;}
 false 	{yylval.str = yytext; return FALSECONST;}
 and     {yylval.str = yytext; return AND;}
