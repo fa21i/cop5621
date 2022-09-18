@@ -12,7 +12,8 @@
 %union {int val; char* str;}
 %start program
 %token <str> NAME CONST 
-%token <val> COMPARATOR ADDOP MINOP DEFINE FUNCTION BOOLOP IF LET TYPE PRINT RPAREN LPAREN NOT MULTOP BOOLCONST
+%token <val> COMPARATOR ADDOP MINOP DEFINE GET-INT GET-BOOL AND OR IF LET INTTYPE BOOLTYPE PRINT RPAREN LPAREN NOT MULTOP TRUECONST FALSECONST
+
 %type <val> program type expr term fla 
 
 
@@ -24,7 +25,7 @@ program :   LPAREN DEFINE NAME type expr RPAREN program  {
                 insert(++glob);fprintf(fdot, "%d [label=DEFINE ordering=\"out\"]\n", glob);
                 insert(++glob);fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n", glob);
                 insert(++glob);fprintf(fdot, "%d [label=type ordering=\"out\"]\n%d -> %d\n", glob,glob,$4);
-                insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,$5);
+                insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,$5);removeData();
                 insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
                 insert(prog_pos);
                 insert(++glob);fprintf(fdot, "%d [label=program ordering=\"out\"]\n", glob);
@@ -46,7 +47,7 @@ program :   LPAREN DEFINE NAME type expr RPAREN program  {
                 insert(++glob);fprintf(fdot, "%d [label=type ordering=\"out\"]\n%d -> %d\n", glob,glob,$6);
                 insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
                 insert(++glob);fprintf(fdot, "%d [label=type ordering=\"out\"]\n%d -> %d\n", glob,glob,$8);                
-                insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,$9);
+                insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,$9);removeData();
                 insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
                 insert(prog_pos);
                 insert(++glob);fprintf(fdot, "%d [label=program ordering=\"out\"]\n", glob);
@@ -74,23 +75,22 @@ program :   LPAREN DEFINE NAME type expr RPAREN program  {
                 insert(++glob);fprintf(fdot, "%d [label=type ordering=\"out\"]\n%d -> %d\n", glob,glob,$10);
                 insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
                 insert(++glob);fprintf(fdot, "%d [label=type ordering=\"out\"]\n%d -> %d\n", glob,glob,$12);                
-                insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,$13);
+                insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,$13);removeData();
                 insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
                 insert(prog_pos);
                 insert(++glob);fprintf(fdot, "%d [label=program ordering=\"out\"]\n", glob);
-                while(!isEmpty()){
-                        int x = removeData();
-                        if(x!=glob){
-                                fprintf(fdot,"%d -> %d\n",glob,x);
-                        }
-                }
+                int x;
+                do{
+                        x = removeData();
+                        fprintf(fdot,"%d -> %d\n",glob,x);
+                }while(x!=$1&&x!=0);
                 };
         |   LPAREN PRINT expr RPAREN {
                 
                 $$=glob;
                 insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
                 insert(++glob);fprintf(fdot, "%d [label=PRINT ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,$3);
+                insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,$3);removeData();
                 insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
                 insert(++glob);fprintf(fdot, "%d [label=program ordering=\"out\"]\n", glob);
                 while(!isEmpty()){
@@ -101,32 +101,31 @@ program :   LPAREN DEFINE NAME type expr RPAREN program  {
                 }
                 };
         ;
-type    :   TYPE {++glob;fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob,$1);$$=glob;};
+type    :       INTTYPE {++glob;fprintf(fdot, "%d [label=int ordering=\"out\"]\n", glob);$$=glob;};
+        |       BOOLTYPE {++glob;fprintf(fdot, "%d [label=bool ordering=\"out\"]\n", glob);$$=glob;};
         ;
 expr    :   term {
                 insert(++glob);fprintf(fdot, "%d [label=term ordering=\"out\"]\n", glob);$$=glob;
-                while(!isEmpty()){
-                        int x = removeData();
-                        if(x!=glob){
-                                fprintf(fdot,"%d -> %d\n",glob,x);
-                        }
-                }
+                int x;
+                do{
+                        x = removeData();
+                        fprintf(fdot,"%d -> %d\n",glob,x);
+                }while(x!=$1&&x!=0);
                 };
         |   fla {
-                insert(++glob);fprintf(fdot, "%d [label=fla ordering=\"out\"]\n", glob);$$=glob;
-                while(!isEmpty()){
-                        int x = removeData();
-                        if(x!=glob){
-                                fprintf(fdot,"%d -> %d\n",glob,x);
-                        }
-                }
+                insert(++glob);fprintf(fdot, "%d [label=fla2 ordering=\"out\"]%d\n", glob,$1);$$=glob;
+                int x;
+                do{
+                        x = removeData();
+                        fprintf(fdot,"%d -> %d\n",glob,x);
+                }while(x!=$1&&x!=0);
                 };
         ;
 term    :   CONST {insert(++glob);fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob, $1);$$=glob;};
         |   NAME {insert(++glob);fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob,$1);$$=glob;};
-        |   LPAREN FUNCTION RPAREN{
+        |   LPAREN GET-INT RPAREN{
                 insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=\"FUNCTION\" ordering=\"out\"]\n", glob);
+                insert(++glob);fprintf(fdot, "%d [label=get-int ordering=\"out\"]\n", glob);
                 insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);$$=glob;
         };
         |   LPAREN ADDOP term term RPAREN {
@@ -137,12 +136,12 @@ term    :   CONST {insert(++glob);fprintf(fdot, "%d [label=%s ordering=\"out\"]\
                 do{
                         x = removeData();
                         fprintf(fdot,"%d -> %d\n",glob,x);
-                }while(x!=$3);
+                }while(x!=$3&&x!=0);
                 insert(++glob);fprintf(fdot, "%d [label=term ordering=\"out\"]%d\n", glob,$4);
                 do{
                         x = removeData();
                         fprintf(fdot,"%d -> %d\n",glob,x);
-                }while(x!=$4);
+                }while(x!=$4&&x!=0);
                 insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);$$=glob;
                 };
         |   LPAREN MINOP term term RPAREN {
@@ -153,12 +152,12 @@ term    :   CONST {insert(++glob);fprintf(fdot, "%d [label=%s ordering=\"out\"]\
                 do{
                         x = removeData();
                         fprintf(fdot,"%d -> %d\n",glob,x);
-                }while(x!=$3);
+                }while(x!=$3&&x!=0);
                 insert(++glob);fprintf(fdot, "%d [label=term ordering=\"out\"]%d\n", glob,$4);
                 do{
                         x = removeData();
                         fprintf(fdot,"%d -> %d\n",glob,x);
-                }while(x!=$4);
+                }while(x!=$4&&x!=0);
                 insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);$$=glob;
                 };
         |   LPAREN MULTOP term term RPAREN {
@@ -170,12 +169,12 @@ term    :   CONST {insert(++glob);fprintf(fdot, "%d [label=%s ordering=\"out\"]\
                 do{
                         x = removeData();
                         fprintf(fdot,"%d -> %d\n",glob,x);
-                }while(x!=$3);
+                }while(x!=$3&&x!=0);
                 insert(++glob);fprintf(fdot, "%d [label=term ordering=\"out\"]%d\n", glob,$4);
                 do{
                         x = removeData();
                         fprintf(fdot,"%d -> %d\n",glob,x);
-                }while(x!=$4);
+                }while(x!=$4&&x!=0);
                 insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
                 };
         |   LPAREN IF fla term term RPAREN{
@@ -208,15 +207,15 @@ term    :   CONST {insert(++glob);fprintf(fdot, "%d [label=%s ordering=\"out\"]\
         |   LPAREN NAME expr RPAREN{
                 insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
                 insert(++glob);fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n",glob);
-                insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,$3);                
+                insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,$3);removeData();  
                 insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);$$=glob;
                 
                 };
         |   LPAREN NAME expr expr RPAREN{
                 insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
                 insert(++glob);fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n",glob);
-                insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,$3);   
-                insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,$4);                             
+                insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,$3);removeData();   
+                insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,$4);removeData();                             
                 insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);$$=glob;
                 
                 };
@@ -225,18 +224,24 @@ term    :   CONST {insert(++glob);fprintf(fdot, "%d [label=%s ordering=\"out\"]\
                 insert(++glob);fprintf(fdot, "%d [label=LET ordering=\"out\"]\n", glob);
                 insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
                 insert(++glob);fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n",glob);
-                insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,$5);
+                insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,$5);removeData();
                 insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);$$=glob;   
-                insert(++glob);fprintf(fdot, "%d [label=term ordering=\"out\"]\n%d -> %d\n", glob,glob,$7);                             
+                insert(++glob);fprintf(fdot, "%d [label=term1 ordering=\"out\"]\n", glob,glob,$7);
+                int x;
+                do{
+                        x = removeData();
+                        fprintf(fdot,"%d -> %d\n",glob,x);
+                }while(x!=$7&&x!=0);                      
                 insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);$$=glob;
                 
                 };
         ;
-fla     :   BOOLCONST {insert(++glob);fprintf(fdot, "%d [label=truefalse ordering=\"out\"]\n", glob);$$=glob;};
-        |   NAME {insert(++glob);fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n", glob);$$=glob;};
-        |   LPAREN FUNCTION RPAREN{
+fla     :   TRUECONST {insert(++glob);fprintf(fdot, "%d [label=true ordering=\"out\"]\n", glob,$1);$$=glob;};
+        |   FALSECONST {insert(++glob);fprintf(fdot, "%d [label=false ordering=\"out\"]\n", glob,$1);$$=glob;};
+        |   NAME {insert(++glob);fprintf(fdot, "%d [label=\"%s\" ordering=\"out\"]\n", glob,$1);$$=glob;};
+        |   LPAREN GET-BOOL RPAREN{
                 insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=FUNCTION ordering=\"out\"]\n",glob);
+                insert(++glob);fprintf(fdot, "%d [label=get-bool ordering=\"out\"]\n",glob);
                 insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);$$=glob;
                 };
         |   LPAREN COMPARATOR term term RPAREN{
@@ -266,28 +271,53 @@ fla     :   BOOLCONST {insert(++glob);fprintf(fdot, "%d [label=truefalse orderin
                 }while(x!=$3&&x!=0);                             
                 insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);$$=glob;
                 };
-        |   LPAREN BOOLOP term term RPAREN{
+        |   LPAREN AND fla fla RPAREN{
                 insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=BOOLOP ordering=\"out\"]\n",glob);
-                insert(++glob);fprintf(fdot, "%d [label=term ordering=\"out\"]\n%d -> %d\n", glob,glob,$3);
-                insert(++glob);fprintf(fdot, "%d [label=term ordering=\"out\"]\n%d -> %d\n", glob,glob,$4);                            
-                insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);$$=glob;
-        };
-        |   LPAREN IF fla fla fla RPAREN{
-                insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=IF ordering=\"out\"]\n",glob);
-                insert(++glob);fprintf(fdot, "%d [label=fla ordering=\"out\"]%d\n", glob,$3);
+                insert(++glob);fprintf(fdot, "%d [label=and ordering=\"out\"]\n",glob);
+                insert(++glob);fprintf(fdot, "%d [label=fla ordering=\"out\"]\n", glob);
                 int x;
                 do{
                         x = removeData();
                         fprintf(fdot,"%d -> %d\n",glob,x);
                 }while(x!=$3&&x!=0);
-                insert(++glob);fprintf(fdot, "%d [label=fla ordering=\"out\"]%d\n", glob,$4); 
+                insert(++glob);fprintf(fdot, "%d [label=fla ordering=\"out\"]\n", glob); 
+                do{
+                        x = removeData();
+                        fprintf(fdot,"%d -> %d\n",glob,x);
+                }while(x!=$4&&x!=0);                           
+                insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);$$=glob;
+        };
+        |   LPAREN OR fla fla RPAREN{
+                insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
+                insert(++glob);fprintf(fdot, "%d [label=or ordering=\"out\"]\n",glob);
+                insert(++glob);fprintf(fdot, "%d [label=fla ordering=\"out\"]\n", glob);
+                int x;
+                do{
+                        x = removeData();
+                        fprintf(fdot,"%d -> %d\n",glob,x);
+                }while(x!=$3&&x!=0);
+                insert(++glob);fprintf(fdot, "%d [label=fla ordering=\"out\"]\n", glob); 
+                do{
+                        x = removeData();
+                        fprintf(fdot,"%d -> %d\n",glob,x);
+                }while(x!=$4&&x!=0);                           
+                insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);$$=glob;
+        };
+        |   LPAREN IF fla fla fla RPAREN{
+                insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
+                insert(++glob);fprintf(fdot, "%d [label=IF ordering=\"out\"]\n",glob);
+                insert(++glob);fprintf(fdot, "%d [label=fla1 ordering=\"out\"]%d\n", glob,$3);
+                int x;
+                do{
+                        x = removeData();
+                        fprintf(fdot,"%d -> %d\n",glob,x);
+                }while(x!=$3&&x!=0);
+                insert(++glob);fprintf(fdot, "%d [label=fla1 ordering=\"out\"]%d\n", glob,$4); 
                 do{
                         x = removeData();
                         fprintf(fdot,"%d -> %d\n",glob,x);
                 }while(x!=$4&&x!=0);   
-                insert(++glob);fprintf(fdot, "%d [label=fla ordering=\"out\"]%d\n", glob,$5); 
+                insert(++glob);fprintf(fdot, "%d [label=fla1 ordering=\"out\"]%d\n", glob,$5); 
                 do{
                         x = removeData();
                         fprintf(fdot,"%d -> %d\n",glob,x);
@@ -303,14 +333,14 @@ fla     :   BOOLCONST {insert(++glob);fprintf(fdot, "%d [label=truefalse orderin
         |   LPAREN NAME expr RPAREN{
                 insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
                 insert(++glob);fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n",glob);
-                insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,$3);
+                insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,$3);removeData();
                 insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);$$=glob;
                 }
         |   LPAREN NAME expr expr RPAREN{
                 insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
                 insert(++glob);fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n",glob);
-                insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,$3);
-                insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,$4);
+                insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,$3);removeData();
+                insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,$4);removeData();
                 insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);$$=glob;
                 };
         |   LPAREN LET LPAREN NAME expr RPAREN fla RPAREN{
@@ -318,9 +348,14 @@ fla     :   BOOLCONST {insert(++glob);fprintf(fdot, "%d [label=truefalse orderin
                 insert(++glob);fprintf(fdot, "%d [label=LET ordering=\"out\"]\n", glob);
                 insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
                 insert(++glob);fprintf(fdot, "%d [label=\"NAME\" ordering=\"out\"]\n",glob);
-                insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,$5);
+                insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,$5);removeData();
                 insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);$$=glob;    
-                insert(++glob);fprintf(fdot, "%d [label=fla ordering=\"out\"]\n%d -> %d\n", glob,glob,$7);                                    
+                insert(++glob);fprintf(fdot, "%d [label=fla ordering=\"out\"]\n%d -> %d\n", glob,glob,$7);
+                int x; 
+                do{
+                        x = removeData();
+                        fprintf(fdot,"%d -> %d\n",glob,x);
+                }while(x!=$7&&x!=0);                                     
                 insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);$$=glob;
                 };
         ;
