@@ -101,7 +101,7 @@ program :   LPAREN DEFINE NAME type expr RPAREN program  {
                 }
                 };
         ;
-type    :   TYPE {++glob;fprintf(fdot, "%d [label=TYPE ordering=\"out\"]\n", glob);$$=glob;};
+type    :   TYPE {++glob;fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob,$1);$$=glob;};
         ;
 expr    :   term {
                 insert(++glob);fprintf(fdot, "%d [label=term ordering=\"out\"]\n", glob);$$=glob;
@@ -123,7 +123,7 @@ expr    :   term {
                 };
         ;
 term    :   CONST {insert(++glob);fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob, $1);$$=glob;};
-        |   NAME {insert(++glob);fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n", glob);$$=glob;};
+        |   NAME {insert(++glob);fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob,$1);$$=glob;};
         |   LPAREN FUNCTION RPAREN{
                 insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
                 insert(++glob);fprintf(fdot, "%d [label=\"FUNCTION\" ordering=\"out\"]\n", glob);
