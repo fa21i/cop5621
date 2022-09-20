@@ -3,7 +3,7 @@ int count = 1;
 int token = 0;
 int token_not_defined=0;
 #include <stdio.h>
-#include "new_parser.tab.h"
+#include "y.tab.h"
 int yylex();
 int yywrap(){return 1;}
 %}

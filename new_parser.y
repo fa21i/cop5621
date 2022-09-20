@@ -8,7 +8,6 @@
 	void yyerror(char *s);
         int glob = 0;
         int arr[50];
-        //extern FILE *yyin;
 %}
 
 %union {int val; char* str;}
@@ -198,7 +197,6 @@ fla     :   BOOLCONST   {glob++; fprintf(fdot, "%d [label=%s ordering=\"out\"]\n
 /*arg : ID {glob ++; printf("id: %s, %d\n", $1, glob); $$ = glob; }
 | CONST {glob ++; printf("const: %s, %d\n", $1, glob); $$ = glob; };
 */
-#include "lex.yy.c"
 
 void yyerror(char * s)
 {  
@@ -212,15 +210,6 @@ int main(int argc, char* argv[])
         fdot = fopen("parse_tree.dot", "w+");
         fprintf(fdot, "digraph print {\n");     
         yyparse();
-        /*yyin=fopen("sample.txt","r+");
-        if(yyin==NULL)
-        {
-                return 0;
-        }
-        else 
-        {
-                yyparse();
-        }*/
         fprintf(fdot, "}\n");
         fclose(fdot); 
         return 0;
