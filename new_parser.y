@@ -6,7 +6,6 @@
 	void yyerror(char *s);
         int glob = 0;
         int arr[50];
-        //extern FILE *yyin;
 %}
 
 %union {int val; char* str;}
@@ -111,7 +110,7 @@ program :   LPAREN DEFINE NAME type expr RPAREN program    {glob+=5; fprintf(fdo
 type    :   TYPE        {glob++; fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob-1, $1); $$ = glob;
                                 fprintf(fdot, "%d -> %d\n", $$, glob-1);} 
         ;
-expr    :   term        {glob++;fprintf(fdot, "%d [label=term ordering=\"out\"]\n", $1); $$ = glob;
+expr    :   term        {glob++; fprintf(fdot, "%d [label=term ordering=\"out\"]\n", $1); $$ = glob;
                         fprintf(fdot, "%d -> %d\n", $$, $1);}
         |   fla         {glob++; fprintf(fdot, "%d [label=term ordering=\"out\"]\n", $1); $$ = glob;}
         ;
