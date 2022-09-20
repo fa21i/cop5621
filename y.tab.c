@@ -119,7 +119,6 @@
 	void yyerror(char *s);
         int glob = 0;
         int arr[50];
-        //extern FILE *yyin;
 
 
 /* Enabling traces.  */
@@ -142,10 +141,10 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 12 "new_parser.y"
+#line 11 "new_parser.y"
 {int val; char* str;}
 /* Line 193 of yacc.c.  */
-#line 149 "y.tab.c"
+#line 148 "y.tab.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -158,7 +157,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 162 "y.tab.c"
+#line 161 "y.tab.c"
 
 #ifdef short
 # undef short
@@ -460,10 +459,10 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    20,    20,    35,    63,   100,   111,   114,   116,   118,
-     120,   122,   129,   140,   151,   162,   173,   174,   175,   176,
-     177,   179,   181,   183,   184,   185,   186,   187,   188,   189,
-     190,   191
+       0,    19,    19,    34,    62,    99,   110,   113,   115,   117,
+     119,   121,   128,   139,   150,   161,   172,   173,   174,   175,
+     176,   178,   180,   182,   183,   184,   185,   186,   187,   188,
+     189,   190
 };
 #endif
 
@@ -1436,7 +1435,7 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 20 "new_parser.y"
+#line 19 "new_parser.y"
     {glob+=5; fprintf(fdot, "%d [label=program ordering=\"out\"]\n", glob);
                                                         fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob-4);
                                                         fprintf(fdot, "%d [label=\"define-fun\" ordering=\"out\"]\n", glob-3);
@@ -1455,7 +1454,7 @@ yyreduce:
     break;
 
   case 3:
-#line 35 "new_parser.y"
+#line 34 "new_parser.y"
     {glob += 12; 
                                                                                         fprintf(fdot, "%d [label=program ordering=\"out\"]\n", glob); 
                                                                                         fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob-11);
@@ -1487,7 +1486,7 @@ yyreduce:
     break;
 
   case 4:
-#line 63 "new_parser.y"
+#line 62 "new_parser.y"
     {glob+=16;
                                                                                                 fprintf(fdot, "%d [label=program ordering=\"out\"]\n", glob);
                                                                                                 fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob-15);
@@ -1528,7 +1527,7 @@ yyreduce:
     break;
 
   case 5:
-#line 100 "new_parser.y"
+#line 99 "new_parser.y"
     {glob+=4; 
                                                 fprintf(fdot, "%d [label=program ordering=\"out\"]\n", glob);
                                                 fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob-3);
@@ -1542,36 +1541,36 @@ yyreduce:
     break;
 
   case 6:
-#line 111 "new_parser.y"
+#line 110 "new_parser.y"
     {glob++; fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob-1, (yyvsp[(1) - (1)].str)); (yyval.val) = glob;
                                 fprintf(fdot, "%d -> %d\n", (yyval.val), glob-1);}
     break;
 
   case 7:
-#line 114 "new_parser.y"
-    {glob++;fprintf(fdot, "%d [label=term ordering=\"out\"]\n", (yyvsp[(1) - (1)].val)); (yyval.val) = glob;
-                        fprintf(fdot, "%d -> %d\n", (yyval.val), (yyvsp[(1) - (1)].val));}
+#line 113 "new_parser.y"
+    {glob++; fprintf(fdot, "%d [label=term ordering=\"out\"]\n", (yyvsp[(1) - (1)].val)); (yyval.val) = glob;
+                                fprintf(fdot, "%d -> %d\n", (yyval.val), (yyvsp[(1) - (1)].val));}
     break;
 
   case 8:
-#line 116 "new_parser.y"
-    {fprintf(fdot, "%d [label=term ordering=\"out\"]\n", (yyvsp[(1) - (1)].val)); (yyval.val) = glob;}
+#line 115 "new_parser.y"
+    {glob++; fprintf(fdot, "%d [label=term ordering=\"out\"]\n", (yyvsp[(1) - (1)].val)); (yyval.val) = glob;}
     break;
 
   case 9:
-#line 118 "new_parser.y"
+#line 117 "new_parser.y"
     {glob++; fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob-1, (yyvsp[(1) - (1)].str)); (yyval.val) = glob;
                                 fprintf(fdot, "%d -> %d\n", (yyval.val), glob-1);}
     break;
 
   case 10:
-#line 120 "new_parser.y"
+#line 119 "new_parser.y"
     {glob++; fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob, (yyvsp[(1) - (1)].str)); (yyval.val) = glob;
                                 fprintf(fdot, "%d -> %d\n", (yyval.val), glob-1);}
     break;
 
   case 11:
-#line 122 "new_parser.y"
+#line 121 "new_parser.y"
     {glob+=3;
                                                 fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob-2); 
                                                 fprintf(fdot, "%d [label=\"%s\" ordering=\"out\"]\n", glob-1, strtok((yyvsp[(2) - (3)].str), " )"));
@@ -1582,7 +1581,7 @@ yyreduce:
     break;
 
   case 12:
-#line 129 "new_parser.y"
+#line 128 "new_parser.y"
     {glob+=5;
                                                         fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob-4); 
                                                         fprintf(fdot, "%d [label=\"+\" ordering=\"out\"]\n", glob-3); 
@@ -1597,20 +1596,20 @@ yyreduce:
     break;
 
   case 21:
-#line 179 "new_parser.y"
+#line 178 "new_parser.y"
     {glob++; fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob, (yyvsp[(1) - (1)].str)); (yyval.val) = glob;
                                 fprintf(fdot, "%d -> %d\n", (yyval.val)+1, glob);}
     break;
 
   case 22:
-#line 181 "new_parser.y"
+#line 180 "new_parser.y"
     {glob++; fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob, (yyvsp[(1) - (1)].str)); (yyval.val) = glob;
                                 fprintf(fdot, "%d -> %d\n", (yyval.val)+1, glob);}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1614 "y.tab.c"
+#line 1613 "y.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1824,7 +1823,7 @@ yyreturn:
 }
 
 
-#line 193 "new_parser.y"
+#line 192 "new_parser.y"
 
 
 /*arg : ID {glob ++; printf("id: %s, %d\n", $1, glob); $$ = glob; }

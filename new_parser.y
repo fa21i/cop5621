@@ -111,7 +111,7 @@ type    :   TYPE        {glob++; fprintf(fdot, "%d [label=%s ordering=\"out\"]\n
                                 fprintf(fdot, "%d -> %d\n", $$, glob-1);} 
         ;
 expr    :   term        {glob++; fprintf(fdot, "%d [label=term ordering=\"out\"]\n", $1); $$ = glob;
-                        fprintf(fdot, "%d -> %d\n", $$, $1);}
+                                fprintf(fdot, "%d -> %d\n", $$, $1);}
         |   fla         {glob++; fprintf(fdot, "%d [label=term ordering=\"out\"]\n", $1); $$ = glob;}
         ;
 term    :   CONST       {glob++; fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob-1, $1); $$ = glob;
