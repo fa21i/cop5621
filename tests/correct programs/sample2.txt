@@ -1,1 +1,1 @@
-(print (+ 1 2))
+(define-fun v1 int 1) (print 2)

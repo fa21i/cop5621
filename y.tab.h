@@ -39,43 +39,45 @@
    /* Put the tokens into the symbol table, so that GDB and other debuggers
       know about them.  */
    enum yytokentype {
-     NAME = 258,
-     CONST = 259,
-     BOOLCONST = 260,
-     MULTOP = 261,
-     COMPARATOR = 262,
-     ADDOP = 263,
-     MINOP = 264,
-     DEFINE = 265,
-     FUNCTION = 266,
-     BOOLOP = 267,
-     IF = 268,
-     LET = 269,
-     TYPE = 270,
-     PRINT = 271,
-     RPAREN = 272,
-     LPAREN = 273,
-     NOT = 274
+     CONST = 258,
+     NAME = 259,
+     TYPE = 260,
+     BOOLCONST = 261,
+     RPAREN = 262,
+     FUNCTION = 263,
+     COMPARATOR = 264,
+     MULTOP = 265,
+     DIVOP = 266,
+     ADDOP = 267,
+     MINOP = 268,
+     DEFINE = 269,
+     BOOLOP = 270,
+     IF = 271,
+     LET = 272,
+     PRINT = 273,
+     NOT = 274,
+     LPAREN = 275
    };
 #endif
 /* Tokens.  */
-#define NAME 258
-#define CONST 259
-#define BOOLCONST 260
-#define MULTOP 261
-#define COMPARATOR 262
-#define ADDOP 263
-#define MINOP 264
-#define DEFINE 265
-#define FUNCTION 266
-#define BOOLOP 267
-#define IF 268
-#define LET 269
-#define TYPE 270
-#define PRINT 271
-#define RPAREN 272
-#define LPAREN 273
+#define CONST 258
+#define NAME 259
+#define TYPE 260
+#define BOOLCONST 261
+#define RPAREN 262
+#define FUNCTION 263
+#define COMPARATOR 264
+#define MULTOP 265
+#define DIVOP 266
+#define ADDOP 267
+#define MINOP 268
+#define DEFINE 269
+#define BOOLOP 270
+#define IF 271
+#define LET 272
+#define PRINT 273
 #define NOT 274
+#define LPAREN 275
 
 
 
@@ -85,7 +87,7 @@ typedef union YYSTYPE
 #line 12 "new_parser.y"
 {int val; char* str;}
 /* Line 1529 of yacc.c.  */
-#line 89 "y.tab.h"
+#line 91 "y.tab.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

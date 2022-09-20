@@ -1,6 +1,1 @@
-<<<<<<< HEAD
-(print (+ 1 2))
-=======
-(print
-(+ 5 bla))
->>>>>>> main
+(print 1)

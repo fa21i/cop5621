@@ -66,43 +66,45 @@
    /* Put the tokens into the symbol table, so that GDB and other debuggers
       know about them.  */
    enum yytokentype {
-     NAME = 258,
-     CONST = 259,
-     BOOLCONST = 260,
-     MULTOP = 261,
-     COMPARATOR = 262,
-     ADDOP = 263,
-     MINOP = 264,
-     DEFINE = 265,
-     FUNCTION = 266,
-     BOOLOP = 267,
-     IF = 268,
-     LET = 269,
-     TYPE = 270,
-     PRINT = 271,
-     RPAREN = 272,
-     LPAREN = 273,
-     NOT = 274
+     CONST = 258,
+     NAME = 259,
+     TYPE = 260,
+     BOOLCONST = 261,
+     RPAREN = 262,
+     FUNCTION = 263,
+     COMPARATOR = 264,
+     MULTOP = 265,
+     DIVOP = 266,
+     ADDOP = 267,
+     MINOP = 268,
+     DEFINE = 269,
+     BOOLOP = 270,
+     IF = 271,
+     LET = 272,
+     PRINT = 273,
+     NOT = 274,
+     LPAREN = 275
    };
 #endif
 /* Tokens.  */
-#define NAME 258
-#define CONST 259
-#define BOOLCONST 260
-#define MULTOP 261
-#define COMPARATOR 262
-#define ADDOP 263
-#define MINOP 264
-#define DEFINE 265
-#define FUNCTION 266
-#define BOOLOP 267
-#define IF 268
-#define LET 269
-#define TYPE 270
-#define PRINT 271
-#define RPAREN 272
-#define LPAREN 273
+#define CONST 258
+#define NAME 259
+#define TYPE 260
+#define BOOLCONST 261
+#define RPAREN 262
+#define FUNCTION 263
+#define COMPARATOR 264
+#define MULTOP 265
+#define DIVOP 266
+#define ADDOP 267
+#define MINOP 268
+#define DEFINE 269
+#define BOOLOP 270
+#define IF 271
+#define LET 272
+#define PRINT 273
 #define NOT 274
+#define LPAREN 275
 
 
 
@@ -111,7 +113,7 @@
 #line 1 "new_parser.y"
 
         #include <stdio.h>
-        #include "queue.c"
+        #include <string.h>
         int yylex();
         FILE *fdot;
 	void yyerror(char *s);
@@ -143,7 +145,7 @@ typedef union YYSTYPE
 #line 12 "new_parser.y"
 {int val; char* str;}
 /* Line 193 of yacc.c.  */
-#line 147 "y.tab.c"
+#line 149 "y.tab.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -156,7 +158,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 160 "y.tab.c"
+#line 162 "y.tab.c"
 
 #ifdef short
 # undef short
@@ -371,20 +373,20 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  5
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   162
+#define YYLAST   155
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  20
+#define YYNTOKENS  21
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  6
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  30
+#define YYNRULES  31
 /* YYNRULES -- Number of states.  */
-#define YYNSTATES  118
+#define YYNSTATES  122
 
 /* YYTRANSLATE(YYLEX) -- Bison symbol number corresponding to YYLEX.  */
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   274
+#define YYMAXUTOK   275
 
 #define YYTRANSLATE(YYX)						\
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
@@ -419,7 +421,7 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
-      15,    16,    17,    18,    19
+      15,    16,    17,    18,    19,    20
 };
 
 #if YYDEBUG
@@ -428,40 +430,40 @@ static const yytype_uint8 yytranslate[] =
 static const yytype_uint8 yyprhs[] =
 {
        0,     0,     3,    11,    23,    39,    44,    46,    48,    50,
-      52,    54,    58,    64,    70,    76,    83,    87,    92,    98,
-     107,   109,   111,   115,   121,   126,   132,   139,   143,   148,
-     154
+      52,    54,    58,    64,    70,    76,    82,    89,    93,    98,
+     104,   113,   115,   117,   121,   127,   132,   138,   145,   149,
+     154,   160
 };
 
 /* YYRHS -- A `-1'-separated list of the rules' RHS.  */
 static const yytype_int8 yyrhs[] =
 {
-      21,     0,    -1,    18,    10,     3,    22,    23,    17,    21,
-      -1,    18,    10,     3,    18,     3,    22,    17,    22,    23,
-      17,    21,    -1,    18,    10,     3,    18,     3,    22,    17,
-      18,     3,    22,    17,    22,    23,    17,    21,    -1,    18,
-      16,    23,    17,    -1,    15,    -1,    24,    -1,    25,    -1,
-       4,    -1,     3,    -1,    18,    11,    17,    -1,    18,     8,
-      24,    24,    17,    -1,    18,     9,    24,    24,    17,    -1,
-      18,     6,    24,    24,    17,    -1,    18,    13,    25,    24,
-      24,    17,    -1,    18,     3,    17,    -1,    18,     3,    23,
-      17,    -1,    18,     3,    23,    23,    17,    -1,    18,    14,
-      18,     3,    23,    17,    24,    17,    -1,     5,    -1,     3,
-      -1,    18,    11,    17,    -1,    18,     7,    24,    24,    17,
-      -1,    18,    19,    25,    17,    -1,    18,    12,    24,    24,
-      17,    -1,    18,    13,    25,    25,    25,    17,    -1,    18,
-       3,    17,    -1,    18,     3,    23,    17,    -1,    18,     3,
-      23,    23,    17,    -1,    18,    14,    18,     3,    23,    17,
-      25,    17,    -1
+      22,     0,    -1,    20,    14,     4,    23,    24,     7,    22,
+      -1,    20,    14,     4,    20,     4,    23,     7,    23,    24,
+       7,    22,    -1,    20,    14,     4,    20,     4,    23,     7,
+      20,     4,    23,     7,    23,    24,     7,    22,    -1,    20,
+      18,    24,     7,    -1,     5,    -1,    25,    -1,    26,    -1,
+       3,    -1,     4,    -1,    20,     8,     7,    -1,    20,    12,
+      25,    25,     7,    -1,    20,    13,    25,    25,     7,    -1,
+      20,    10,    25,    25,     7,    -1,    20,    11,    25,    25,
+       7,    -1,    20,    16,    26,    25,    25,     7,    -1,    20,
+       4,     7,    -1,    20,     4,    24,     7,    -1,    20,     4,
+      24,    24,     7,    -1,    20,    17,    20,     4,    24,     7,
+      25,     7,    -1,     6,    -1,     4,    -1,    20,     8,     7,
+      -1,    20,     9,    25,    25,     7,    -1,    20,    19,    26,
+       7,    -1,    20,    15,    25,    25,     7,    -1,    20,    16,
+      26,    26,    26,     7,    -1,    20,     4,     7,    -1,    20,
+       4,    24,     7,    -1,    20,     4,    24,    24,     7,    -1,
+      20,    17,    20,     4,    24,     7,    26,     7,    -1
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    20,    20,    36,    57,    82,    98,   100,   109,   119,
-     120,   121,   126,   133,   140,   147,   155,   160,   167,   175,
-     187,   188,   189,   194,   201,   207,   214,   223,   228,   234,
-     241
+       0,    20,    20,    35,    63,   100,   111,   114,   116,   118,
+     120,   122,   129,   140,   151,   162,   173,   174,   175,   176,
+     177,   179,   181,   183,   184,   185,   186,   187,   188,   189,
+     190,   191
 };
 #endif
 
@@ -470,10 +472,10 @@ static const yytype_uint8 yyrline[] =
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
 {
-  "$end", "error", "$undefined", "NAME", "CONST", "BOOLCONST", "MULTOP",
-  "COMPARATOR", "ADDOP", "MINOP", "DEFINE", "FUNCTION", "BOOLOP", "IF",
-  "LET", "TYPE", "PRINT", "RPAREN", "LPAREN", "NOT", "$accept", "program",
-  "type", "expr", "term", "fla", 0
+  "$end", "error", "$undefined", "CONST", "NAME", "TYPE", "BOOLCONST",
+  "RPAREN", "FUNCTION", "COMPARATOR", "MULTOP", "DIVOP", "ADDOP", "MINOP",
+  "DEFINE", "BOOLOP", "IF", "LET", "PRINT", "NOT", "LPAREN", "$accept",
+  "program", "type", "expr", "term", "fla", 0
 };
 #endif
 
@@ -483,26 +485,27 @@ static const char *const yytname[] =
 static const yytype_uint16 yytoknum[] =
 {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
-     265,   266,   267,   268,   269,   270,   271,   272,   273,   274
+     265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
+     275
 };
 # endif
 
 /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    20,    21,    21,    21,    21,    22,    23,    23,    24,
-      24,    24,    24,    24,    24,    24,    24,    24,    24,    24,
+       0,    21,    22,    22,    22,    22,    23,    24,    24,    25,
       25,    25,    25,    25,    25,    25,    25,    25,    25,    25,
-      25
+      25,    26,    26,    26,    26,    26,    26,    26,    26,    26,
+      26,    26
 };
 
 /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
        0,     2,     7,    11,    15,     4,     1,     1,     1,     1,
-       1,     3,     5,     5,     5,     6,     3,     4,     5,     8,
-       1,     1,     3,     5,     4,     5,     6,     3,     4,     5,
-       8
+       1,     3,     5,     5,     5,     5,     6,     3,     4,     5,
+       8,     1,     1,     3,     5,     4,     5,     6,     3,     4,
+       5,     8
 };
 
 /* YYDEFACT[STATE-NAME] -- Default rule to reduce with in state
@@ -510,18 +513,19 @@ static const yytype_uint8 yyr2[] =
    means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       0,     0,     0,     0,     0,     1,     0,    10,     9,    20,
+       0,     0,     0,     0,     0,     1,     0,     9,    10,    21,
        0,     0,     7,     8,     6,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     5,     0,     0,
-      16,     0,    10,     0,     0,     0,     0,     0,    11,     0,
-      21,     0,     0,     0,     0,     0,     0,    17,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     5,     0,
+       0,    17,     0,    11,    10,     0,     0,     0,     0,     0,
+       0,     0,    22,     0,     0,     0,     0,     0,     0,    18,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,    24,     0,     2,    18,    16,
-       0,    11,     0,     0,    14,    23,    12,    13,    25,    27,
-       0,    22,     0,     0,     0,     0,     0,     0,     0,    17,
-       0,     0,    28,     0,     0,    15,    26,     0,     0,     0,
-      18,     0,    29,     0,     0,     0,     0,     0,     0,     0,
-      19,    30,     0,     3,     0,     0,     0,     4
+       0,     0,     0,     0,     0,     0,     0,     0,    25,     0,
+       2,    19,    17,     0,    11,     0,     0,    24,    14,    15,
+      12,    13,    26,    28,     0,    23,     0,     0,     0,     0,
+       0,     0,     0,    18,     0,     0,    29,     0,     0,    16,
+      27,     0,     0,     0,    19,     0,    30,     0,     0,     0,
+       0,     0,     0,     0,    20,    31,     0,     3,     0,     0,
+       0,     4
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
@@ -532,27 +536,28 @@ static const yytype_int8 yydefgoto[] =
 
 /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
    STATE-NUM.  */
-#define YYPACT_NINF -34
+#define YYPACT_NINF -41
 static const yytype_int16 yypact[] =
 {
-      -8,    40,     2,    15,    48,   -34,    43,   -34,   -34,   -34,
-      96,     6,   -34,   -34,   -34,    27,    48,   108,     8,     8,
-       8,     8,    14,     8,    11,    17,    11,   -34,    26,    23,
-     -34,   113,   -34,   148,     8,     8,     8,     8,   -34,     8,
-     -34,    25,    48,    42,    32,    46,    -8,   -34,    50,   116,
-      51,    11,    52,    54,    56,    59,    60,    62,   119,    64,
-      11,    66,     8,    11,    48,   -34,    44,   -34,   -34,   -34,
-     124,   -34,     8,    57,   -34,   -34,   -34,   -34,   -34,   -34,
-     135,   -34,    11,    82,    69,    71,    72,    87,    48,   -34,
-      74,    48,   -34,    77,    48,   -34,   -34,    48,    26,    78,
-     -34,    79,   -34,    80,    83,    89,    97,    -8,     8,    11,
-     -34,   -34,    26,   -34,    48,   115,    -8,   -34
+     -11,    18,    12,    29,    90,   -41,    54,   -41,   -41,   -41,
+     107,    27,   -41,   -41,   -41,    49,    90,    11,    48,    66,
+      66,    66,    66,    66,    66,    94,    36,    94,   -41,    62,
+      56,   -41,    22,   -41,   -41,   131,    66,    66,    66,    66,
+      66,    66,   -41,   121,    90,    69,    68,    70,   -11,   -41,
+      78,    34,    83,    94,    81,    96,    97,    99,   100,   101,
+     102,    40,   105,    94,    93,    66,    94,    90,   -41,    61,
+     -41,   -41,   -41,    58,   -41,    66,   117,   -41,   -41,   -41,
+     -41,   -41,   -41,   -41,    85,   -41,    94,   123,   124,   125,
+     126,   130,    90,   -41,   138,    90,   -41,   139,    90,   -41,
+     -41,    90,    62,   142,   -41,   143,   -41,   144,   145,   146,
+     147,   -11,    66,    94,   -41,   -41,    62,   -41,    90,   148,
+     -11,   -41
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -34,   -33,   -11,   -16,   -15,   -17
+     -41,   -40,   -19,   -16,   -17,   -14
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
@@ -562,62 +567,61 @@ static const yytype_int8 yypgoto[] =
 #define YYTABLE_NINF -1
 static const yytype_uint8 yytable[] =
 {
-      29,    31,     5,    34,    35,    36,    37,    42,    39,    44,
-       1,    32,     8,    67,    40,    48,     9,    45,     6,    53,
-      54,    55,    56,    27,    57,    63,    33,    62,    58,    41,
-      28,    38,    19,    70,    72,    43,    59,    23,    60,    61,
-      46,    14,    80,    82,    26,    64,    85,    84,    86,    65,
-       3,     7,     8,     9,    90,    88,     4,    62,    14,    14,
-      91,    15,    87,    66,    93,    63,    10,    68,    71,     0,
-      73,    74,    99,    75,   113,   101,    76,    77,   103,    78,
-     105,    81,   104,   117,    83,    94,    95,   106,    96,    97,
-      98,   100,   105,   104,   102,   107,   108,   109,   115,    17,
-     110,   114,    18,    19,    20,    21,   111,    22,    23,    24,
-      25,     7,     8,     9,   112,    26,     7,     8,     9,     7,
-       8,     9,     7,     8,     9,    30,    10,     7,     8,     9,
-      47,    10,   116,    69,    10,     0,    79,    10,     7,     8,
-       9,    89,    10,     0,     0,     0,     0,     0,     0,     0,
-       0,    49,    92,    10,    18,     0,    20,    21,     0,    50,
-       0,    51,    52
+      30,    32,    36,    37,    38,    39,    40,    41,    70,     1,
+      47,    44,     5,    46,     7,     8,    50,     9,    31,    55,
+      56,    57,    58,    59,    60,     7,     8,    65,     9,    49,
+      66,    10,     3,     6,    28,    73,     4,     7,     8,    75,
+       9,    72,    10,     7,     8,    84,     9,    83,    88,    86,
+      92,    90,    89,    29,    10,    33,    45,    94,    65,    14,
+      10,     7,     8,    48,     9,    93,    14,    14,    97,     7,
+      34,   117,    66,    67,    15,    68,   103,    69,    10,   105,
+     121,    91,   107,   110,   108,    71,    35,   109,     7,     8,
+      74,     9,    96,     7,     8,   108,     9,   118,    42,   109,
+       9,    76,   119,    77,    78,    10,    79,    80,    81,    82,
+      10,    17,    85,    87,    43,    18,    19,    20,    21,    22,
+      23,    95,    24,    25,    26,    61,    27,    98,     0,    62,
+      19,    99,   100,   101,   102,    51,    24,    63,    64,    52,
+      27,    20,    21,    22,    23,   104,   106,    53,    54,   111,
+     112,   113,   114,   115,   116,   120
 };
 
 static const yytype_int8 yycheck[] =
 {
-      16,    17,     0,    18,    19,    20,    21,    24,    23,    26,
-      18,     3,     4,    46,     3,    31,     5,    28,     3,    34,
-      35,    36,    37,    17,    39,    42,    18,    42,     3,    18,
-       3,    17,     7,    49,    51,    18,    11,    12,    13,    14,
-      17,    15,    58,    60,    19,     3,    63,    62,    64,    17,
-      10,     3,     4,     5,    70,    66,    16,    72,    15,    15,
-       3,    18,    18,    17,    80,    82,    18,    17,    17,    -1,
-      18,    17,    88,    17,   107,    91,    17,    17,    94,    17,
-      97,    17,    97,   116,    18,     3,    17,    98,    17,    17,
-       3,    17,   109,   108,    17,    17,    17,    17,   114,     3,
-      17,   112,     6,     7,     8,     9,    17,    11,    12,    13,
-      14,     3,     4,     5,    17,    19,     3,     4,     5,     3,
-       4,     5,     3,     4,     5,    17,    18,     3,     4,     5,
-      17,    18,    17,    17,    18,    -1,    17,    18,     3,     4,
-       5,    17,    18,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,     3,    17,    18,     6,    -1,     8,     9,    -1,    11,
-      -1,    13,    14
+      16,    17,    19,    20,    21,    22,    23,    24,    48,    20,
+      29,    25,     0,    27,     3,     4,    32,     6,     7,    36,
+      37,    38,    39,    40,    41,     3,     4,    44,     6,     7,
+      44,    20,    14,     4,     7,    51,    18,     3,     4,    53,
+       6,     7,    20,     3,     4,    61,     6,     7,    65,    63,
+      69,    67,    66,     4,    20,     7,    20,    73,    75,     5,
+      20,     3,     4,     7,     6,     7,     5,     5,    84,     3,
+       4,   111,    86,     4,    20,     7,    92,     7,    20,    95,
+     120,    20,    98,   102,   101,     7,    20,   101,     3,     4,
+       7,     6,     7,     3,     4,   112,     6,   116,     4,   113,
+       6,    20,   118,     7,     7,    20,     7,     7,     7,     7,
+      20,     4,     7,    20,    20,     8,     9,    10,    11,    12,
+      13,     4,    15,    16,    17,     4,    19,     4,    -1,     8,
+       9,     7,     7,     7,     4,     4,    15,    16,    17,     8,
+      19,    10,    11,    12,    13,     7,     7,    16,    17,     7,
+       7,     7,     7,     7,     7,     7
 };
 
 /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
    symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,    18,    21,    10,    16,     0,     3,     3,     4,     5,
-      18,    23,    24,    25,    15,    18,    22,     3,     6,     7,
-       8,     9,    11,    12,    13,    14,    19,    17,     3,    23,
-      17,    23,     3,    18,    24,    24,    24,    24,    17,    24,
-       3,    18,    25,    18,    25,    22,    17,    17,    23,     3,
-      11,    13,    14,    24,    24,    24,    24,    24,     3,    11,
-      13,    14,    24,    25,     3,    17,    17,    21,    17,    17,
-      23,    17,    25,    18,    17,    17,    17,    17,    17,    17,
-      23,    17,    25,    18,    24,    25,    23,    18,    22,    17,
-      23,     3,    17,    23,     3,    17,    17,    17,     3,    23,
-      17,    23,    17,    23,    24,    25,    22,    17,    17,    17,
-      17,    17,    17,    21,    22,    23,    17,    21
+       0,    20,    22,    14,    18,     0,     4,     3,     4,     6,
+      20,    24,    25,    26,     5,    20,    23,     4,     8,     9,
+      10,    11,    12,    13,    15,    16,    17,    19,     7,     4,
+      24,     7,    24,     7,     4,    20,    25,    25,    25,    25,
+      25,    25,     4,    20,    26,    20,    26,    23,     7,     7,
+      24,     4,     8,    16,    17,    25,    25,    25,    25,    25,
+      25,     4,     8,    16,    17,    25,    26,     4,     7,     7,
+      22,     7,     7,    24,     7,    26,    20,     7,     7,     7,
+       7,     7,     7,     7,    24,     7,    26,    20,    25,    26,
+      24,    20,    23,     7,    24,     4,     7,    24,     4,     7,
+       7,     7,     4,    24,     7,    24,     7,    24,    25,    26,
+      23,     7,     7,     7,     7,     7,     7,    22,    23,    24,
+       7,    22
 };
 
 #define yyerrok		(yyerrstatus = 0)
@@ -1433,349 +1437,180 @@ yyreduce:
     {
         case 2:
 #line 20 "new_parser.y"
-    {
-                (yyval.val)=glob;
-                insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=DEFINE ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=type ordering=\"out\"]\n%d -> %d\n", glob,glob,(yyvsp[(4) - (7)].val));
-                insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,(yyvsp[(5) - (7)].val));
-                insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=program ordering=\"out\"]\n", glob);
-                while(!isEmpty()){
-                        int x = removeData();
-                        if(x!=glob){
-                                fprintf(fdot,"%d -> %d\n",glob,x);
-                        }
-                }
-                }
+    {glob+=5; fprintf(fdot, "%d [label=program ordering=\"out\"]\n", glob);
+                                                        fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob-4);
+                                                        fprintf(fdot, "%d [label=\"define-fun\" ordering=\"out\"]\n", glob-3);
+                                                        fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob-2, strtok((yyvsp[(3) - (7)].str), " "));
+                                                        fprintf(fdot, "%d [label=type ordering=\"out\"]\n", (yyvsp[(4) - (7)].val));
+                                                        fprintf(fdot, "%d [label=expr ordering=\"out\"]\n", (yyvsp[(5) - (7)].val)); 
+                                                        fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob-1); 
+                                                        fprintf(fdot, "%d [label=program ordering=\"out\"]\n",(yyvsp[(7) - (7)].val));(yyval.val)=glob;
+                                                        fprintf(fdot, "%d -> %d\n", (yyval.val), glob-4);
+                                                        fprintf(fdot, "%d -> %d\n", (yyval.val), glob-3);
+                                                        fprintf(fdot, "%d -> %d\n", (yyval.val), glob-2);
+                                                        fprintf(fdot, "%d -> %d\n", (yyval.val), (yyvsp[(4) - (7)].val));        
+                                                        fprintf(fdot, "%d -> %d\n", (yyval.val), (yyvsp[(5) - (7)].val));
+                                                        fprintf(fdot, "%d -> %d\n", (yyval.val), glob-1);
+                                                        fprintf(fdot, "%d -> %d\n", (yyval.val), (yyvsp[(7) - (7)].val));}
     break;
 
   case 3:
-#line 36 "new_parser.y"
-    {
-                (yyval.val)=glob;
-                insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=DEFINE ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=type ordering=\"out\"]\n%d -> %d\n", glob,glob,(yyvsp[(6) - (11)].val));
-                insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=type ordering=\"out\"]\n%d -> %d\n", glob,glob,(yyvsp[(8) - (11)].val));                
-                insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,(yyvsp[(9) - (11)].val));
-                insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=program ordering=\"out\"]\n", glob);
-                while(!isEmpty()){
-                        int x = removeData();
-                        if(x!=glob){
-                                fprintf(fdot,"%d -> %d\n",glob,x);
-                        }
-                }
-                }
+#line 35 "new_parser.y"
+    {glob += 12; 
+                                                                                        fprintf(fdot, "%d [label=program ordering=\"out\"]\n", glob); 
+                                                                                        fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob-11);
+                                                                                        fprintf(fdot, "%d [label=\"define-fun\" ordering=\"out\"]\n", glob-10);
+                                                                                        fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob-9, strtok((yyvsp[(3) - (11)].str), " ("));
+                                                                                        fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob-8);
+                                                                                        fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob-7, strtok((yyvsp[(5) - (11)].str), " "));
+                                                                                        fprintf(fdot, "%d [label=type ordering=\"out\"]\n", glob-6);
+                                                                                        fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob-5);
+                                                                                        fprintf(fdot, "%d [label=type ordering=\"out\"]\n", glob-4);
+                                                                                        fprintf(fdot, "%d [label=expr ordering=\"out\"]\n", glob-3);
+                                                                                        fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob-2);
+                                                                                        fprintf(fdot, "%d [label=program ordering=\"out\"]\n", glob-1);(yyval.val) = glob; 
+                                                                                        fprintf(fdot, "%d -> %d\n", glob-6, (yyvsp[(6) - (11)].val));        //for type
+                                                                                        fprintf(fdot, "%d -> %d\n", glob-4, (yyvsp[(8) - (11)].val));         //for type
+                                                                                        fprintf(fdot, "%d -> %d\n", glob-3, (yyvsp[(9) - (11)].val));         //for type
+                                                                                        fprintf(fdot, "%d -> %d\n", glob-1, (yyvsp[(11) - (11)].val));        //for program        
+                                                                                        fprintf(fdot, "%d -> %d\n", (yyval.val), glob-11);        
+                                                                                        fprintf(fdot, "%d -> %d\n", (yyval.val), glob-10);
+                                                                                        fprintf(fdot, "%d -> %d\n", (yyval.val), glob-9);
+                                                                                        fprintf(fdot, "%d -> %d\n", (yyval.val), glob-8);
+                                                                                        fprintf(fdot, "%d -> %d\n", (yyval.val), glob-7);
+                                                                                        fprintf(fdot, "%d -> %d\n", (yyval.val), glob-6);
+                                                                                        fprintf(fdot, "%d -> %d\n", (yyval.val), glob-5);
+                                                                                        fprintf(fdot, "%d -> %d\n", (yyval.val), glob-4);        
+                                                                                        fprintf(fdot, "%d -> %d\n", (yyval.val), glob-3);
+                                                                                        fprintf(fdot, "%d -> %d\n", (yyval.val), glob-2);
+                                                                                        fprintf(fdot, "%d -> %d\n", (yyval.val), glob-1);}
     break;
 
   case 4:
-#line 57 "new_parser.y"
-    {
-
-                (yyval.val)=glob;
-                insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=DEFINE ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=type ordering=\"out\"]\n%d -> %d\n", glob,glob,(yyvsp[(6) - (15)].val));
-                insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=type ordering=\"out\"]\n%d -> %d\n", glob,glob,(yyvsp[(10) - (15)].val));
-                insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=type ordering=\"out\"]\n%d -> %d\n", glob,glob,(yyvsp[(12) - (15)].val));                
-                insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,(yyvsp[(13) - (15)].val));
-                insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=program ordering=\"out\"]\n", glob);
-                while(!isEmpty()){
-                        int x = removeData();
-                        if(x!=glob){
-                                fprintf(fdot,"%d -> %d\n",glob,x);
-                        }
-                }
-                }
+#line 63 "new_parser.y"
+    {glob+=16;
+                                                                                                fprintf(fdot, "%d [label=program ordering=\"out\"]\n", glob);
+                                                                                                fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob-15);
+                                                                                                fprintf(fdot, "%d [label=\"define-fun\" ordering=\"out\"]\n", glob-14); 
+                                                                                                fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob-13, strtok((yyvsp[(3) - (15)].str), " ("));
+                                                                                                fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob-12);
+                                                                                                fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob-11, strtok((yyvsp[(5) - (15)].str), " "));
+                                                                                                fprintf(fdot, "%d [label=type ordering=\"out\"]\n", glob-10);
+                                                                                                fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob-9);
+                                                                                                fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob-8);
+                                                                                                fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob-7, strtok((yyvsp[(9) - (15)].str), " "));
+                                                                                                fprintf(fdot, "%d [label=type ordering=\"out\"]\n", glob-6);
+                                                                                                fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob-5);
+                                                                                                fprintf(fdot, "%d [label=type ordering=\"out\"]\n", glob-4);
+                                                                                                fprintf(fdot, "%d [label=expr ordering=\"out\"]\n", glob-3);
+                                                                                                fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob-2);
+                                                                                                fprintf(fdot, "%d [label=program ordering=\"out\"]\n", glob-1);(yyval.val) = glob;
+                                                                                                fprintf(fdot, "%d -> %d\n", glob-10, (yyvsp[(6) - (15)].val));        //type
+                                                                                                fprintf(fdot, "%d -> %d\n", glob-6, (yyvsp[(10) - (15)].val));        //type
+                                                                                                fprintf(fdot, "%d -> %d\n", glob-4, (yyvsp[(12) - (15)].val));        //type
+                                                                                                fprintf(fdot, "%d -> %d\n", glob-3, (yyvsp[(13) - (15)].val));        //expr
+                                                                                                fprintf(fdot, "%d -> %d\n", glob-1, (yyvsp[(15) - (15)].val));        //program
+                                                                                                fprintf(fdot, "%d -> %d\n", (yyval.val), glob-15);
+                                                                                                fprintf(fdot, "%d -> %d\n", (yyval.val), glob-14);
+                                                                                                fprintf(fdot, "%d -> %d\n", (yyval.val), glob-13);
+                                                                                                fprintf(fdot, "%d -> %d\n", (yyval.val), glob-12);
+                                                                                                fprintf(fdot, "%d -> %d\n", (yyval.val), glob-11);        
+                                                                                                fprintf(fdot, "%d -> %d\n", (yyval.val), glob-10);
+                                                                                                fprintf(fdot, "%d -> %d\n", (yyval.val), glob-9);
+                                                                                                fprintf(fdot, "%d -> %d\n", (yyval.val), glob-8);
+                                                                                                fprintf(fdot, "%d -> %d\n", (yyval.val), glob-7);
+                                                                                                fprintf(fdot, "%d -> %d\n", (yyval.val), glob-6);
+                                                                                                fprintf(fdot, "%d -> %d\n", (yyval.val), glob-5);
+                                                                                                fprintf(fdot, "%d -> %d\n", (yyval.val), glob-4);        
+                                                                                                fprintf(fdot, "%d -> %d\n", (yyval.val), glob-3);
+                                                                                                fprintf(fdot, "%d -> %d\n", (yyval.val), glob-2);
+                                                                                                fprintf(fdot, "%d -> %d\n", (yyval.val), glob-1);}
     break;
 
   case 5:
-#line 82 "new_parser.y"
-    {
-                
-                (yyval.val)=glob;
-                insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=PRINT ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,(yyvsp[(3) - (4)].val));
-                insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=program ordering=\"out\"]\n", glob);
-                while(!isEmpty()){
-                        int x = removeData();
-                        if(x!=glob){
-                                fprintf(fdot,"%d -> %d\n",glob,x);
-                        }
-                }
-                }
+#line 100 "new_parser.y"
+    {glob+=4; 
+                                                fprintf(fdot, "%d [label=program ordering=\"out\"]\n", glob);
+                                                fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob-3);
+                                                fprintf(fdot, "%d [label=print ordering=\"out\"]\n", glob-2);
+                                                fprintf(fdot, "%d [label=expr ordering=\"out\"]\n", (yyvsp[(3) - (4)].val));
+                                                fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob-1); (yyval.val)=glob;
+                                                fprintf(fdot, "%d -> %d\n", (yyval.val), glob-3);
+                                                fprintf(fdot, "%d -> %d\n", (yyval.val), glob-2);
+                                                fprintf(fdot, "%d -> %d\n", (yyval.val), (yyvsp[(3) - (4)].val));
+                                                fprintf(fdot, "%d -> %d\n", (yyval.val), glob-1);}
     break;
 
   case 6:
-#line 98 "new_parser.y"
-    {++glob;fprintf(fdot, "%d [label=type ordering=\"out\"]\n", glob);(yyval.val)=glob;}
+#line 111 "new_parser.y"
+    {glob++; fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob-1, (yyvsp[(1) - (1)].str)); (yyval.val) = glob;
+                                fprintf(fdot, "%d -> %d\n", (yyval.val), glob-1);}
     break;
 
   case 7:
-#line 100 "new_parser.y"
-    {
-                insert(++glob);fprintf(fdot, "%d [label=term ordering=\"out\"]\n", glob);(yyval.val)=glob;
-                while(!isEmpty()){
-                        int x = removeData();
-                        if(x!=glob){
-                                fprintf(fdot,"%d -> %d\n",glob,x);
-                        }
-                }
-                }
+#line 114 "new_parser.y"
+    {glob++;fprintf(fdot, "%d [label=term ordering=\"out\"]\n", (yyvsp[(1) - (1)].val)); (yyval.val) = glob;
+                        fprintf(fdot, "%d -> %d\n", (yyval.val), (yyvsp[(1) - (1)].val));}
     break;
 
   case 8:
-#line 109 "new_parser.y"
-    {
-                ++glob;fprintf(fdot, "%d [label=fla ordering=\"out\"]\n%d -> %d\n", glob,glob,(yyvsp[(1) - (1)].val));(yyval.val)=glob;
-                while(!isEmpty()){
-                        int x = removeData();
-                        if(x!=glob){
-                                fprintf(fdot,"%d -> %d\n",glob,x);
-                        }
-                }
-                }
+#line 116 "new_parser.y"
+    {fprintf(fdot, "%d [label=term ordering=\"out\"]\n", (yyvsp[(1) - (1)].val)); (yyval.val) = glob;}
     break;
 
   case 9:
-#line 119 "new_parser.y"
-    {++glob;fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob, (yyvsp[(1) - (1)].str));(yyval.val)=glob;}
+#line 118 "new_parser.y"
+    {glob++; fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob-1, (yyvsp[(1) - (1)].str)); (yyval.val) = glob;
+                                fprintf(fdot, "%d -> %d\n", (yyval.val), glob-1);}
     break;
 
   case 10:
 #line 120 "new_parser.y"
-    {++glob;fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob, (yyvsp[(1) - (1)].str));(yyval.val)=glob;}
+    {glob++; fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob, (yyvsp[(1) - (1)].str)); (yyval.val) = glob;
+                                fprintf(fdot, "%d -> %d\n", (yyval.val), glob-1);}
     break;
 
   case 11:
-#line 121 "new_parser.y"
-    {
-                insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=\"\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);(yyval.val)=glob;
-        }
+#line 122 "new_parser.y"
+    {glob+=3;
+                                                fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob-2); 
+                                                fprintf(fdot, "%d [label=\"%s\" ordering=\"out\"]\n", glob-1, strtok((yyvsp[(2) - (3)].str), " )"));
+                                                fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob); (yyval.val) = glob;
+                                                fprintf(fdot, "%d -> %d\n", (yyval.val)+1, glob-2);
+                                                fprintf(fdot, "%d -> %d\n", (yyval.val)+1, glob-1);
+                                                fprintf(fdot, "%d -> %d\n", (yyval.val)+1, glob);}
     break;
 
   case 12:
-#line 126 "new_parser.y"
-    {
-                insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=\"+\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=term ordering=\"out\"]\n%d -> %d\n", glob,glob,(yyvsp[(3) - (5)].val));
-                insert(++glob);fprintf(fdot, "%d [label=term ordering=\"out\"]\n%d -> %d\n", glob,glob,(yyvsp[(4) - (5)].val));
-                insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);(yyval.val)=glob;
-                }
-    break;
-
-  case 13:
-#line 133 "new_parser.y"
-    {
-                insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=\"-\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=term ordering=\"out\"]\n%d -> %d\n", glob,glob,(yyvsp[(3) - (5)].val));
-                insert(++glob);fprintf(fdot, "%d [label=term ordering=\"out\"]\n%d -> %d\n", glob,glob,(yyvsp[(4) - (5)].val));
-                insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);(yyval.val)=glob;
-                }
-    break;
-
-  case 14:
-#line 140 "new_parser.y"
-    {
-                insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=\"%s\" ordering=\"out\"]\n", glob, (yyvsp[(2) - (5)].str));
-                insert(++glob);fprintf(fdot, "%d [label=term ordering=\"out\"]\n%d -> %d\n", glob,glob,(yyvsp[(3) - (5)].val));
-                insert(++glob);fprintf(fdot, "%d [label=term ordering=\"out\"]\n%d -> %d\n", glob,glob,(yyvsp[(4) - (5)].val));
-                insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);(yyval.val)=glob;
-                }
-    break;
-
-  case 15:
-#line 147 "new_parser.y"
-    {
-                insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=IF ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=fla ordering=\"out\"]\n%d -> %d\n", glob,glob,(yyvsp[(3) - (6)].val));
-                insert(++glob);fprintf(fdot, "%d [label=term ordering=\"out\"]\n%d -> %d\n", glob,glob,(yyvsp[(4) - (6)].val));
-                insert(++glob);fprintf(fdot, "%d [label=term ordering=\"out\"]\n%d -> %d\n", glob,glob,(yyvsp[(5) - (6)].val));
-                insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);(yyval.val)=glob;
-                }
-    break;
-
-  case 16:
-#line 155 "new_parser.y"
-    {
-                insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n",glob);
-                insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);(yyval.val)=glob;
-                }
-    break;
-
-  case 17:
-#line 160 "new_parser.y"
-    {
-                insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n",glob);
-                insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,(yyvsp[(3) - (4)].val));                
-                insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);(yyval.val)=glob;
-                
-                }
-    break;
-
-  case 18:
-#line 167 "new_parser.y"
-    {
-                insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n",glob);
-                insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,(yyvsp[(3) - (5)].val));   
-                insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,(yyvsp[(4) - (5)].val));                             
-                insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);(yyval.val)=glob;
-                
-                }
-    break;
-
-  case 19:
-#line 175 "new_parser.y"
-    {
-                insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=LET ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n",glob);
-                insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,(yyvsp[(5) - (8)].val));
-                insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);(yyval.val)=glob;   
-                insert(++glob);fprintf(fdot, "%d [label=term ordering=\"out\"]\n%d -> %d\n", glob,glob,(yyvsp[(7) - (8)].val));                             
-                insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);(yyval.val)=glob;
-                
-                }
-    break;
-
-  case 20:
-#line 187 "new_parser.y"
-    {++glob;fprintf(fdot, "%d [label=const ordering=\"out\"]\n", glob);(yyval.val)=glob;}
+#line 129 "new_parser.y"
+    {glob+=5;
+                                                        fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob-4); 
+                                                        fprintf(fdot, "%d [label=\"+\" ordering=\"out\"]\n", glob-3); 
+                                                        fprintf(fdot, "%d [label=term ordering=\"out\"]\n", glob-2); 
+                                                        fprintf(fdot, "%d [label=term ordering=\"out\"]\n", glob-1); 
+                                                        fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob); (yyval.val) = glob;
+                                                        fprintf(fdot, "%d -> %d\n", (yyval.val)+1, glob-4);
+                                                        fprintf(fdot, "%d -> %d\n", (yyval.val)+1, glob-3);
+                                                        fprintf(fdot, "%d -> %d\n", (yyval.val)+1, glob-2);
+                                                        fprintf(fdot, "%d -> %d\n", (yyval.val)+1, glob-1);
+                                                        fprintf(fdot, "%d -> %d\n", (yyval.val)+1, glob);}
     break;
 
   case 21:
-#line 188 "new_parser.y"
-    {++glob;fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n", glob);(yyval.val)=glob;}
+#line 179 "new_parser.y"
+    {glob++; fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob, (yyvsp[(1) - (1)].str)); (yyval.val) = glob;
+                                fprintf(fdot, "%d -> %d\n", (yyval.val)+1, glob);}
     break;
 
   case 22:
-#line 189 "new_parser.y"
-    {
-                insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=FUNCTION ordering=\"out\"]\n",glob);
-                insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);(yyval.val)=glob;
-                }
-    break;
-
-  case 23:
-#line 194 "new_parser.y"
-    {
-                insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=COMPARATOR ordering=\"out\"]\n",glob);
-                insert(++glob);fprintf(fdot, "%d [label=term ordering=\"out\"]\n%d -> %d\n", glob,glob,(yyvsp[(3) - (5)].val));                             
-                insert(++glob);fprintf(fdot, "%d [label=term ordering=\"out\"]\n%d -> %d\n", glob,glob,(yyvsp[(4) - (5)].val));                             
-                insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);(yyval.val)=glob;
-                }
-    break;
-
-  case 24:
-#line 201 "new_parser.y"
-    {
-                insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=NOT ordering=\"out\"]\n",glob);
-                insert(++glob);fprintf(fdot, "%d [label=fla ordering=\"out\"]\n%d -> %d\n", glob,glob,(yyvsp[(3) - (4)].val));                             
-                insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);(yyval.val)=glob;
-                }
-    break;
-
-  case 25:
-#line 207 "new_parser.y"
-    {
-                insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=BOOLOP ordering=\"out\"]\n",glob);
-                insert(++glob);fprintf(fdot, "%d [label=term ordering=\"out\"]\n%d -> %d\n", glob,glob,(yyvsp[(3) - (5)].val));
-                insert(++glob);fprintf(fdot, "%d [label=term ordering=\"out\"]\n%d -> %d\n", glob,glob,(yyvsp[(4) - (5)].val));                            
-                insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);(yyval.val)=glob;
-        }
-    break;
-
-  case 26:
-#line 214 "new_parser.y"
-    {
-                insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=IF ordering=\"out\"]\n",glob);
-                insert(++glob);fprintf(fdot, "%d [label=fla ordering=\"out\"]\n%d -> %d\n", glob,glob,(yyvsp[(3) - (6)].val));
-                insert(++glob);fprintf(fdot, "%d [label=fla ordering=\"out\"]\n%d -> %d\n", glob,glob,(yyvsp[(4) - (6)].val));    
-                insert(++glob);fprintf(fdot, "%d [label=fla ordering=\"out\"]\n%d -> %d\n", glob,glob,(yyvsp[(5) - (6)].val));                                    
-                insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);(yyval.val)=glob;
-  
-        }
-    break;
-
-  case 27:
-#line 223 "new_parser.y"
-    {
-                insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n",glob);
-                insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);(yyval.val)=glob;
-                }
-    break;
-
-  case 28:
-#line 228 "new_parser.y"
-    {
-                insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n",glob);
-                insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,(yyvsp[(3) - (4)].val));
-                insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);(yyval.val)=glob;
-                }
-    break;
-
-  case 29:
-#line 234 "new_parser.y"
-    {
-                insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n",glob);
-                insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,(yyvsp[(3) - (5)].val));
-                insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,(yyvsp[(4) - (5)].val));
-                insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);(yyval.val)=glob;
-                }
-    break;
-
-  case 30:
-#line 241 "new_parser.y"
-    {
-                insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=LET ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
-                insert(++glob);fprintf(fdot, "%d [label=\"NAME\" ordering=\"out\"]\n",glob);
-                insert(++glob);fprintf(fdot, "%d [label=expr ordering=\"out\"]\n%d -> %d\n", glob,glob,(yyvsp[(5) - (8)].val));
-                insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);(yyval.val)=glob;    
-                insert(++glob);fprintf(fdot, "%d [label=fla ordering=\"out\"]\n%d -> %d\n", glob,glob,(yyvsp[(7) - (8)].val));                                    
-                insert(++glob);fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);(yyval.val)=glob;
-                }
+#line 181 "new_parser.y"
+    {glob++; fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob, (yyvsp[(1) - (1)].str)); (yyval.val) = glob;
+                                fprintf(fdot, "%d -> %d\n", (yyval.val)+1, glob);}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1779 "y.tab.c"
+#line 1614 "y.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1989,13 +1824,12 @@ yyreturn:
 }
 
 
-#line 252 "new_parser.y"
+#line 193 "new_parser.y"
 
 
 /*arg : ID {glob ++; printf("id: %s, %d\n", $1, glob); $$ = glob; }
 | CONST {glob ++; printf("const: %s, %d\n", $1, glob); $$ = glob; };
 */
-#include "lex.yy.c"
 
 void yyerror(char * s)
 {  
