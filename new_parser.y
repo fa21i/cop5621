@@ -17,7 +17,7 @@
 %union {int val; char* str;}
 %start program
 %token <str> NAME CONST 
-%token <val> COMPARATOR ADDOP MINOP DEFINE FUNCTION BOOLOP IF LET TYPE PRINT RPAREN LPAREN NOT MULTOP BOOLCONST
+%token <val> COMPARATOR ADDOP MINOP DEFINE GETINT GETBOOL AND OR IF LET INTTYPE BOOLTYPE PRINT RPAREN LPAREN NOT MULTOP TRUECONST FALSECONST
 %type <val> program type expr term fla 
 
 
@@ -91,9 +91,12 @@ program :   LPAREN DEFINE NAME type expr RPAREN program  {
                 general_loop(glob,$$);
                 };
         ;
-type    :   TYPE {
+type    :   INTTYPE {
                 a[glob+1]=1;$$=glob+1;
-                ++glob;fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob,$1);};
+                ++glob;fprintf(fdot, "%d [label=int ordering=\"out\"]\n", glob,$1);};
+        |   BOOLTYPE {
+                a[glob+1]=1;$$=glob+1;
+                ++glob;fprintf(fdot, "%d [label=bool ordering=\"out\"]\n", glob,$1);};
         ;
 expr    :   term {
                 a[glob+1]=1;$$=glob+1;
@@ -114,10 +117,10 @@ term    :   CONST {
                 a[glob+1]=1;$$=glob+1;
                 ++glob;fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob,$1);
                 };
-        |   LPAREN FUNCTION RPAREN{
+        |   LPAREN GETINT RPAREN{
                 a[glob+1]=3;$$=glob+1;
                 ++glob;fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
-                ++glob;fprintf(fdot, "%d [label=\"FUNCTION\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=\"getInt\" ordering=\"out\"]\n", glob);
                 ++glob;fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob); 
         };
         |   LPAREN ADDOP term term RPAREN {
@@ -203,18 +206,22 @@ term    :   CONST {
                 
                 };
         ;
-fla     :   BOOLCONST {
+fla     :   TRUECONST {
                 a[glob+1]=1;$$=glob+1;
-                ++glob;fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob,$1);
+                ++glob;fprintf(fdot, "%d [label=true ordering=\"out\"]\n", glob,$1);
+                };
+        |   FALSECONST {
+                a[glob+1]=1;$$=glob+1;
+                ++glob;fprintf(fdot, "%d [label=false ordering=\"out\"]\n", glob,$1);
                 };
         |   NAME {
                 a[glob+1]=1;$$=glob+1;
                 ++glob;fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n", glob,$1);
                 };
-        |   LPAREN FUNCTION RPAREN{
+        |   LPAREN GETBOOL RPAREN{
                 a[glob+1]=3;$$=glob+1;
                 ++glob;fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
-                ++glob;fprintf(fdot, "%d [label=FUNCTION ordering=\"out\"]\n",glob);
+                ++glob;fprintf(fdot, "%d [label=getBool ordering=\"out\"]\n",glob);
                 ++glob;fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
                 };
         |   LPAREN COMPARATOR term term RPAREN{
@@ -235,10 +242,20 @@ fla     :   BOOLCONST {
                 general_loop(glob,$3);                            
                 ++glob;fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
                 };
-        |   LPAREN BOOLOP term term RPAREN{
+        |   LPAREN AND term term RPAREN{
                 a[glob+1]=5;$$=glob+1;
                 ++glob;fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
-                ++glob;fprintf(fdot, "%d [label=BOOLOP ordering=\"out\"]\n",glob);
+                ++glob;fprintf(fdot, "%d [label=AND ordering=\"out\"]\n",glob);
+                ++glob;fprintf(fdot, "%d [label=term ordering=\"out\"]\n",glob);
+                general_loop(glob,$3);
+                ++glob;fprintf(fdot, "%d [label=term ordering=\"out\"]\n",glob); 
+                general_loop(glob,$4);                           
+                ++glob;fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
+        };
+        |   LPAREN OR term term RPAREN{
+                a[glob+1]=5;$$=glob+1;
+                ++glob;fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=OR ordering=\"out\"]\n",glob);
                 ++glob;fprintf(fdot, "%d [label=term ordering=\"out\"]\n",glob);
                 general_loop(glob,$3);
                 ++glob;fprintf(fdot, "%d [label=term ordering=\"out\"]\n",glob); 
@@ -313,7 +330,7 @@ int main(int argc, char* argv[])
 
         fdot = fopen("parse_tree.dot", "w+");
         fprintf(fdot, "digraph print {\n");     
-        yyin=fopen(argv[1],"r+");
+        yyin=fopen("tests/correct programs/sample4.txt ","r+");
         if(yyin==NULL)
         {
                 return 0;
