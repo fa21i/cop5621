@@ -350,14 +350,29 @@ int main(int argc, char* argv[])
 
 
 /*
+prog : sum {
+        int a1 = insert_node(token: "1", ntoken: 0);
+        int a2 = insert_node("x", 0);
+        int a3 = insert_node("y", 0);
+        insert_children(3, a1, a2, a3);
+        insert_node("+", 0);
+}
+
+
 sum: arg {
                 insert_child($1);
-                $$ = insert_node("+", PLUS);
+                $$ = $1 //$$=insert_node("+", PLUS);
         }
         |
         sum PLUS arg {
                 inert_child($1);
                 isnert_child($3);
+                OR
+                insert_children(2, $1, $3);
                 $$ = insert_node("+", PLUS);
         }
+
+arg: ID {
+        $$ = insert_node(strdup($1), ID);
+}
 }*/
