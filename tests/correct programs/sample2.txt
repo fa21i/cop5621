@@ -1,1 +1,1 @@
-(print (+ 1 2))
+( define-fun rand ( v1 int ) bool ( if true (get-int) (get-bool)))(print 5)

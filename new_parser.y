@@ -2,195 +2,318 @@
 
 %{
         #include <stdio.h>
-        #include <string.h>
         int yylex();
         FILE *fdot;
 	void yyerror(char *s);
         int glob = 0;
-        int arr[50];
+        int a[250];
+        int i;
+        extern FILE *yyin;
+        void general_loop(int glob, int id){
+                for(i=0;i<a[id];i++){
+                        fprintf(fdot,"%d -> %d\n",glob,i+id);
+                }
+        }
 %}
 
 %union {int val; char* str;}
 %start program
-%token <str> CONST NAME TYPE BOOLCONST RPAREN FUNCTION
-%token <val> COMPARATOR MULTOP DIVOP ADDOP MINOP DEFINE BOOLOP IF LET PRINT NOT LPAREN
+%token <str> NAME CONST 
+%token <val> COMPARATOR ADDOP MINOP DEFINE GETINT GETBOOL AND OR IF LET INTTYPE BOOLTYPE PRINT RPAREN LPAREN NOT MULTOP TRUECONST FALSECONST
 %type <val> program type expr term fla 
 
 
 %%
-program :   LPAREN DEFINE NAME type expr RPAREN program    {glob+=8; fprintf(fdot, "%d [label=program ordering=\"out\"]\n", glob);
-                                                        fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob-7);
-                                                        fprintf(fdot, "%d [label=\"define-fun\" ordering=\"out\"]\n", glob-6);
-                                                        fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob-5, strtok($3, " "));
-                                                        fprintf(fdot, "%d [label=type ordering=\"out\"]\n", glob-4);
-                                                        fprintf(fdot, "%d [label=expr ordering=\"out\"]\n", glob-3); 
-                                                        fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob-2); 
-                                                        fprintf(fdot, "%d [label=program ordering=\"out\"]\n", glob-1);$$=glob;
-                                                        fprintf(fdot, "%d -> %d\n", glob-4, $4);        //link for type
-                                                        fprintf(fdot, "%d -> %d\n", glob-3, $5);        //link for expr
-                                                        fprintf(fdot, "%d -> %d\n", glob-1, $7);        //link for program
-                                                        fprintf(fdot, "%d -> %d\n", $$, glob-7);
-                                                        fprintf(fdot, "%d -> %d\n", $$, glob-6);
-                                                        fprintf(fdot, "%d -> %d\n", $$, glob-5);
-                                                        fprintf(fdot, "%d -> %d\n", $$, glob-4);        
-                                                        fprintf(fdot, "%d -> %d\n", $$, glob-3);
-                                                        fprintf(fdot, "%d -> %d\n", $$, glob-2);
-                                                        fprintf(fdot, "%d -> %d\n", $$, glob-1);}       //works
-        |   LPAREN DEFINE NAME LPAREN NAME type RPAREN type expr RPAREN program {glob += 12; 
-                                                                                        fprintf(fdot, "%d [label=program ordering=\"out\"]\n", glob); 
-                                                                                        fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob-11);
-                                                                                        fprintf(fdot, "%d [label=\"define-fun\" ordering=\"out\"]\n", glob-10);
-                                                                                        fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob-9, strtok($3, " ("));
-                                                                                        fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob-8);
-                                                                                        fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob-7, strtok($5, " "));
-                                                                                        fprintf(fdot, "%d [label=type ordering=\"out\"]\n", glob-6);
-                                                                                        fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob-5);
-                                                                                        fprintf(fdot, "%d [label=type ordering=\"out\"]\n", glob-4);
-                                                                                        fprintf(fdot, "%d [label=expr ordering=\"out\"]\n", glob-3);
-                                                                                        fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob-2);
-                                                                                        fprintf(fdot, "%d [label=program ordering=\"out\"]\n", glob-1);$$ = glob; 
-                                                                                        fprintf(fdot, "%d -> %d\n", glob-6, $6);        //for type
-                                                                                        fprintf(fdot, "%d -> %d\n", glob-4, $8);         //for type
-                                                                                        fprintf(fdot, "%d -> %d\n", glob-3, $9);         //for type
-                                                                                        fprintf(fdot, "%d -> %d\n", glob-1, $11);        //for program        
-                                                                                        fprintf(fdot, "%d -> %d\n", $$, glob-11);        
-                                                                                        fprintf(fdot, "%d -> %d\n", $$, glob-10);
-                                                                                        fprintf(fdot, "%d -> %d\n", $$, glob-9);
-                                                                                        fprintf(fdot, "%d -> %d\n", $$, glob-8);
-                                                                                        fprintf(fdot, "%d -> %d\n", $$, glob-7);
-                                                                                        fprintf(fdot, "%d -> %d\n", $$, glob-6);
-                                                                                        fprintf(fdot, "%d -> %d\n", $$, glob-5);
-                                                                                        fprintf(fdot, "%d -> %d\n", $$, glob-4);        
-                                                                                        fprintf(fdot, "%d -> %d\n", $$, glob-3);
-                                                                                        fprintf(fdot, "%d -> %d\n", $$, glob-2);
-                                                                                        fprintf(fdot, "%d -> %d\n", $$, glob-1);} 
-        |   LPAREN DEFINE NAME LPAREN NAME type RPAREN LPAREN NAME type RPAREN type expr RPAREN program {glob+=16;
-                                                                                                fprintf(fdot, "%d [label=program ordering=\"out\"]\n", glob);
-                                                                                                fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob-15);
-                                                                                                fprintf(fdot, "%d [label=\"define-fun\" ordering=\"out\"]\n", glob-14); 
-                                                                                                fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob-13, strtok($3, " ("));
-                                                                                                fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob-12);
-                                                                                                fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob-11, strtok($5, " "));
-                                                                                                fprintf(fdot, "%d [label=type ordering=\"out\"]\n", glob-10);
-                                                                                                fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob-9);
-                                                                                                fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob-8);
-                                                                                                fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob-7, strtok($9, " "));
-                                                                                                fprintf(fdot, "%d [label=type ordering=\"out\"]\n", glob-6);
-                                                                                                fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob-5);
-                                                                                                fprintf(fdot, "%d [label=type ordering=\"out\"]\n", glob-4);
-                                                                                                fprintf(fdot, "%d [label=expr ordering=\"out\"]\n", glob-3);
-                                                                                                fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob-2);
-                                                                                                fprintf(fdot, "%d [label=program ordering=\"out\"]\n", glob-1);$$ = glob;
-                                                                                                fprintf(fdot, "%d -> %d\n", glob-10, $6);        //type
-                                                                                                fprintf(fdot, "%d -> %d\n", glob-6, $10);        //type
-                                                                                                fprintf(fdot, "%d -> %d\n", glob-4, $12);        //type
-                                                                                                fprintf(fdot, "%d -> %d\n", glob-3, $13);        //expr
-                                                                                                fprintf(fdot, "%d -> %d\n", glob-1, $15);        //program
-                                                                                                fprintf(fdot, "%d -> %d\n", $$, glob-15);
-                                                                                                fprintf(fdot, "%d -> %d\n", $$, glob-14);
-                                                                                                fprintf(fdot, "%d -> %d\n", $$, glob-13);
-                                                                                                fprintf(fdot, "%d -> %d\n", $$, glob-12);
-                                                                                                fprintf(fdot, "%d -> %d\n", $$, glob-11);        
-                                                                                                fprintf(fdot, "%d -> %d\n", $$, glob-10);
-                                                                                                fprintf(fdot, "%d -> %d\n", $$, glob-9);
-                                                                                                fprintf(fdot, "%d -> %d\n", $$, glob-8);
-                                                                                                fprintf(fdot, "%d -> %d\n", $$, glob-7);
-                                                                                                fprintf(fdot, "%d -> %d\n", $$, glob-6);
-                                                                                                fprintf(fdot, "%d -> %d\n", $$, glob-5);
-                                                                                                fprintf(fdot, "%d -> %d\n", $$, glob-4);        
-                                                                                                fprintf(fdot, "%d -> %d\n", $$, glob-3);
-                                                                                                fprintf(fdot, "%d -> %d\n", $$, glob-2);
-                                                                                                fprintf(fdot, "%d -> %d\n", $$, glob-1);}
-        |   LPAREN PRINT expr RPAREN    {glob+=5; fprintf(fdot, "%d [label=program ordering=\"out\"]\n", glob);
-                                                fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob-4);
-                                                fprintf(fdot, "%d [label=print ordering=\"out\"]\n", glob-3);
-                                                fprintf(fdot, "%d [label=expr ordering=\"out\"]\n", glob-2);
-                                                fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob-1); $$=glob;
-                                                fprintf(fdot, "%d -> %d\n", glob-2, $3);        //link for expr
-                                                fprintf(fdot, "%d -> %d\n", $$, glob-4);
-                                                fprintf(fdot, "%d -> %d\n", $$, glob-3);
-                                                fprintf(fdot, "%d -> %d\n", $$, glob-2);
-                                                fprintf(fdot, "%d -> %d\n", $$, glob-1);}       //works
+program :   LPAREN DEFINE NAME type expr RPAREN program  {
+                a[glob+1]=6;$$=glob+1;
+                ++glob;fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=DEFINE ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=type ordering=\"out\"]\n",glob);
+                general_loop(glob,$4);
+                ++glob;fprintf(fdot, "%d [label=expr ordering=\"out\"]\n",glob);
+                general_loop(glob,$5);
+                ++glob;fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=program ordering=\"out\"]\n", glob);
+                general_loop(glob,$$);
+                fprintf(fdot,"%d -> %d\n",glob,$$-1);
+                };
+        |   LPAREN DEFINE NAME LPAREN NAME type RPAREN type expr RPAREN program{
+                a[glob+1]=10;$$=glob+1;
+                ++glob;fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=DEFINE ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=type ordering=\"out\"]\n",glob);
+                general_loop(glob,$6);
+                ++glob;fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=type ordering=\"out\"]\n",glob); 
+                general_loop(glob,$8);               
+                ++glob;fprintf(fdot, "%d [label=expr ordering=\"out\"]\n",glob);
+                general_loop(glob,$9);
+                ++glob;fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=program ordering=\"out\"]\n", glob);
+                general_loop(glob,$$);
+                fprintf(fdot,"%d -> %d\n",glob,$$-1);
+                };
+
+        |   LPAREN DEFINE NAME LPAREN NAME type RPAREN LPAREN NAME type RPAREN type expr RPAREN program{
+                a[glob+1]=14;$$=glob+1;
+                ++glob;fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=DEFINE ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=type ordering=\"out\"]\n", glob);
+                general_loop(glob,$6);
+                ++glob;fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=type ordering=\"out\"]\n", glob);
+                general_loop(glob,$10);
+                ++glob;fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=type ordering=\"out\"]\n",glob);  
+                general_loop(glob,$12);              
+                ++glob;fprintf(fdot, "%d [label=expr ordering=\"out\"]\n",glob);
+                general_loop(glob,$13);
+                ++glob;fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=program ordering=\"out\"]\n", glob);
+                general_loop(glob,$$);
+                fprintf(fdot,"%d -> %d\n",glob,$$-1);
+                };
+        |   LPAREN PRINT expr RPAREN {
+                a[glob+1]=4;$$=glob+1;
+                ++glob;fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=PRINT ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=expr ordering=\"out\"]\n",glob);
+                general_loop(glob,$3);
+                ++glob;fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=program ordering=\"out\"]\n", glob);
+                general_loop(glob,$$);
+                };
         ;
-type    :   TYPE        {glob++; fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob, $1); $$ = glob;}       //works
+type    :   INTTYPE {
+                a[glob+1]=1;$$=glob+1;
+                ++glob;fprintf(fdot, "%d [label=int ordering=\"out\"]\n", glob,$1);};
+        |   BOOLTYPE {
+                a[glob+1]=1;$$=glob+1;
+                ++glob;fprintf(fdot, "%d [label=bool ordering=\"out\"]\n", glob,$1);};
         ;
-expr    :   term        {glob++; fprintf(fdot, "%d [label=term ordering=\"out\"]\n", glob); $$ = glob;}  //work
-        |   fla         {glob++; fprintf(fdot, "%d [label=fla ordering=\"out\"]\n", glob); $$ = glob;}
+expr    :   term {
+                a[glob+1]=1;$$=glob+1;
+                ++glob;fprintf(fdot, "%d [label=term ordering=\"out\"]\n", glob);
+                general_loop(glob,$1);
+                };
+        |   fla {
+                a[glob+1]=1;$$=glob+1;
+                ++glob;fprintf(fdot, "%d [label=fla ordering=\"out\"]\n", glob);
+                general_loop(glob,$1);
+                };
         ;
-term    :   CONST       {glob++; fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob, $1); $$ = glob;
-                                fprintf(fdot, "%d -> %d\n", $$+1, glob);}       //works
-        |   NAME        {glob++; fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob, $1); $$ = glob;
-                                fprintf(fdot, "%d -> %d\n", $$+1, glob);}       //works
-        |   LPAREN FUNCTION RPAREN     {glob+=3;
-                                                fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob-2); 
-                                                fprintf(fdot, "%d [label=\"%s\" ordering=\"out\"]\n", glob-1, strtok($2, " )"));
-                                                fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob); $$ = glob;
-                                                fprintf(fdot, "%d -> %d\n", $$+1, glob-2);
-                                                fprintf(fdot, "%d -> %d\n", $$+1, glob-1);
-                                                fprintf(fdot, "%d -> %d\n", $$+1, glob);}
-        |   LPAREN ADDOP term term RPAREN       {glob+=5;
-                                                        fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob-4); 
-                                                        fprintf(fdot, "%d [label=\"+\" ordering=\"out\"]\n", glob-3); 
-                                                        fprintf(fdot, "%d [label=term ordering=\"out\"]\n", glob-2); 
-                                                        fprintf(fdot, "%d [label=term ordering=\"out\"]\n", glob-1); 
-                                                        fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob); $$ = glob;
-                                                        fprintf(fdot, "%d -> %d\n", $$+1, glob-4);
-                                                        fprintf(fdot, "%d -> %d\n", $$+1, glob-3);
-                                                        fprintf(fdot, "%d -> %d\n", $$+1, glob-2);
-                                                        fprintf(fdot, "%d -> %d\n", $$+1, glob-1);
-                                                        fprintf(fdot, "%d -> %d\n", $$+1, glob);}
-        |   LPAREN MINOP term term RPAREN       /*{glob+=5;
-                                                        fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob-4); 
-                                                        fprintf(fdot, "%d [label=\"-\" ordering=\"out\"]\n", glob-3); 
-                                                        fprintf(fdot, "%d [label=term ordering=\"out\"]\n", glob-2); 
-                                                        fprintf(fdot, "%d [label=term ordering=\"out\"]\n", glob-1); 
-                                                        fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob); $$ = glob;
-                                                        fprintf(fdot, "%d -> %d\n", $$+1, glob-5);
-                                                        fprintf(fdot, "%d -> %d\n", $$+1, glob-4);
-                                                        fprintf(fdot, "%d -> %d\n", $$+1, glob-3);
-                                                        fprintf(fdot, "%d -> %d\n", $$+1, glob-2);
-                                                        fprintf(fdot, "%d -> %d\n", $$+1, glob-1);}*/
-        |   LPAREN MULTOP term term RPAREN       /*{glob+=5;
-                                                        fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob-5); 
-                                                        fprintf(fdot, "%d [label=\"*\" ordering=\"out\"]\n", glob-4); 
-                                                        fprintf(fdot, "%d [label=term ordering=\"out\"]\n", glob-3); 
-                                                        fprintf(fdot, "%d [label=term ordering=\"out\"]\n", glob-2); 
-                                                        fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob-1); $$ = glob;
-                                                        fprintf(fdot, "%d -> %d\n", $$+1, glob-5);
-                                                        fprintf(fdot, "%d -> %d\n", $$+1, glob-4);
-                                                        fprintf(fdot, "%d -> %d\n", $$+1, glob-3);
-                                                        fprintf(fdot, "%d -> %d\n", $$+1, glob-2);
-                                                        fprintf(fdot, "%d -> %d\n", $$+1, glob-1);}*/
-        |   LPAREN DIVOP term term RPAREN       /*{glob+=5;
-                                                        fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob-5); 
-                                                        fprintf(fdot, "%d [label=\"+\" ordering=\"out\"]\n", glob-4); 
-                                                        fprintf(fdot, "%d [label=term ordering=\"out\"]\n", glob-3); 
-                                                        fprintf(fdot, "%d [label=term ordering=\"out\"]\n", glob-2); 
-                                                        fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob-1); $$ = glob;
-                                                        fprintf(fdot, "%d -> %d\n", $$+1, glob-5);
-                                                        fprintf(fdot, "%d -> %d\n", $$+1, glob-4);
-                                                        fprintf(fdot, "%d -> %d\n", $$+1, glob-3);
-                                                        fprintf(fdot, "%d -> %d\n", $$+1, glob-2);
-                                                        fprintf(fdot, "%d -> %d\n", $$+1, glob-1);}*/
-        |   LPAREN IF fla term term RPAREN
-        |   LPAREN NAME RPAREN
-        |   LPAREN NAME expr RPAREN
-        |   LPAREN NAME expr expr RPAREN
-        |   LPAREN LET LPAREN NAME expr RPAREN term RPAREN
+term    :   CONST {
+                a[glob+1]=1;$$=glob+1;
+                ++glob;fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob,$1);
+                };
+        |   NAME {
+                a[glob+1]=1;$$=glob+1;
+                ++glob;fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob,$1);
+                };
+        |   LPAREN GETINT RPAREN{
+                a[glob+1]=3;$$=glob+1;
+                ++glob;fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=\"getInt\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob); 
+        };
+        |   LPAREN ADDOP term term RPAREN {
+                a[glob+1]=5;$$=glob+1;
+                ++glob;fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=\"+\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=term ordering=\"out\"]\n", glob);
+                general_loop(glob,$3);
+                ++glob;fprintf(fdot, "%d [label=term ordering=\"out\"]\n", glob);
+                general_loop(glob,$4);
+                ++glob;fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
+                };
+        |   LPAREN MINOP term term RPAREN {
+                a[glob+1]=5;$$=glob+1;
+                ++glob;fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=\"-\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=term ordering=\"out\"]\n", glob);
+                general_loop(glob,$3);
+                ++glob;fprintf(fdot, "%d [label=term ordering=\"out\"]\n", glob);
+                general_loop(glob,$4);
+                ++glob;fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
+                };
+        |   LPAREN MULTOP term term RPAREN {
+                a[glob+1]=5;$$=glob+1;
+                ++glob;fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=\"*|div|mod\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=term ordering=\"out\"]\n", glob);
+                general_loop(glob,$3);
+                ++glob;fprintf(fdot, "%d [label=term ordering=\"out\"]\n", glob);
+                general_loop(glob,$4);
+                ++glob;fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
+                };
+        |   LPAREN IF fla term term RPAREN{
+                a[glob+1]=6;$$=glob+1;
+                ++glob;fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=IF ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=fla ordering=\"out\"]\n", glob);
+                general_loop(glob,$3);
+                ++glob;fprintf(fdot, "%d [label=term ordering=\"out\"]\n", glob);
+                general_loop(glob,$4);
+                ++glob;fprintf(fdot, "%d [label=term ordering=\"out\"]\n", glob);
+                general_loop(glob,$5);
+                ++glob;fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
+                };
+        |   LPAREN NAME RPAREN {
+                a[glob+1]=3;$$=glob+1;
+                ++glob;fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n",glob);
+                ++glob;fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
+                }
+        |   LPAREN NAME expr RPAREN{
+                a[glob+1]=4;$$=glob+1;
+                ++glob;fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n",glob);
+                ++glob;fprintf(fdot, "%d [label=expr ordering=\"out\"]\n", glob);  
+                general_loop(glob,$3);              
+                ++glob;fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
+                
+                };
+        |   LPAREN NAME expr expr RPAREN{
+                a[glob+1]=5;$$=glob+1;
+                ++glob;fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n",glob);
+                ++glob;fprintf(fdot, "%d [label=expr ordering=\"out\"]\n",glob);  
+                general_loop(glob,$4); 
+                ++glob;fprintf(fdot, "%d [label=expr ordering=\"out\"]\n",glob);  
+                general_loop(glob,$5);                           
+                ++glob;fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
+                
+                };
+        |   LPAREN LET LPAREN NAME expr RPAREN term RPAREN{
+                a[glob+1]=8;$$=glob+1;
+                ++glob;fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=LET ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n",glob);
+                ++glob;fprintf(fdot, "%d [label=expr ordering=\"out\"]\n",glob);
+                general_loop(glob,$5);
+                ++glob;fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob); 
+                ++glob;fprintf(fdot, "%d [label=term ordering=\"out\"]\n",glob); 
+                general_loop(glob,$7);                            
+                ++glob;fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
+                
+                };
         ;
-fla     :   BOOLCONST   {glob++; fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob, $1); $$ = glob;
-                                fprintf(fdot, "%d -> %d\n", $$+1, glob);}       //works
-        |   NAME        {glob++; fprintf(fdot, "%d [label=%s ordering=\"out\"]\n", glob, $1); $$ = glob;
-                                fprintf(fdot, "%d -> %d\n", $$+1, glob);}       //works
-        |   LPAREN FUNCTION RPAREN
-        |   LPAREN COMPARATOR term term RPAREN
-        |   LPAREN NOT fla RPAREN
-        |   LPAREN BOOLOP term term RPAREN
-        |   LPAREN IF fla fla fla RPAREN
-        |   LPAREN NAME RPAREN
-        |   LPAREN NAME expr RPAREN
-        |   LPAREN NAME expr expr RPAREN
-        |   LPAREN LET LPAREN NAME expr RPAREN fla RPAREN
+fla     :   TRUECONST {
+                a[glob+1]=1;$$=glob+1;
+                ++glob;fprintf(fdot, "%d [label=true ordering=\"out\"]\n", glob,$1);
+                };
+        |   FALSECONST {
+                a[glob+1]=1;$$=glob+1;
+                ++glob;fprintf(fdot, "%d [label=false ordering=\"out\"]\n", glob,$1);
+                };
+        |   NAME {
+                a[glob+1]=1;$$=glob+1;
+                ++glob;fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n", glob,$1);
+                };
+        |   LPAREN GETBOOL RPAREN{
+                a[glob+1]=3;$$=glob+1;
+                ++glob;fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=getBool ordering=\"out\"]\n",glob);
+                ++glob;fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
+                };
+        |   LPAREN COMPARATOR term term RPAREN{
+                a[glob+1]=5;$$=glob+1;
+                ++glob;fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=COMPARATOR ordering=\"out\"]\n",glob);
+                ++glob;fprintf(fdot, "%d [label=term ordering=\"out\"]\n", glob);  
+                general_loop(glob,$3);                          
+                ++glob;fprintf(fdot, "%d [label=term ordering=\"out\"]\n", glob);  
+                general_loop(glob,$4);                        
+                ++glob;fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
+                };
+        |   LPAREN NOT fla RPAREN{
+                a[glob+1]=4;$$=glob+1;
+                ++glob;fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=NOT ordering=\"out\"]\n",glob);
+                ++glob;fprintf(fdot, "%d [label=fla ordering=\"out\"]\n", glob); 
+                general_loop(glob,$3);                            
+                ++glob;fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
+                };
+        |   LPAREN AND term term RPAREN{
+                a[glob+1]=5;$$=glob+1;
+                ++glob;fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=AND ordering=\"out\"]\n",glob);
+                ++glob;fprintf(fdot, "%d [label=term ordering=\"out\"]\n",glob);
+                general_loop(glob,$3);
+                ++glob;fprintf(fdot, "%d [label=term ordering=\"out\"]\n",glob); 
+                general_loop(glob,$4);                           
+                ++glob;fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
+        };
+        |   LPAREN OR term term RPAREN{
+                a[glob+1]=5;$$=glob+1;
+                ++glob;fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=OR ordering=\"out\"]\n",glob);
+                ++glob;fprintf(fdot, "%d [label=term ordering=\"out\"]\n",glob);
+                general_loop(glob,$3);
+                ++glob;fprintf(fdot, "%d [label=term ordering=\"out\"]\n",glob); 
+                general_loop(glob,$4);                           
+                ++glob;fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
+        };
+        |   LPAREN IF fla fla fla RPAREN{
+                a[glob+1]=6;$$=glob+1;
+                ++glob;fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=IF ordering=\"out\"]\n",glob);
+                ++glob;fprintf(fdot, "%d [label=fla ordering=\"out\"]\n", glob);
+                general_loop(glob,$3);
+                ++glob;fprintf(fdot, "%d [label=fla ordering=\"out\"]\n", glob); 
+                general_loop(glob,$4);  
+                ++glob;fprintf(fdot, "%d [label=fla ordering=\"out\"]\n", glob);
+                general_loop(glob,$5);                                    
+                ++glob;fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
+  
+        };
+        |   LPAREN NAME RPAREN{
+                a[glob+1]=3;$$=glob+1;
+                ++glob;fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n",glob);
+                ++glob;fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
+                }
+        |   LPAREN NAME expr RPAREN{
+                a[glob+1]=4;$$=glob+1;
+                ++glob;fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n",glob);
+                ++glob;fprintf(fdot, "%d [label=expr ordering=\"out\"]\n",glob);
+                general_loop(glob,$3);
+                ++glob;fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
+                }
+        |   LPAREN NAME expr expr RPAREN{
+                a[glob+1]=5;$$=glob+1;
+                ++glob;fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=NAME ordering=\"out\"]\n",glob);
+                ++glob;fprintf(fdot, "%d [label=expr ordering=\"out\"]\n",glob);
+                general_loop(glob,$3);
+                ++glob;fprintf(fdot, "%d [label=expr ordering=\"out\"]\n",glob);
+                general_loop(glob,$4);
+                ++glob;fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
+                };
+        |   LPAREN LET LPAREN NAME expr RPAREN fla RPAREN{
+                a[glob+1]=8;$$=glob+1;
+                ++glob;fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=LET ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=\"(\" ordering=\"out\"]\n", glob);
+                ++glob;fprintf(fdot, "%d [label=\"NAME\" ordering=\"out\"]\n",glob);
+                ++glob;fprintf(fdot, "%d [label=expr ordering=\"out\"]\n",glob);
+                general_loop(glob,$5);
+                ++glob;fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);    
+                ++glob;fprintf(fdot, "%d [label=fla ordering=\"out\"]\n",glob);   
+                general_loop(glob,$7);                                 
+                ++glob;fprintf(fdot, "%d [label=\")\" ordering=\"out\"]\n", glob);
+                };
         ;
 %%
 
@@ -198,9 +321,9 @@ fla     :   BOOLCONST   {glob++; fprintf(fdot, "%d [label=%s ordering=\"out\"]\n
 | CONST {glob ++; printf("const: %s, %d\n", $1, glob); $$ = glob; };
 */
 
-void yyerror(char * s)
+void yyerror(char *s)
 {  
-        fprintf (stderr, "%s\n", s);
+        fprintf (stdout, "%s\n", s);
 }
 
 int main(int argc, char* argv[])
@@ -209,7 +332,15 @@ int main(int argc, char* argv[])
 
         fdot = fopen("parse_tree.dot", "w+");
         fprintf(fdot, "digraph print {\n");     
-        yyparse();
+        yyin=fopen("tests/correct programs/sample4.txt ","r+");
+        if(yyin==NULL)
+        {
+                return 0;
+        }
+        else 
+        {
+                yyparse();
+        }
         fprintf(fdot, "}\n");
         fclose(fdot); 
         return 0;
