@@ -346,3 +346,18 @@ int main(int argc, char* argv[])
         return 0;
         
 }
+
+
+
+/*
+sum: arg {
+                insert_child($1);
+                $$ = insert_node("+", PLUS);
+        }
+        |
+        sum PLUS arg {
+                inert_child($1);
+                isnert_child($3);
+                $$ = insert_node("+", PLUS);
+        }
+}*/
