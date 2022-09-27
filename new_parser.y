@@ -11,11 +11,10 @@
         int glob = 0;
         int a[250];
         int i;
+        char* s;
         extern FILE *yyin;
-        void general_loop(int glob, int id){
-                for(i=0;i<a[id];i++){
-                        fprintf(fdot,"%d -> %d\n",glob,i+id);
-                }
+        char * getStr(char* a){
+                return strtok(a, " ");
         }
 %}
 
@@ -28,6 +27,7 @@
 
 %%
 program :   LPAREN DEFINE NAME type expr RPAREN program  {
+                
                 };
         |   LPAREN DEFINE NAME LPAREN NAME type RPAREN type expr RPAREN program{
                 insert_child($6);
@@ -40,8 +40,10 @@ program :   LPAREN DEFINE NAME type expr RPAREN program  {
         |   LPAREN DEFINE NAME LPAREN NAME type RPAREN LPAREN NAME type RPAREN type expr RPAREN program{
                 };
         |   LPAREN PRINT expr RPAREN {
+                int main_loc = insert_node("main",1);
+                insert_child(main_loc);
                 insert_child($3);
-                $$ = insert_node("Print",2);
+                $$ = insert_node("ENTRY",2);
                 };
         ;
 type    :   INTTYPE {
@@ -53,21 +55,21 @@ type    :   INTTYPE {
                 };
         ;
 expr    :   term {
-                insert_child($1);
-                $$ = insert_node("term",1);
+                // insert_child($1);
+                // $$ = insert_node("term",1);
                 
                 };
         |   fla {
-                insert_child($1);
-                $$ = insert_node("fla",1);
+                // insert_child($1);
+                // $$ = insert_node("fla",1);
                 };
         ;
 term    :   CONST {
-                $$ = insert_node($1,CONST);
+                $$ = insert_node(getStr($1),CONST);
 
                 };
         |   NAME {
-                $$ = insert_node($1,NAME);
+                $$ = insert_node(getStr($1),NAME);
 
                 };
         |   LPAREN GETINT RPAREN{
@@ -76,7 +78,7 @@ term    :   CONST {
         |   LPAREN ADDOP expr expr RPAREN {
                 insert_child($3);
                 insert_child($4);
-                $$ = insert_node("+",ADDOP);
+                $$ = insert_node("PLUS",ADDOP);
                 };
         |   LPAREN MINOP expr expr RPAREN {
                 insert_child($3);
@@ -107,7 +109,9 @@ term    :   CONST {
                 $$ = insert_node("NAME",1);
                 };
         |   LPAREN LET LPAREN NAME expr RPAREN expr RPAREN{
-                insert_child($5);
+                int loc = insert_node(getStr($4),1);
+                insert_child(loc);
+                insert_child($5);                
                 insert_child($7);
                 $$ = insert_node("LET",1);
                 };
