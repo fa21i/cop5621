@@ -146,9 +146,9 @@ int visit_ast(int (*f)(struct ast* ast_node)){
 FILE *fp;
 int print(struct ast* temp_root) {
   if (!temp_root->is_leaf){
-    fprintf(fp, "%d [label=\"%s\", fontname=\"monospace\", style=filled, fillcolor=mintcream];\n ", temp_root->id, temp_root->token);
+    fprintf(fp, "%d [label=\"%s\", fontname=\"monospace\", style=filled, fillcolor=mintcream, ordering=\"out\"];\n ", temp_root->id, temp_root->token);
   } else {
-    fprintf(fp, "%d [label=\"%s\", fontname=\"monospace\"];\n ", temp_root->id, temp_root->token);
+    fprintf(fp, "%d [label=\"%s\", fontname=\"monospace\", ordering=\"out\"];\n ", temp_root->id, temp_root->token);
   }
   if (temp_root->child != NULL){
     struct ast_child* temp_ast_child_root = temp_root->child;
