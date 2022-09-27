@@ -12,13 +12,8 @@ int yywrap(){return 1;}
 ;.* {;}
 [-]?[0-9]+ 	{yylval.str = yytext; return CONST;}
 (<|>|<=|>=|=) 	{yylval.str = yytext; return COMPARATOR;}
-<<<<<<< HEAD
-\+ 	{return ADDOP;}
-\- 	{return MINOP;}
-=======
 \+ 	{yylval.str = yytext; return ADDOP;}
 \- 	{yylval.str = yytext; return MINOP;}
->>>>>>> main
 \*|mod|div 	{yylval.str = yytext; return MULTOP;}
 define-fun	{yylval.str = yytext; return DEFINE;}
 get-int     {yylval.str = yytext; return GETINT;}
