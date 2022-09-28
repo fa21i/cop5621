@@ -1,7 +1,5 @@
 %{
         #include <stdio.h>
-        #define _SVID_SOURCE
-        #define _POSIX_C_SOURCE 200809L
         #include <string.h>
         #include <stdlib.h>
         #include "ast.h"
@@ -11,10 +9,15 @@
         int glob = 0;
         int a[250];
         int i;
-        char* s;
+        char s[3];
         extern FILE *yyin;
         char * getStr(char* a){
-                return strtok(a, " ");
+                // free(s);
+                // strncpy(s,a,2);
+                // s[2] = '\0';
+                // fprintf(fdot,"GetSTR: %s -> %s\n",a,strtok(a," "));
+                return strdup(strtok(a," "));
+                // return s;
         }
 %}
 
@@ -27,17 +30,34 @@
 
 %%
 program :   LPAREN DEFINE NAME type expr RPAREN program  {
-                
+                insert_child(insert_node(getStr($3),1));
+                insert_child($4);
+                insert_child($5);
+                // insert_child($7);
+                $$ = insert_node("define-fun",DEFINE);
                 };
         |   LPAREN DEFINE NAME LPAREN NAME type RPAREN type expr RPAREN program{
+                int name1 = insert_node(getStr($3),1);
+                int name2 = insert_node(getStr($5),1);
+                insert_child(name1);
+                insert_child(name2);
                 insert_child($6);
                 insert_child($8);
                 insert_child($9);
-                insert_child($10);
-                $$ = insert_node("Define",DEFINE);
+                // insert_child($11);
+                $$ = insert_node("define-fun",DEFINE);
                 };
 
         |   LPAREN DEFINE NAME LPAREN NAME type RPAREN LPAREN NAME type RPAREN type expr RPAREN program{
+                int name1 = insert_node($3,1);
+                int name2 = insert_node(getStr($5),1);
+                int name3 = insert_node(getStr($9),1);
+                insert_child(name1);
+                insert_child(name2);
+                insert_child(name3);
+                insert_child($13);
+                // insert_child($15);
+                $$ = insert_node("define-fun",DEFINE);
                 };
         |   LPAREN PRINT expr RPAREN {
                 int main_loc = insert_node("main",1);
@@ -55,21 +75,23 @@ type    :   INTTYPE {
                 };
         ;
 expr    :   term {
-                // insert_child($1);
-                // $$ = insert_node("term",1);
+                $$ = $1;
+                // $$ = insert_node($1,1);
                 
                 };
         |   fla {
+                $$ = $1;
                 // insert_child($1);
                 // $$ = insert_node("fla",1);
                 };
         ;
 term    :   CONST {
-                $$ = insert_node(getStr($1),CONST);
-
+                $$ = insert_node(getStr($1),1);
+                // fprintf(fdot, "$$: %d ------------> $1: %s\n",$$,strtok($1, " "));
                 };
         |   NAME {
-                $$ = insert_node(getStr($1),NAME);
+                $$ = insert_node(getStr($1),1);
+                // fprintf(fdot, "$$: %d ------------> $1: %s\n",$$,strtok($1, " "));
 
                 };
         |   LPAREN GETINT RPAREN{
@@ -97,7 +119,7 @@ term    :   CONST {
                 $$ = insert_node("IF",1) ;
                 };
         |   LPAREN NAME RPAREN {
-                $$ = insert_node($2,1);
+                $$ = insert_node(getStr($2),1);
                 };
         |   LPAREN NAME expr RPAREN{
                 insert_child($3);
@@ -117,19 +139,34 @@ term    :   CONST {
                 };
         ;
 fla     :   TRUECONST {
+                $$ = insert_node("True",1);
                 };
         |   FALSECONST {
+                $$ = insert_node("False",1);
                 };
         ;
         |   LPAREN GETBOOL RPAREN{
+                $$ = insert_node("get-bool",GETINT);
                 };
         |   LPAREN COMPARATOR expr expr RPAREN{
+                insert_child($3);
+                insert_child($4);
+                $$ = insert_node("Comparator",1);
+                
                 };
         |   LPAREN NOT expr RPAREN{
+                insert_child($3);
+                $$ = insert_node("Not",1);
                 };
         |   LPAREN AND expr expr RPAREN{
+                insert_child($3);
+                insert_child($4);
+                $$ = insert_node("AND",1);
         };
         |   LPAREN OR expr expr RPAREN{
+                insert_child($3);
+                insert_child($4);
+                $$ = insert_node("OR",1);
         };
         ;
 %%
@@ -149,7 +186,7 @@ int main(int argc, char* argv[])
 
         fdot = fopen("parse_tree.dot", "w+");
         fprintf(fdot, "digraph print {\n");     
-        yyin=fopen("tests/correct programs/sample1.txt ","r+");
+        yyin=fopen("tests/correct programs/sample3.txt ","r+");
         if(yyin==NULL)
         {
                 printf("Failed");
