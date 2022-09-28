@@ -123,12 +123,12 @@ term    :   CONST {
                 };
         |   LPAREN NAME expr RPAREN{
                 insert_child($3);
-                $$ = insert_node("NAME",1);
+                $$ = insert_node(getStr($2),1);
                 };
         |   LPAREN NAME expr expr RPAREN{
                 insert_child($3);
                 insert_child($4);
-                $$ = insert_node("NAME",1);
+                $$ = insert_node(getStr($2),1);
                 };
         |   LPAREN LET LPAREN NAME expr RPAREN expr RPAREN{
                 int loc = insert_node(getStr($4),1);
@@ -210,7 +210,7 @@ int main(int argc, char* argv[])
 
         fdot = fopen("parse_tree.dot", "w+");
         fprintf(fdot, "digraph print {\n");     
-        yyin=fopen("tests/correct programs/sample3.txt ","r+");
+        yyin=fopen("tests/correct programs/sample4.txt ","r+");
         if(yyin==NULL)
         {
                 printf("Failed");

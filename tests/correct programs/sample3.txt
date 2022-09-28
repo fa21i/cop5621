@@ -1,2 +1,2 @@
-(define-fun name (v int) int (if (> v 0) (+ 1 2) 20))
+(define-fun name (v int) int (if (>= v 0) (+ 1 2) 20))
 (print (name (get-int)))
