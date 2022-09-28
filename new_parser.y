@@ -24,7 +24,7 @@
 %union {int val; char* str;}
 %start program
 %token <str> NAME CONST 
-%token <val> COMPARATOR ADDOP MINOP DEFINE GETINT GETBOOL AND OR IF LET INTTYPE BOOLTYPE PRINT RPAREN LPAREN NOT MULTOP TRUECONST FALSECONST
+%token <val> LT GT EQ LTEQ GTEQ ADDOP MINOP DEFINE GETINT GETBOOL AND OR IF LET INTTYPE BOOLTYPE PRINT RPAREN LPAREN NOT MULTOP TRUECONST FALSECONST
 %type <val> program type expr term fla 
 
 
@@ -49,7 +49,7 @@ program :   LPAREN DEFINE NAME type expr RPAREN program  {
                 };
 
         |   LPAREN DEFINE NAME LPAREN NAME type RPAREN LPAREN NAME type RPAREN type expr RPAREN program{
-                int name1 = insert_node($3,1);
+                int name1 = insert_node(getStr($3),1);
                 int name2 = insert_node(getStr($5),1);
                 int name3 = insert_node(getStr($9),1);
                 insert_child(name1);
@@ -148,10 +148,34 @@ fla     :   TRUECONST {
         |   LPAREN GETBOOL RPAREN{
                 $$ = insert_node("get-bool",GETINT);
                 };
-        |   LPAREN COMPARATOR expr expr RPAREN{
+        |   LPAREN LT expr expr RPAREN{
                 insert_child($3);
                 insert_child($4);
-                $$ = insert_node("Comparator",1);
+                $$ = insert_node("LT",1);
+                
+                };
+        |   LPAREN GT expr expr RPAREN{
+                insert_child($3);
+                insert_child($4);
+                $$ = insert_node("GT",1);
+                
+                };
+        |   LPAREN EQ expr expr RPAREN{
+                insert_child($3);
+                insert_child($4);
+                $$ = insert_node("EQ",1);
+                
+                };
+        |   LPAREN LTEQ expr expr RPAREN{
+                insert_child($3);
+                insert_child($4);
+                $$ = insert_node("LTEQ",1);
+                
+                };
+        |   LPAREN GTEQ expr expr RPAREN{
+                insert_child($3);
+                insert_child($4);
+                $$ = insert_node("GT EQ",1);
                 
                 };
         |   LPAREN NOT expr RPAREN{
