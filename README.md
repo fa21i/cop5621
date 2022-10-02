@@ -1,11 +1,11 @@
 # cop5621
 PARSER
-  win_bison -d new_parser.y /
-  win_flex lex.l /
-  gcc lex.yy.c new_parser.tab.c
+  yacc -d new_parser.y /
+  lex lex.l /
+  gcc lex.yy.c y.tab.c ast.c comp.c -o comp
   
   Reading in files to test
-    ./a.out tests/correct\ programs/sample?(1/2/3).txt
+    ./comp < tests/correct\ programs/sample?(1/2/3).txt
     change any of the sample files to see possible syntax errors
   
     
