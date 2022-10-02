@@ -4,13 +4,12 @@
         #include <stdlib.h>
         #include "ast.h"
         int yylex();
-        FILE *fdot;
+        
 	void yyerror(char *s);
         int glob = 0;
         int a[250];
         int i;
         char s[3];
-        extern FILE *yyin;
         char * getStr(char* a){
                 // free(s);
                 // strncpy(s,a,2);
@@ -204,27 +203,4 @@ void yyerror(char *s)
         fprintf (stdout, "%s\n", s);
 }
 
-int main(int argc, char* argv[])
-{
-        char filename[50];
 
-        fdot = fopen("parse_tree.dot", "w+");
-        fprintf(fdot, "digraph print {\n");     
-        yyin=fopen("tests/correct programs/sample4.txt ","r+");
-        if(yyin==NULL)
-        {
-                printf("Failed");
-                print_ast();
-                return 0;
-        }
-        else 
-        {
-                yyparse();
-                print_ast();
-                free_ast();
-        }
-        fprintf(fdot, "}\n");
-        fclose(fdot); 
-        return 0;
-        
-}
