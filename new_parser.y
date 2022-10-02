@@ -15,7 +15,7 @@
                 // strncpy(s,a,2);
                 // s[2] = '\0';
                 // fprintf(fdot,"GetSTR: %s -> %s\n",a,strtok(a," "));
-                return strdup(strtok(a," "));
+                return strdup(strtok(strtok(a," "),")"));
                 // return s;
         }
 %}
