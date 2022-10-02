@@ -1,9 +1,12 @@
 # cop5621
 PARSER
-  yacc -d new_parser.y /
-  lex lex.l /
+  yacc -d new_parser.y 
+LEX
+  lex lex.l
+COMPILE
   gcc lex.yy.c y.tab.c ast.c comp.c -o comp
   
+RUN
   Reading in files to test
     ./comp < tests/correct\ programs/sample?(1/2/3).txt
     change any of the sample files to see possible syntax errors
