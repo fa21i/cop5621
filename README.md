@@ -1,27 +1,27 @@
 # cop5621
 ### PARSER
 ```
-yacc -d new_parser.y
+$ yacc -d new_parser.y
 ```
  
 ### LEX
 ```
-lex lex.l
+$ lex lex.l
 ```
 
 ### GCC
 ```
-gcc lex.yy.c y.tab.c ast.c comp.c -o comp
+$ gcc lex.yy.c y.tab.c ast.c comp.c -o comp
 ```
 
 ### COMPILE
 ```
-make
+$ make
 ```
 ### RUN
 Reading in files to test
 ```
-./comp < tests/correct\ programs/sample?(1/2/3).txt
+$ ./comp < tests/correct\ programs/sample?(1/2/3).txt
 ```
 
 >change any of the sample files to see possible syntax errors
