@@ -29,15 +29,15 @@
 
 %%
 program :   LPAREN DEFINE NAME type expr RPAREN program  {
-                insert_child(insert_node(getStr($3),1));
+                insert_child(insert_node(getStr($3),NAME));
                 insert_child($4);
                 insert_child($5);
                 // insert_child($7);
                 $$ = insert_node("define-fun",DEFINE);
                 };
         |   LPAREN DEFINE NAME LPAREN NAME type RPAREN type expr RPAREN program{
-                int name1 = insert_node(getStr($3),1);
-                int name2 = insert_node(getStr($5),1);
+                int name1 = insert_node(getStr($3),NAME);
+                int name2 = insert_node(getStr($5),NAME);
                 insert_child(name1);
                 insert_child(name2);
                 insert_child($6);
@@ -48,12 +48,15 @@ program :   LPAREN DEFINE NAME type expr RPAREN program  {
                 };
 
         |   LPAREN DEFINE NAME LPAREN NAME type RPAREN LPAREN NAME type RPAREN type expr RPAREN program{
-                int name1 = insert_node(getStr($3),1);
-                int name2 = insert_node(getStr($5),1);
-                int name3 = insert_node(getStr($9),1);
+                int name1 = insert_node(getStr($3),NAME);
+                int name2 = insert_node(getStr($5),NAME);
+                int name3 = insert_node(getStr($9),NAME);
                 insert_child(name1);
                 insert_child(name2);
                 insert_child(name3);
+                insert_child($6);
+                insert_child($10);
+                insert_child($12);
                 insert_child($13);
                 // insert_child($15);
                 $$ = insert_node("define-fun",DEFINE);
@@ -85,12 +88,11 @@ expr    :   term {
                 };
         ;
 term    :   CONST {
-                $$ = insert_node(getStr($1),1);
+                $$ = insert_node(getStr($1),CONST);
                 // fprintf(fdot, "$$: %d ------------> $1: %s\n",$$,strtok($1, " "));
                 };
         |   NAME {
-                $$ = insert_node(getStr($1),1);
-                // fprintf(fdot, "$$: %d ------------> $1: %s\n",$$,strtok($1, " "));
+                $$ = insert_node(getStr($1),NAME);
 
                 };
         |   LPAREN GETINT RPAREN{
@@ -104,92 +106,92 @@ term    :   CONST {
         |   LPAREN MINOP expr expr RPAREN {
                 insert_child($3);
                 insert_child($4);
-                $$ = insert_node("-",1);
+                $$ = insert_node("-",MINOP);
                 };
         |   LPAREN MULTOP expr expr RPAREN {
                 insert_child($3);
                 insert_child($4);
-                $$ = insert_node("*",1);
+                $$ = insert_node("*",MULTOP);
                 };
         |   LPAREN IF expr expr expr RPAREN{
                 insert_child($3);
                 insert_child($4);
                 insert_child($5);
-                $$ = insert_node("IF",1) ;
+                $$ = insert_node("IF",IF) ;
                 };
         |   LPAREN NAME RPAREN {
-                $$ = insert_node(getStr($2),1);
+                $$ = insert_node(getStr($2),NAME);
                 };
         |   LPAREN NAME expr RPAREN{
                 insert_child($3);
-                $$ = insert_node(getStr($2),1);
+                $$ = insert_node(getStr($2),NAME);
                 };
         |   LPAREN NAME expr expr RPAREN{
                 insert_child($3);
                 insert_child($4);
-                $$ = insert_node(getStr($2),1);
+                $$ = insert_node(getStr($2),NAME);
                 };
         |   LPAREN LET LPAREN NAME expr RPAREN expr RPAREN{
-                int loc = insert_node(getStr($4),1);
+                int loc = insert_node(getStr($4),NAME);
                 insert_child(loc);
                 insert_child($5);                
                 insert_child($7);
-                $$ = insert_node("LET",1);
+                $$ = insert_node("LET",LET);
                 };
         ;
 fla     :   TRUECONST {
-                $$ = insert_node("True",1);
+                $$ = insert_node("True",TRUECONST);
                 };
         |   FALSECONST {
-                $$ = insert_node("False",1);
+                $$ = insert_node("False",FALSECONST);
                 };
         ;
         |   LPAREN GETBOOL RPAREN{
-                $$ = insert_node("get-bool",GETINT);
+                $$ = insert_node("get-bool",GETBOOL);
                 };
         |   LPAREN LT expr expr RPAREN{
                 insert_child($3);
                 insert_child($4);
-                $$ = insert_node("LT",1);
+                $$ = insert_node("LT",LT);
                 
                 };
         |   LPAREN GT expr expr RPAREN{
                 insert_child($3);
                 insert_child($4);
-                $$ = insert_node("GT",1);
+                $$ = insert_node("GT",GT);
                 
                 };
         |   LPAREN EQ expr expr RPAREN{
                 insert_child($3);
                 insert_child($4);
-                $$ = insert_node("EQ",1);
+                $$ = insert_node("EQ",EQ);
                 
                 };
         |   LPAREN LTEQ expr expr RPAREN{
                 insert_child($3);
                 insert_child($4);
-                $$ = insert_node("LTEQ",1);
+                $$ = insert_node("LTEQ",LTEQ);
                 
                 };
         |   LPAREN GTEQ expr expr RPAREN{
                 insert_child($3);
                 insert_child($4);
-                $$ = insert_node("GT EQ",1);
+                $$ = insert_node("GTEQ",GTEQ);
                 
                 };
         |   LPAREN NOT expr RPAREN{
                 insert_child($3);
-                $$ = insert_node("Not",1);
+                $$ = insert_node("Not",NOT);
                 };
         |   LPAREN AND expr expr RPAREN{
                 insert_child($3);
                 insert_child($4);
-                $$ = insert_node("AND",1);
+                $$ = insert_node("AND",AND);
         };
         |   LPAREN OR expr expr RPAREN{
                 insert_child($3);
                 insert_child($4);
-                $$ = insert_node("OR",1);
+                $$ = insert_node("OR",OR);
         };
         ;
 %%
