@@ -33,6 +33,21 @@ int demo(struct ast* node)
               (define-fun f bool true)
 
               (define-fun g (v int) bool (let (g true) g))
+
+
+        a type of each expression chould be either int or bool
+        types are identified inductively for each AST node:
+           (explicit types)
+           constants 1, 2, 3 etc. and function get-int have type int
+           true, false and function get-bool have type bool
+           AST nodes for operations +, -, *, div, mod have type int
+           AST nodes for operations <, <=, =, >=, >, not, 'or;, 'and' have type bool
+           (infered types)
+           a call of function declared as (define-fun ... ty ...) has type ty
+           a variable v in the parse tree of (define-fun ... (v ty) ...) has type ty
+           a variable v in the parse tree of (let (v op1) op2) has type op1
+           an if-node (if ... op1 op2) has type of op1 (or of op2)
+           a let-node (let (...) op) has type of op
        
         (define-fun f1 (i int) bool (= i 1))
         (define-fun f2 (i bool) (j int) int (if i j 0))
