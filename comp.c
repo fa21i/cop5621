@@ -5,10 +5,39 @@ int yyparse();
 int demo(struct ast* node)
 {
         
-        //(define-fun f1 (i int) bool (= i 1))
-        //(define-fun f2 (i bool) (j int) int (if i j 0))
-        //(print (let (x (f2 (get-bool) (get-int))) x))
-        /*
+       /*Semantic checking
+           each variable v can be used only in two cases
+
+              in the body of a function if v is declared as one of the function's arguements:
+                 e.g., (define-fun f (v int) bool (= v 1)) -- allwed
+                       (define-fun g bool (= v 1)) -- not allowed (semantic error)
+           
+              in the body of a let-binder if v is declared in the let-s first argumen,
+                 e.g., (+ (let (v 1) (= v 1)) v) -- not allowed 
+
+           each variable name can be declared exactly once:
+              per each function,
+                 e.g., (define-fun f (v int) (v bool) ...) --  not allowed
+              a sequence of nested let-biinders,
+                 e.g., (let (x ...) (let (x ...) ...)) --  not allowed (cant redefine)
+              or both,
+                 e.g., (define-fun f (v int) ... (let (v ...) ...)) -- not allowed
+              but... (+ (let (x ...) x) (let (x ...) x)) -- allowed (stay within their scopes, not the same "x")
+
+           functions can be called only if thye are previously defined (except get-int and get-bool)
+              (define-fun f (v int) bool (g))
+              (define-fun g bool (get-bool)) -- not allowed (g is used before it's declared, get-bool is allowed, should be switched)
+           
+           each function name can be used in exactly one define-fun and cannot be an input/local variable name of the defined function
+              (define-fun f (f int) bool true)
+              (define-fun f bool true)
+
+              (define-fun g (v int) bool (let (g true) g))
+       
+        (define-fun f1 (i int) bool (= i 1))
+        (define-fun f2 (i bool) (j int) int (if i j 0))
+        (print (let (x (f2 (get-bool) (get-int))) x))
+        
         vsit fin: f1
            visit its arg: i of type INT, valid in 2 -- 6
           user var (of unknown type): i in location 4
