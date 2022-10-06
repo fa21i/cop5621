@@ -52,6 +52,21 @@ int demo(struct ast* node)
         (define-fun f1 (i int) bool (= i 1))
         (define-fun f2 (i bool) (j int) int (if i j 0))
         (print (let (x (f2 (get-bool) (get-int))) x))
+
+        (LAZY ALGORITHM)
+        introduce a map M from AST nodes to {int, bool, unknown}
+        initialize SymbolTable (data structure) as an empty table, and M as a map to unknown
+        for all function declarations:
+           fill functino names, input/return types/names and scopes in SymbolTable
+        while there eixists an AST node 'node' such that M(node) == unknown do
+           introduce a type variable 'ty' := unknown
+           if 'node' has an explicit type 'ty0', then assign ty := ty0
+           otherwise, recall the inference rule for this sort of node:
+              if the rule relies on some type ty1 of a symbol from SymbolTable, then infer ty := ty1
+              if the rule relies on some type ty2 of a child AST node node2, and M(node2) == ty2, then infer ty := ty2
+           if ty is not unkown:
+              assign M(node) := ty
+              if node corresponds to some let-variable v, then fill v, its type ty and its scope in SymbolTable
         
         vsit fin: f1
            visit its arg: i of type INT, valid in 2 -- 6
