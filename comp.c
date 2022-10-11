@@ -158,14 +158,13 @@ int demo1(struct ast* node){
                   if(t_parent!=NULL && node->parent!=temp && temp!=t_parent &&
                      strcmp(get_child(temp,1)->token,node->token)==0){
                      printf("%s is already declared in %d-%d scope\n",node->token,temp->id,t_parent->id);
-                     // return 1;
+                     return 1;
                   }
                }
             }
             bool flag = false;
             for (int i = 0; i < arg_c; i++){
                if(strcmp(fun_scope[i],"LET")==0 && strcmp(node->token,args[i])==0){
-                  // printf("here: %s, scope: %d--%d\n", node->token,scope[i][0],scope[i][1]);
                   struct ast* temp = find_ast_node(scope[i][0])->parent;
                   struct ast* t_parent = find_parent(node,temp);
                   if (t_parent!=NULL)
@@ -176,11 +175,8 @@ int demo1(struct ast* node){
             }
             if(!flag){
                printf("%s is not in scope1\n",node->token);
+               return 1;
             }
-            // if(scope[r_index][0]!=node->id && scope[r_index][1]<node->id){
-            //    printf("%s is not in scope\n",node->token);
-            //    // return 1;
-            // }
             return 0;
          }
          else if( strcmp(fun_scope[r_index],get_child(get_root(node),1)->token)!=0){
