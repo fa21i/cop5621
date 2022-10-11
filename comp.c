@@ -5,9 +5,17 @@ char* args[20];
 int types[20];
 int scope[20][2];
 char* fun_scope[20];
+int id[20];
 int arg_c = 0;
 int type_c = 0;
-
+struct args {
+   char* name;
+   int type;
+   int s1;
+   int s2;
+   char* root_fun;
+   int id; 
+};
 int print_array(int a[]){
    for (int i = 0; i < type_c; i++)
    {
@@ -32,6 +40,25 @@ int print_scope(int a[][2], int index){
    }  
    printf("\n");
    return 0;
+}
+int get_count(char *a[],char *str){
+   int count=0;
+   for(int i=0;i<arg_c;i++){
+      if(strcmp(a[i],str)==0){
+         count++;
+      }
+   }
+   return count;
+}
+int* get_all_index(char* a[], char* str){
+   static int b[10];
+   int c=0;
+   for(int i=0;i<arg_c;i++){
+      if(strcmp(a[i],str)==0){
+         b[c++] = i;
+      }
+   }
+   return b;
 }
 int return_index(char* a[], char* str){
    for(int i=0;i<arg_c;i++){
@@ -123,10 +150,37 @@ int demo1(struct ast* node){
       }
       else if(get_child(get_root(node),1)->ntoken!=MAIN){
          if(strcmp(fun_scope[r_index],"LET")==0){
-            if(scope[r_index][0]!=node->id && scope[r_index][1]<node->id){
-               printf("%s is not in scope\n",node->token);
-               // return 1;
+            for (int i = 0; i < arg_c; i++)
+            {
+               if(strcmp(fun_scope[i],"LET")==0){
+                  struct ast* temp = find_ast_node(scope[i][0])->parent;
+                  struct ast* t_parent = find_parent(node,temp);
+                  if(t_parent!=NULL && node->parent!=temp && temp!=t_parent &&
+                     strcmp(get_child(temp,1)->token,node->token)==0){
+                     printf("%s is already declared in %d-%d scope\n",node->token,temp->id,t_parent->id);
+                     // return 1;
+                  }
+               }
             }
+            bool flag = false;
+            for (int i = 0; i < arg_c; i++){
+               if(strcmp(fun_scope[i],"LET")==0 && strcmp(node->token,args[i])==0){
+                  // printf("here: %s, scope: %d--%d\n", node->token,scope[i][0],scope[i][1]);
+                  struct ast* temp = find_ast_node(scope[i][0])->parent;
+                  struct ast* t_parent = find_parent(node,temp);
+                  if (t_parent!=NULL)
+                  {
+                     flag = true;
+                  }
+               }
+            }
+            if(!flag){
+               printf("%s is not in scope1\n",node->token);
+            }
+            // if(scope[r_index][0]!=node->id && scope[r_index][1]<node->id){
+            //    printf("%s is not in scope\n",node->token);
+            //    // return 1;
+            // }
             return 0;
          }
          else if( strcmp(fun_scope[r_index],get_child(get_root(node),1)->token)!=0){
@@ -138,7 +192,9 @@ int demo1(struct ast* node){
             return 0;
          }
       }
-      else if(get_child(get_root(node),1)->ntoken==MAIN && strcmp(fun_scope[r_index],"LET")==0){
+      else if(get_child(get_root(node),1)->ntoken==MAIN && 
+               strcmp(fun_scope[r_index],"LET")==0){
+
          printf("%s in not in scope\n", node->token);
          return 1;
       }
