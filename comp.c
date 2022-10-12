@@ -219,7 +219,7 @@ int scope_checking(struct ast* node){
             if(strcmp(fun_scope[i],"LET")==0 && strcmp(node->token,args[i])==0){
                struct ast* temp = find_ast_node(scope[i][0])->parent;
                struct ast* t_parent = find_parent(node,temp);
-               if (node->parent!=temp && )
+               if (t_parent!=NULL)
                {
                   flag = true;
                   break;
