@@ -1,0 +1,3 @@
+(define-fun f (i int) bool true)
+(define-fun g (h int) bool (let (i true) (f true)))
+(print (if (f 4) true true))

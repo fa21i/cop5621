@@ -101,9 +101,17 @@ int count_vars(char* fun_name){
 int declarations(struct ast* node)
 {
    if(node->ntoken == DEFINE){
-      printf("visit fun: %s\n", node->token);
+      // printf("visit fun: %s\n", node->token);
+      for (int i = 0; i < arg_c; i++)
+      {
+         if((strcmp(fun_scope[i],"DEFINE")==0 || strcmp(fun_scope[i],"LET")==0) && 
+            strcmp(args[i],get_child(node,1)->token)==0){
+               printf("function %s again cannot be declared twice\n",args[i]);
+               return 1;
+            }
+      }
       int how_many_children = get_child_num(node);
-      printf("how_many_children: %d\n", how_many_children);
+      // printf("how_many_children: %d\n", how_many_children);
       int id_fun_body = get_child(node, how_many_children)->id;
       fun_scope[arg_c] = "DEFINE" ;
       scope[arg_c][0] = get_child(node,1)->id;
@@ -127,21 +135,32 @@ int declarations(struct ast* node)
          if(arg->ntoken==INTTYPE || arg->ntoken==BOOLTYPE){
             types[type_c++] = arg->ntoken;
          }
-         printf("   declare its arg: %s of type %d, valid in %d -- %d\n",
-            arg->token, 
-            arg->ntoken,
-            arg->id, id_fun_body);
+         // printf("   declare its arg: %s of type %d, valid in %d -- %d\n",
+         //    arg->token, 
+         //    arg->ntoken,
+         //    arg->id, id_fun_body);
       }
+      
+      
    }
    if(node->ntoken == LET){
-      printf("visit fun: %s\n", node->token);
+      // printf("visit fun: %s\n", node->token);
+      for (int i = 0; i < arg_c; i++)
+      {
+         if(strcmp(fun_scope[i],"DEFINE")==0 && 
+            strcmp(args[i],get_child(node,1)->token)==0){
+               printf("Cannot define function %s again",args[i]);
+               return 1;
+            }
+      }
+      
       struct ast *let_child = get_child(node,2);
       int let_expr = let_child->ntoken;
-      printf("   declare its arg: %s of type %d, valid in %d -- %d\n",
-         get_child(node,1)->token,
-         let_expr,
-         get_child(node,1)->id,
-         get_child(node,3)->id);
+      // printf("   declare its arg: %s of type %d, valid in %d -- %d\n",
+         // get_child(node,1)->token,
+         // let_expr,
+         // get_child(node,1)->id,
+         // get_child(node,3)->id);
 
       if(let_expr==ADDOP||let_expr==MINOP||let_expr==MULTOP ||
          let_expr==LT || let_expr==GT || let_expr == EQ || 
@@ -171,12 +190,12 @@ int declarations(struct ast* node)
 int scope_checking(struct ast* node){
    if(node->ntoken==NAME){
       int r_index = return_index(args,node->token); 
-      printf("var: %s, fun-scope: %s, scope: %d -- %d, ID: %d\n",
-         node->token,
-         fun_scope[r_index],
-         scope[r_index][0],
-         scope[r_index][1],
-         node->id);
+      // printf("var: %s, fun-scope: %s, scope: %d -- %d, ID: %d\n",
+      //    node->token,
+      //    fun_scope[r_index],
+      //    scope[r_index][0],
+      //    scope[r_index][1],
+      //    node->id);
       if(r_index==-1){
          printf("%s not initialized\n",node->token);
          return 1;
@@ -200,9 +219,10 @@ int scope_checking(struct ast* node){
             if(strcmp(fun_scope[i],"LET")==0 && strcmp(node->token,args[i])==0){
                struct ast* temp = find_ast_node(scope[i][0])->parent;
                struct ast* t_parent = find_parent(node,temp);
-               if (t_parent!=NULL)
+               if (node->parent!=temp && )
                {
                   flag = true;
+                  break;
                }
             }
          }
@@ -212,7 +232,7 @@ int scope_checking(struct ast* node){
          }
          return 0;
       }
-      else if(get_child(get_root(node),1)->ntoken!=MAIN ){ 
+      else if(get_child(get_root(node),1)->ntoken!=MAIN && strcmp(fun_scope[r_index],"DEFINE")!=0){ 
          //    strcmp(fun_scope[r_index],get_child(get_root(node),1)->token)!=0){
          // printf("%s is not in scope\n",node->token);
          // return 1;
@@ -235,6 +255,15 @@ int scope_checking(struct ast* node){
          //    printf("%s in not in scope\n", node->token);
          //    return 1;
          // }
+         for (int i = 0; i < arg_c; i++)
+         {
+            if(strcmp(args[i],node->token)==0
+                 && strcmp(fun_scope[i],"DEFINE")!=0 && strcmp(fun_scope[i],"LET")!=0){
+               printf("Variable %s in not in scope\n",node->token);
+               return 1;
+            }
+         }
+         
          
       }
    }
@@ -300,7 +329,7 @@ int type_checking(struct ast* node){
          }
       }
       int r_index = return_index(args,node->token);
-      if(r_index!=-1 && strcmp(fun_scope[r_index],"DEFINE")==0 && get_child(get_root(node),1)->ntoken==MAIN ){
+      if(r_index!=-1 && strcmp(fun_scope[r_index],"DEFINE")==0 && strcmp(node->parent->token,"DEFINE-FUN")!=0 ){
          // printf("heere %s\n",node->token);
          int child_num = get_child_num(node);
          if(count_vars(args[r_index])==child_num){
@@ -309,7 +338,7 @@ int type_checking(struct ast* node){
                for (int i = 0; i < child_num; i++)
                {
                  if(tokens[get_child(node,i+1)->id].type!=types[b[i]]){
-                     printf("Argument No. %d  of Function %s is of wrong type\n",i+1,node->token);
+                     printf("Argument #%d  of Function %s is of wrong type\n",i+1,node->token);
                      return 1;
                  }
                }
@@ -349,7 +378,6 @@ int type_checking(struct ast* node){
    else if ( 
          node->ntoken == AND
       || node->ntoken == OR
-      || node->ntoken == NOT
       ){
    
       struct ast *child1 = get_child(node,1); 
@@ -364,9 +392,25 @@ int type_checking(struct ast* node){
       }
       tokens[node->id].type = BOOLTYPE;    
    }
+   else if(node->ntoken == NOT){
+      struct ast *child1 = get_child(node,1);
+      if(tokens[child1->id].type != BOOLTYPE){
+         printf("\'NOT\' argument %s is not of type BOOL\n",node->token);
+         return 1;
+      } 
+   }
 
    else if(node->ntoken==LET){
-      
+      // struct ast* root = get_root(node->parent);
+      // int child_num = get_child_num(root);
+      // printf("%d",root->id);
+      // int ret_type = get_child(node,child_num-1)->ntoken;
+      // int type = tokens[get_child(node,child_num)->id].type;
+      // // printf("%s> %d--%d--%d\n",get_child(node,1)->token,child_num,ret_type,type);
+      // if(ret_type != type){
+      //    printf("Type of the body of a function %s doesn't match with return type\n",get_child(node,1)->token);
+      //    return 1;
+      // }
       tokens[node->id].type = tokens[get_child(node,3)->id].type;
    }
 
@@ -384,7 +428,17 @@ int type_checking(struct ast* node){
       }
       tokens[node->id].type = tokens[get_child(node,3)->id].type;
    }
-   
+   else if(strcmp(node->token,"DEFINE-FUN")==0){
+      int child_num = get_child_num(node);
+      
+      int ret_type = get_child(node,child_num-1)->ntoken;
+      int type = tokens[get_child(node,child_num)->id].type;
+      // printf("%s> %d--%d--%d\n",get_child(node,1)->token,child_num,ret_type,type);
+      if(ret_type != type){
+         printf("Type of the body of a function %s doesn't match with return type\n",get_child(node,1)->token);
+         return 1;
+      }
+   }
    return 0;
       
 }
@@ -393,6 +447,7 @@ int main (int argc, char **argv) {
    int retval = yyparse();
 
    if (retval == 0) {
+      print_ast();
       int a = visit_ast(declarations);
       if(a!=0){
          return 1;
@@ -412,7 +467,7 @@ int main (int argc, char **argv) {
       print_char_array(fun_scope);
       printf("\n");
       print_tokens();
-      print_ast();
+      
    }
 
    free_ast();
