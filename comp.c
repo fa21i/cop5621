@@ -460,14 +460,14 @@ int main (int argc, char **argv) {
       if(a!=0){
          return 1;
       }
-      print_char_array(args);
-      print_array(types);
-      print_scope(scope,0);
-      print_scope(scope,1);
-      print_char_array(fun_scope);
-      printf("\n");
-      print_tokens();
-      
+      // print_char_array(args);
+      // print_array(types);
+      // print_scope(scope,0);
+      // print_scope(scope,1);
+      // print_char_array(fun_scope);
+      // printf("\n");
+      // print_tokens();
+      printf("Success!");
    }
 
    free_ast();
