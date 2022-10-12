@@ -308,8 +308,8 @@ int type_checking(struct ast* node){
                int *b = get_all_index(fun_scope,node->token);
                for (int i = 0; i < child_num; i++)
                {
-                 if(tokens[get_child(node,1)->id].type!=types[b[i]]){
-                     printf("Function %s has wrong variable type\n",node->token);
+                 if(tokens[get_child(node,i+1)->id].type!=types[b[i]]){
+                     printf("Argument No. %d  of Function %s is of wrong type\n",i+1,node->token);
                      return 1;
                  }
                }
