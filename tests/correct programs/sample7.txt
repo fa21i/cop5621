@@ -1,2 +1,3 @@
-(define-fun v1 (v2 bool) (v3 int) bool false)
-(print (f4 (get-int)))
+(define-fun fun1 (v2 bool) (v3 bool) bool (or false (let (v true) (= v2 v))))
+(define-fun fun2 (v1 bool) bool (or v1 true))
+(print (let (x 1) (let (y x) y)))
