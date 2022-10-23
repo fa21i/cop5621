@@ -467,7 +467,7 @@ int main (int argc, char **argv) {
       // print_char_array(fun_scope);
       // printf("\n");
       // print_tokens();
-      printf("Success!");
+      printf("Success!\n");
    }
 
    free_ast();
