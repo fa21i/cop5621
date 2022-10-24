@@ -103,12 +103,19 @@ bool hasNode(int id){
    }
    return false;
 }
+
+struct CFG* head_cfg = (struct CFG*) malloc(sizeof(struct CFG));
+
+int add_to_cfg(struct CFG* head, struct CFG* next){
+}
+
+
 int construct_cfg(struct ast* node){
    printf("node: %s\n",node->token);
    if((node->ntoken==DEFINE || node->ntoken==PRINT) 
       && !hasNode(get_child(node,1)->id)){
       
-      struct CFG* new_cfg;
+      struct CFG* new_cfg = (struct CFG*) malloc(sizeof(struct CFG));
       struct ast* en = get_child(node,1);
       struct ast* ex = get_child(node,get_child_num(node));
       printf("reached\n");
