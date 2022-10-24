@@ -6,6 +6,44 @@ struct token{
    char* name;
    int type;
 };
+struct cfgToken{
+   char* name;
+   int id;
+   int parentNum;
+   int childNum;
+   struct cfgToken *parent1;
+   struct cfgToken *parent2;
+   struct cfgToken *child1;
+   struct cfgToken *child2;
+};
+// struct N{
+//    struct ast* node;
+//    char* type;
+// };
+struct V{
+   struct ast* node;
+   struct V* next;
+};
+struct E{
+   struct ast *u;
+   struct ast *v;
+   struct E *next;
+};
+struct CFG{
+   struct V* V;
+   struct E* E;
+   struct ast* entry;
+   struct ast* ex;
+   struct CFG* next;
+};
+struct Map{
+   struct ast* key;
+   struct ast* body;
+   char* value;
+   struct Map* next;
+};
+struct Map* map;
+struct CFG* cfg = NULL;
 struct token tokens[250];
 char* args[20];
 int types[20];
@@ -22,6 +60,100 @@ struct args {
    char* root_fun;
    int id; 
 };
+// int construct_map(struct ast* node){
+//    if(node->ntoken==DEFINE){
+//       struct CFG* new_cfg;
+//       new_cfg->entry = get_child(node,1);
+      
+//       if(cfg == NULL){
+
+//       }
+//    }
+//    if(strcmp(n->type,"exit")==0){
+//       map->key = n;
+//       strcpy(map->value,"body");
+//       map->body =  n->node;
+//       map->next = NULL;
+//    }
+//    else if(get_child_num(n->node)==0){
+//       map->key = n;
+//       strcpy(map->value,"done");
+//       map->body =  n->node;
+//       map->next = NULL;
+//    }
+//    else{
+//       map->key = n;
+//       strcpy(map->value,"unknown");
+//       map->next = NULL;
+//    }
+//    return 0;
+// }
+bool hasNode(int id){
+   struct CFG* temp;
+   temp = cfg;
+   
+   while (temp!=NULL && temp->next!=NULL)
+   {
+      printf("id: %d,temp id: %d\n",id,temp->entry->id);
+      if(temp->entry->id == id){
+        return true; 
+      }
+      temp=temp->next;
+   }
+   return false;
+}
+int construct_cfg(struct ast* node){
+   printf("node: %s\n",node->token);
+   if((node->ntoken==DEFINE || node->ntoken==PRINT) 
+      && !hasNode(get_child(node,1)->id)){
+      
+      struct CFG* new_cfg;
+      struct ast* en = get_child(node,1);
+      struct ast* ex = get_child(node,get_child_num(node));
+      printf("reached\n");
+      printf("  node: %s\n",en->token);
+      new_cfg->ex = ex;
+      printf("  reached\n");
+      new_cfg->entry = en;
+      
+      struct V* v1;
+      v1->node = en;
+      v1->next = NULL;
+      struct V* v2;
+      v2->node = ex;
+      v2->next = NULL;
+      v1->next = v2;
+      new_cfg->V = v1;
+      struct E* e1;
+      e1->u = en;
+      e1->v = ex;
+      e1->next = NULL;
+      new_cfg->E = e1;
+      new_cfg->next = NULL;
+      if(cfg!=NULL){
+         struct CFG* temp;
+         while (temp->next!=NULL)
+         {
+            temp = temp->next;
+         }
+         temp->next = new_cfg;
+      }
+      else{
+         cfg = new_cfg;
+      }
+   }
+   return 0;
+}
+int print_cfg(){
+   struct CFG* temp;
+   temp = cfg;
+   while (temp!=NULL && temp->next!=NULL){
+      printf("Entry: %s, Exit: %s, Next: %s\n",temp->entry->token,temp->ex->token,temp->next->entry->token);
+      temp=temp->next;
+   }
+   printf("Entry: %s, Exit: %s, Next: NULL\n",temp->entry->token,temp->ex->token);
+   return 0;
+}
 int print_array(int a[]){
    for (int i = 0; i < type_c; i++)
    {
@@ -163,13 +295,12 @@ int declarations(struct ast* node)
          // get_child(node,3)->id);
 
       if(let_expr==ADDOP||let_expr==MINOP||let_expr==MULTOP ||
-         let_expr==LT || let_expr==GT || let_expr == EQ || 
-         let_expr == LTEQ || let_expr == GTEQ ||
          let_expr==GETINT || let_expr==INTTYPE || let_expr==CONST)
          types[type_c++] = INTTYPE;
       else if(let_expr==TRUECONST || let_expr==FALSECONST ||
          let_expr==OR || let_expr==NOT || let_expr==AND ||
-         let_expr==GETBOOL ||let_expr==BOOLTYPE)
+         let_expr==GETBOOL ||let_expr==BOOLTYPE || let_expr==LT || let_expr==GT || let_expr == EQ || 
+         let_expr == LTEQ || let_expr == GTEQ )
          types[type_c++] = BOOLTYPE;
       else if(let_expr==LET || let_expr==IF || let_expr==NAME){
          types[type_c++] = UNKNOWN_TYPE;
@@ -186,7 +317,6 @@ int declarations(struct ast* node)
    }
    return 0;
 }
-
 int scope_checking(struct ast* node){
    if(node->ntoken==NAME){
       int r_index = return_index(args,node->token); 
@@ -357,11 +487,7 @@ int type_checking(struct ast* node){
    else if (node->ntoken == ADDOP 
       || node->ntoken == MINOP 
       || node->ntoken == MULTOP
-      || node->ntoken == EQ 
-      || node->ntoken == LT 
-      || node->ntoken == GT
-      || node->ntoken == GTEQ
-      || node->ntoken == LTEQ){
+      ){
    
       struct ast *child1 = get_child(node,1); 
       struct ast *child2 = get_child(node,2); 
@@ -378,6 +504,7 @@ int type_checking(struct ast* node){
    else if ( 
          node->ntoken == AND
       || node->ntoken == OR
+      
       ){
    
       struct ast *child1 = get_child(node,1); 
@@ -392,12 +519,28 @@ int type_checking(struct ast* node){
       }
       tokens[node->id].type = BOOLTYPE;    
    }
+   else if(
+         node->ntoken == EQ 
+      || node->ntoken == LT 
+      || node->ntoken == GT
+      || node->ntoken == GTEQ
+      || node->ntoken == LTEQ
+   ){
+      struct ast *child1 = get_child(node,1); 
+      struct ast *child2 = get_child(node,2); 
+      if(tokens[child1->id].type != tokens[child2->id].type){
+         printf("First and second operator of %s is not of same type\n",node->token);
+         return 1;
+      } 
+      tokens[node->id].type = BOOLTYPE; 
+   }
    else if(node->ntoken == NOT){
       struct ast *child1 = get_child(node,1);
       if(tokens[child1->id].type != BOOLTYPE){
          printf("\'NOT\' argument %s is not of type BOOL\n",node->token);
          return 1;
       } 
+      tokens[node->id].type = BOOLTYPE;   
    }
 
    else if(node->ntoken==LET){
@@ -423,7 +566,7 @@ int type_checking(struct ast* node){
          return 1;
       } 
       if(tokens[child2->id].type != tokens[child3->id].type){
-         printf("Second and third operator of %s are not same\n",node->token);
+         printf("Second and third operator (%s,%s) of %s are not same\n",tokens[child2->id].name,tokens[child3->id].name,node->token);
          return 1;
       }
       tokens[node->id].type = tokens[get_child(node,3)->id].type;
@@ -435,31 +578,35 @@ int type_checking(struct ast* node){
       int type = tokens[get_child(node,child_num)->id].type;
       // printf("%s> %d--%d--%d\n",get_child(node,1)->token,child_num,ret_type,type);
       if(ret_type != type){
-         printf("Type of the body of a function %s doesn't match with return type\n",get_child(node,1)->token);
+         printf("Type of the body of function %s doesn't match with return type\n",get_child(node,1)->token);
          return 1;
       }
    }
    return 0;
       
 }
+
 int main (int argc, char **argv) {
 
    int retval = yyparse();
 
    if (retval == 0) {
       print_ast();
-      int a = visit_ast(declarations);
-      if(a!=0){
-         return 1;
-      }
-      a = visit_ast(scope_checking);
-      if(a!=0){
-         return 1;
-      }
-      a = visit_ast(type_checking);
-      if(a!=0){
-         return 1;
-      }
+      // int a = visit_ast(declarations);
+      // if(a!=0){
+      //    return 1;
+      // }
+      // a = visit_ast(scope_checking);
+      // if(a!=0){
+      //    return 1;
+      // }
+      // a = visit_ast(type_checking);
+      // if(a!=0){
+      //    return 1;
+      // }
+      visit_ast(construct_cfg);
+      print_cfg();
+      
       // print_char_array(args);
       // print_array(types);
       // print_scope(scope,0);
