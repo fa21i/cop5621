@@ -22,6 +22,25 @@ struct args {
    char* root_fun;
    int id; 
 };
+
+struct block {
+   int id;
+   //node;
+   int status;
+   //next*;
+};
+
+struct edge {
+   int edge[2];
+   //next*
+};
+
+struct cfg {
+   //block*;
+   //edge*;
+};
+
+
 int print_array(int a[]){
    for (int i = 0; i < type_c; i++)
    {
@@ -439,9 +458,14 @@ int type_checking(struct ast* node){
          return 1;
       }
    }
-   return 0;
-      
+   return 0;      
 }
+
+int cfg() {
+   return 0;
+}
+
+
 int main (int argc, char **argv) {
 
    int retval = yyparse();
