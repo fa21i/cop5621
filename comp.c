@@ -21,7 +21,6 @@ struct cfgToken{
 //    char* type;
 // };
 struct V{
-   int id;
    int status;
    struct ast* node;
    struct V* next;
@@ -107,7 +106,39 @@ bool hasNode(int id){
 }
 
 
-int add_to_cfg(struct CFG* head, struct CFG* next){
+int add_V(struct V* v, struct CFG* c){
+   c->v->next = v;
+}
+
+int add_E(struct E* e, struct CFG* c){
+
+}
+
+struct E* find_E(struct CFG* c){
+   struct E* temp = c->e;
+   while(temp->next)
+   {
+      struct V* temp_v = find_V(c, temp->v->id);
+      if(temp_v->status == 0)
+      {
+         return temp;   
+      }
+      else
+         temp = temp->next;
+   }
+   return NULL;
+}
+
+struct *V find_V(struct CFG* c, int id) {
+   struct V* temp = c->v;  
+   while(temp->next)
+   {
+      if(temp->node->id == id)
+         return temp;
+      else
+         temp = temp->next;
+   } 
+   return NULL;
 }
 
 
@@ -127,9 +158,11 @@ int construct_cfg(struct ast* node){
       
       struct V* v1 = (struct V*) malloc(sizeof(struct V));
       v1->node = en;
+      v1->status = 0;
       v1->next = NULL;
       struct V* v2 = (struct V*) malloc(sizeof(struct V));
       v2->node = ex;
+      v2->status = 0;
       v2->next = NULL;
       v1->next = v2;
       new_cfg->v = v1;
@@ -139,6 +172,14 @@ int construct_cfg(struct ast* node){
       e1->next = NULL;
       new_cfg->e = e1;
       new_cfg->next = NULL;
+     
+      struct E* temp_E;
+      while(temp_E = find_E(new_cfg))
+      {
+         struct V* u = find_V(new_cfg, temp_E->v->id);
+         struct V* v = find_V(new_cfg, temp_E->v->id);
+      }
+     
       if(cfg!=NULL){
          struct CFG* temp = cfg;
          while (temp->next!=NULL)
