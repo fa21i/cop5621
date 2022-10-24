@@ -21,6 +21,8 @@ struct cfgToken{
 //    char* type;
 // };
 struct V{
+   int id;
+   int status;
    struct ast* node;
    struct V* next;
 };
@@ -30,18 +32,18 @@ struct E{
    struct E *next;
 };
 struct CFG{
-   struct V* V;
-   struct E* E;
-   struct ast* entry;
+   struct V* v;
+   struct E* e;
+   struct ast* en;
    struct ast* ex;
    struct CFG* next;
 };
-struct Map{
+/*struct Map{
    struct ast* key;
    struct ast* body;
    char* value;
    struct Map* next;
-};
+};*/
 struct Map* map;
 struct CFG* cfg = NULL;
 struct token tokens[250];
@@ -95,8 +97,8 @@ bool hasNode(int id){
    
    while (temp!=NULL && temp->next!=NULL)
    {
-      printf("id: %d,temp id: %d\n",id,temp->entry->id);
-      if(temp->entry->id == id){
+      printf("id: %d,temp id: %d\n",id,temp->en->id);
+      if(temp->en->id == id){
         return true; 
       }
       temp=temp->next;
@@ -104,7 +106,6 @@ bool hasNode(int id){
    return false;
 }
 
-struct CFG* head_cfg = (struct CFG*) malloc(sizeof(struct CFG));
 
 int add_to_cfg(struct CFG* head, struct CFG* next){
 }
@@ -113,7 +114,7 @@ int add_to_cfg(struct CFG* head, struct CFG* next){
 int construct_cfg(struct ast* node){
    printf("node: %s\n",node->token);
    if((node->ntoken==DEFINE || node->ntoken==PRINT) 
-      && !hasNode(get_child(node,1)->id)){
+     /* && !hasNode(get_child(node,1)->id)*/){
       
       struct CFG* new_cfg = (struct CFG*) malloc(sizeof(struct CFG));
       struct ast* en = get_child(node,1);
@@ -122,24 +123,24 @@ int construct_cfg(struct ast* node){
       printf("  node: %s\n",en->token);
       new_cfg->ex = ex;
       printf("  reached\n");
-      new_cfg->entry = en;
+      new_cfg->en = en;
       
-      struct V* v1;
+      struct V* v1 = (struct V*) malloc(sizeof(struct V));
       v1->node = en;
       v1->next = NULL;
-      struct V* v2;
+      struct V* v2 = (struct V*) malloc(sizeof(struct V));
       v2->node = ex;
       v2->next = NULL;
       v1->next = v2;
-      new_cfg->V = v1;
-      struct E* e1;
+      new_cfg->v = v1;
+      struct E* e1 = (struct E*) malloc(sizeof(struct E));
       e1->u = en;
       e1->v = ex;
       e1->next = NULL;
-      new_cfg->E = e1;
+      new_cfg->e = e1;
       new_cfg->next = NULL;
       if(cfg!=NULL){
-         struct CFG* temp;
+         struct CFG* temp = cfg;
          while (temp->next!=NULL)
          {
             temp = temp->next;
@@ -156,10 +157,10 @@ int print_cfg(){
    struct CFG* temp;
    temp = cfg;
    while (temp!=NULL && temp->next!=NULL){
-      printf("Entry: %s, Exit: %s, Next: %s\n",temp->entry->token,temp->ex->token,temp->next->entry->token);
+      printf("Entry: %s, Exit: %s, Next: %s\n",temp->en->token,temp->ex->token,temp->next->en->token);
       temp=temp->next;
    }
-   printf("Entry: %s, Exit: %s, Next: NULL\n",temp->entry->token,temp->ex->token);
+   printf("Entry: %s, Exit: %s, Next: NULL\n",temp->en->token,temp->ex->token);
    return 0;
 }
 int print_array(int a[]){
