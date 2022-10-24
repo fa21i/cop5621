@@ -60,6 +60,7 @@ struct args {
    char* root_fun;
    int id; 
 };
+
 // int construct_map(struct ast* node){
 //    if(node->ntoken==DEFINE){
 //       struct CFG* new_cfg;
@@ -582,8 +583,7 @@ int type_checking(struct ast* node){
          return 1;
       }
    }
-   return 0;
-      
+   return 0;      
 }
 
 int main (int argc, char **argv) {
