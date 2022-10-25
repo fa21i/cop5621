@@ -21,10 +21,10 @@ struct cfgToken{
 //    char* type;
 // };
 struct V{
-   int id;
    int status;
    struct ast* node;
    struct V* next;
+   char* label;
 };
 struct E{
    struct ast *u;
@@ -106,10 +106,78 @@ bool hasNode(int id){
    return false;
 }
 
-
-int add_to_cfg(struct CFG* head, struct CFG* next){
+int is_OP(int t){
+   if(t == GT || t == EQ || t == LT || t == GTEQ || t == LTEQ || t == ADDOP
+      || t == MINOP || t == MULTOP || t == AND || t == OR)
+      return 1;
+   return 0;
 }
 
+int add_V(struct V* v, struct CFG* c){
+   struct V* temp = c->v;
+   while(temp->next)
+      temp = temp->next;
+   temp->next = v;
+   return 0;
+}
+
+int add_E(struct E* e, struct CFG* c){
+   struct E* temp = c->e;
+   while(temp->next)
+      temp = temp->next;
+   temp->next = e;
+   return 0;
+}
+
+struct V* find_V(struct CFG* c, int id) {
+   struct V *temp = c->v;  
+   while(temp->next)
+   {
+      if(temp->node->id == id)
+         return temp;
+      else
+         temp = temp->next;
+   } 
+   return NULL;
+}
+
+struct E* find_E(struct CFG* c){
+   struct E* temp = c->e;
+   while(temp->next)
+   {
+      struct V* temp_v = find_V(c, temp->v->id);
+      if(temp_v->status == 0)
+      {
+         return temp;   
+      }
+      else
+         temp = temp->next;
+   }
+   return NULL;
+}
+
+int remove_E(struct CFG* c, struct E* e){
+   struct E* temp = c->e;
+   struct E* prev;
+   if(c->e == e)
+   {
+      prev = c->e;
+      c->e = c->e->next;
+      free(prev);
+      return 0;
+   }
+   while(temp)
+   {
+      if(temp == e)
+      {
+         prev->next = temp->next;
+         free(temp);
+         return 0;
+      }
+      prev = temp;
+      temp = temp->next;
+   }
+}
 
 int construct_cfg(struct ast* node){
    printf("node: %s\n",node->token);
@@ -127,9 +195,11 @@ int construct_cfg(struct ast* node){
       
       struct V* v1 = (struct V*) malloc(sizeof(struct V));
       v1->node = en;
+      v1->status = 0;
       v1->next = NULL;
       struct V* v2 = (struct V*) malloc(sizeof(struct V));
       v2->node = ex;
+      v2->status = 0;
       v2->next = NULL;
       v1->next = v2;
       new_cfg->v = v1;
@@ -139,6 +209,227 @@ int construct_cfg(struct ast* node){
       e1->next = NULL;
       new_cfg->e = e1;
       new_cfg->next = NULL;
+     
+      struct E* temp_E;
+      while(temp_E = find_E(new_cfg))
+      {
+         struct V *u = find_V(new_cfg, temp_E->u->id);
+         struct V *v = find_V(new_cfg, temp_E->v->id);
+         
+         v->status = 1;
+
+         if(v->node->is_leaf)
+            continue;
+         
+         if(is_OP(v->node->ntoken) == 0)
+         {
+            struct V* v1 = (struct V*) malloc(sizeof(struct V));
+            struct V* v2 = (struct V*) malloc(sizeof(struct V));
+            v1->status = 0;
+            v2->status = 0;
+            v1->node = get_child(v->node,1);
+            v2->node = get_child(v->node,2);
+            v1->next = v2;
+            v2->next = NULL;
+            struct E* e1 = (struct E*) malloc(sizeof(struct E));
+            struct E* e2 = (struct E*) malloc(sizeof(struct E));
+            struct E* e3 = (struct E*) malloc(sizeof(struct E));
+            e1->u = u->node;
+            e1->v = v1->node;
+            e2->u = v1->node;
+            e2->v = v2->node;
+            e3->u = v2->node;
+            e3->v = v->node;
+            e1->next = e2;
+            e2->next = e3;
+            e3->next = NULL;
+
+            add_V(v1, new_cfg);
+            add_E(e1, new_cfg);
+
+            remove_E(new_cfg, temp_E);  
+            /* create label for v */
+            if(v1->node->is_leaf)
+            {
+               v1->label = (char*) malloc(12*sizeof(char));
+               v1->label = v1->node->token;
+            }
+            if(v2->node->is_leaf)
+            {
+               v2->label = (char*) malloc(12*sizeof(char));
+               v2->label = v2->node->token;
+            }
+         }
+         else if(v->node->ntoken == NOT){
+            struct V* v1 = (struct V*) malloc(sizeof(struct V));
+            v1->status = 0;
+            v1->node = get_child(v->node,1);
+            v1->next = NULL;
+            struct E* e1 = (struct E*) malloc(sizeof(struct E));
+            struct E* e2 = (struct E*) malloc(sizeof(struct E));
+            e1->u = u->node;
+            e1->v = v1->node;
+            e2->u = v1->node;
+            e2->v = v2->node;
+            e1->next = e2;
+            e2->next = NULL;
+
+            add_V(v1, new_cfg);
+            add_E(e1, new_cfg);
+
+            remove_E(new_cfg, temp_E);
+         
+            if(v1->node->is_leaf)
+            {
+               v1->label = (char*) malloc(12*sizeof(char));
+               v1->label = v1->node->token;
+            }
+            if(v2->node->is_leaf)
+            {
+               v2->label = v2->node->token;
+            }
+         }
+         else if(v->node->ntoken == LET)
+         {
+            struct V* v1 = (struct V*) malloc(sizeof(struct V));
+            struct V* v2 = (struct V*) malloc(sizeof(struct V));
+            struct V* v3 = (struct V*) malloc(sizeof(struct V));
+            v1->status = 0;
+            v2->status = 0;
+            v3->status = 0;
+            v1->node = get_child(v->node,1);
+            v2->node = get_child(v->node,2);
+            v3->node = get_child(v->node,3);
+            v1->next = v2;
+            v2->next = v3;
+            v3->next = NULL;
+            struct E* e1 = (struct E*) malloc(sizeof(struct E));
+            struct E* e2 = (struct E*) malloc(sizeof(struct E));
+            struct E* e3 = (struct E*) malloc(sizeof(struct E));
+            struct E* e4 = (struct E*) malloc(sizeof(struct E));
+            e1->u = u->node;
+            e1->v = v2->node;
+            e2->u = v2->node;
+            e2->v = v1->node;
+            e3->u = v1->node;
+            e3->v = v3->node;
+            e4->u = v3->node;
+            e4->v = v->node;
+            e1->next = e2;
+            e2->next = e3;
+            e3->next = e4;
+            e4->next = NULL;
+
+            add_V(v1, new_cfg);
+            add_E(e1, new_cfg);
+
+            remove_E(new_cfg, temp_E);
+
+            if(v1->node->is_leaf)
+            {
+               v1->label = (char*) malloc(12*sizeof(char));
+               v1->label = v1->node->token;
+            }
+            if(v2->node->is_leaf)
+            {
+               v2->label = (char*) malloc(12*sizeof(char));
+               v2->label = v2->node->token;
+            }
+            if(v3->node->is_leaf)
+            {
+               v3->label = (char*) malloc(12*sizeof(char));
+               v3->label = v2->node->token;
+            }
+         }          
+         else if(v->node->ntoken == IF)
+         {
+            struct V* v1 = (struct V*) malloc(sizeof(struct V));
+            struct V* v2 = (struct V*) malloc(sizeof(struct V));
+            struct V* v3 = (struct V*) malloc(sizeof(struct V));
+            v1->status = 0;
+            v2->status = 0;
+            v3->status = 0;
+            v1->node = get_child(v->node,1);
+            v2->node = get_child(v->node,2);
+            v3->node = get_child(v->node,3);
+            v1->next = v2;
+            v2->next = v3;
+            v3->next = NULL;
+            struct E* e1 = (struct E*) malloc(sizeof(struct E));
+            struct E* e2 = (struct E*) malloc(sizeof(struct E));
+            struct E* e3 = (struct E*) malloc(sizeof(struct E));
+            struct E* e4 = (struct E*) malloc(sizeof(struct E));
+            struct E* e5 = (struct E*) malloc(sizeof(struct E));
+            e1->u = u->node;
+            e1->v = v1->node;
+            e2->u = v1->node;
+            e2->v = v2->node;
+            e3->u = v1->node;
+            e3->v = v3->node;
+            e4->u = v2->node;
+            e4->v = v->node;
+            e5->u = v3->node;
+            e5->v = v->node;
+            e1->next = e2;
+            e2->next = e3;
+            e3->next = e4;
+            e4->next = e5;
+            e5->next = NULL;
+
+            add_V(v1, new_cfg);
+            add_E(e1, new_cfg);
+
+            remove_E(new_cfg, temp_E);
+
+            if(v1->node->is_leaf)
+            {
+               v1->label = (char*) malloc(12*sizeof(char));
+               v1->label = v1->node->token;
+            }
+            if(v2->node->is_leaf)
+            {
+               v2->label = (char*) malloc(12*sizeof(char));
+               v2->label = v2->node->token;
+            }
+            if(v3->node->is_leaf)
+            {
+               v3->label = (char*) malloc(12*sizeof(char));
+               v3->label = v2->node->token;
+            }
+            
+            v->label = (char*) malloc(100*sizeof(char));
+            //v->label = "If " + v1->node->id + " is true, then " +v->node->id + " := " + v2->node->id + ", else " + v->node->id + " := " + v3->node->id;
+            sprintf(v->label, "If v%d is true, then v%d := v%d, else v%d := v%d", v1->node->id, v->node->id, v2->node->id, v->node->id, v3->node->id);
+         }
+         else if(v->node->ntoken == NOT)
+         {
+            struct V* v1 = (struct V*) malloc(sizeof(struct V));
+            v1->status = 0;
+            v1->node = get_child(v->node,1);
+            v1->next = NULL;
+            struct E* e1 = (struct E*) malloc(sizeof(struct E));
+            struct E* e2 = (struct E*) malloc(sizeof(struct E));
+            e1->u = u->node;
+            e1->v = v1->node;
+            e2->u = v1->node;
+            e2->v = v->node;
+            e1->next = e2;
+            e2->next = NULL;
+  
+            add_V(v1, new_cfg);
+            add_E(e1, new_cfg);
+
+            remove_E(new_cfg, temp_E);
+
+            if(v1->node->is_leaf)
+            {
+               v1->label = (char*) malloc(12*sizeof(char));
+               v1->label = v1->node->token;
+            }
+         }
+
+      }
+     
       if(cfg!=NULL){
          struct CFG* temp = cfg;
          while (temp->next!=NULL)
@@ -153,16 +444,56 @@ int construct_cfg(struct ast* node){
    }
    return 0;
 }
+
 int print_cfg(){
-   struct CFG* temp;
-   temp = cfg;
-   while (temp!=NULL && temp->next!=NULL){
+   struct CFG* temp = cfg;
+   struct V* temp_V = temp->v;
+   struct E* temp_E = temp->e;
+   
+   FILE *fp;
+   fp = fopen("cfg.dot", "w");
+   fprintf(fp, "digraph print {\n");
+
+   while(temp)
+   {
+      while(temp_V)
+      {
+         //if let or if
+         if(temp_V->node->ntoken == LET)
+         {
+            fprintf(fp, "%d [label=\" %s := v%d", temp_V->node->id, temp_V->label, temp_V->next->node->id);   
+         }
+         if(temp_V->node->ntoken == IF)
+         {
+            fprintf(fp, "%d [label=\"%s\"\n", temp_V->label);
+         }
+         else
+         {
+            fprintf(fp, "%d [label=\"v%d := %s\", fontname=\"monospace\"]\n", temp_V->node->id, temp_V->node->id, temp_V->node->token);    //replace with temp_V->label
+         }
+         temp_V = temp_V->next;
+      }
+    
+      while(temp_E)
+      {
+         fprintf(fp, "%d->%d\n", temp_E->u->id, temp_E->v->id);     //<uID->vID>
+         temp_E = temp_E->next;
+      }
+      
+      temp = temp->next;
+   }
+   fprintf(fp, "}\n");
+   fclose(fp);
+   system("dot -Tpdf cfg.dot -o cfg.pdf");
+
+  /* while (temp!=NULL && temp->next!=NULL){
       printf("Entry: %s, Exit: %s, Next: %s\n",temp->en->token,temp->ex->token,temp->next->en->token);
       temp=temp->next;
    }
-   printf("Entry: %s, Exit: %s, Next: NULL\n",temp->en->token,temp->ex->token);
+   printf("Entry: %s, Exit: %s, Next: NULL\n",temp->en->token,temp->ex->token);*/
    return 0;
 }
+
 int print_array(int a[]){
    for (int i = 0; i < type_c; i++)
    {
