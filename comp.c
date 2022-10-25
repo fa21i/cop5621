@@ -219,9 +219,8 @@ int construct_cfg(struct ast* node){
          v->status = 1;
 
          if(v->node->is_leaf)
-            continue;
-         
-         if(is_OP(v->node->ntoken) == 0)
+            continue; 
+         else if(is_OP(v->node->ntoken) == 0)
          {
             struct V* v1 = (struct V*) malloc(sizeof(struct V));
             struct V* v2 = (struct V*) malloc(sizeof(struct V));
@@ -248,7 +247,7 @@ int construct_cfg(struct ast* node){
             add_E(e1, new_cfg);
 
             remove_E(new_cfg, temp_E);  
-            /* create label for v */
+            /* create label for v 
             if(v1->node->is_leaf)
             {
                v1->label = (char*) malloc(12*sizeof(char));
@@ -258,7 +257,7 @@ int construct_cfg(struct ast* node){
             {
                v2->label = (char*) malloc(12*sizeof(char));
                v2->label = v2->node->token;
-            }
+            }*/
          }
          else if(v->node->ntoken == NOT){
             struct V* v1 = (struct V*) malloc(sizeof(struct V));
@@ -325,7 +324,7 @@ int construct_cfg(struct ast* node){
 
             remove_E(new_cfg, temp_E);
 
-            if(v1->node->is_leaf)
+           /* if(v1->node->is_leaf)
             {
                v1->label = (char*) malloc(12*sizeof(char));
                v1->label = v1->node->token;
@@ -339,7 +338,7 @@ int construct_cfg(struct ast* node){
             {
                v3->label = (char*) malloc(12*sizeof(char));
                v3->label = v2->node->token;
-            }
+            }*/
          }          
          else if(v->node->ntoken == IF)
          {
@@ -381,7 +380,7 @@ int construct_cfg(struct ast* node){
 
             remove_E(new_cfg, temp_E);
 
-            if(v1->node->is_leaf)
+            /*if(v1->node->is_leaf)
             {
                v1->label = (char*) malloc(12*sizeof(char));
                v1->label = v1->node->token;
@@ -400,6 +399,7 @@ int construct_cfg(struct ast* node){
             v->label = (char*) malloc(100*sizeof(char));
             //v->label = "If " + v1->node->id + " is true, then " +v->node->id + " := " + v2->node->id + ", else " + v->node->id + " := " + v3->node->id;
             sprintf(v->label, "If v%d is true, then v%d := v%d, else v%d := v%d", v1->node->id, v->node->id, v2->node->id, v->node->id, v3->node->id);
+         */
          }
          else if(v->node->ntoken == NOT)
          {
@@ -421,11 +421,11 @@ int construct_cfg(struct ast* node){
 
             remove_E(new_cfg, temp_E);
 
-            if(v1->node->is_leaf)
+            /*if(v1->node->is_leaf)
             {
                v1->label = (char*) malloc(12*sizeof(char));
                v1->label = v1->node->token;
-            }
+            }*/
          }
 
       }
@@ -461,11 +461,11 @@ int print_cfg(){
          //if let or if
          if(temp_V->node->ntoken == LET)
          {
-            fprintf(fp, "%d [label=\" %s := v%d", temp_V->node->id, temp_V->label, temp_V->next->node->id);   
+            fprintf(fp, "%d [label=\" LET VAR := v%d", temp_V->node->id,  temp_V->next->node->id);   
          }
          if(temp_V->node->ntoken == IF)
          {
-            fprintf(fp, "%d [label=\"%s\"\n", temp_V->label);
+            fprintf(fp, "%d [label=\"IF STRING\"\n", temp_V->node->id, temp_V->label);
          }
          else
          {
@@ -741,6 +741,7 @@ int scope_checking(struct ast* node){
 }
 int type_checking(struct ast* node){
    tokens[node->id].name = node->token;
+
    
    if(node->ntoken==INTTYPE)
       tokens[node->id].type = INTTYPE;
@@ -921,6 +922,13 @@ int type_checking(struct ast* node){
          printf("Type of the body of function %s doesn't match with return type\n",get_child(node,1)->token);
          return 1;
       }
+   }
+   else if(node->ntoken == ASSERT) {
+      struct ast *child1 = get_child(node,1); 
+      if(tokens[child1->id].type != BOOLTYPE){
+         printf("Child of %s is not of type BOOL\n",node->token);
+         return 1;
+      } 
    }
    return 0;      
 }
