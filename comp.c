@@ -251,10 +251,12 @@ int construct_cfg(struct ast* node){
             /* create label for v */
             if(v1->node->is_leaf)
             {
+               v1->label = (char*) malloc(12*sizeof(char));
                v1->label = v1->node->token;
             }
             if(v2->node->is_leaf)
             {
+               v2->label = (char*) malloc(12*sizeof(char));
                v2->label = v2->node->token;
             }
          }
@@ -279,6 +281,7 @@ int construct_cfg(struct ast* node){
          
             if(v1->node->is_leaf)
             {
+               v1->label = (char*) malloc(12*sizeof(char));
                v1->label = v1->node->token;
             }
             if(v2->node->is_leaf)
@@ -324,14 +327,17 @@ int construct_cfg(struct ast* node){
 
             if(v1->node->is_leaf)
             {
+               v1->label = (char*) malloc(12*sizeof(char));
                v1->label = v1->node->token;
             }
             if(v2->node->is_leaf)
             {
+               v2->label = (char*) malloc(12*sizeof(char));
                v2->label = v2->node->token;
             }
             if(v3->node->is_leaf)
             {
+               v3->label = (char*) malloc(12*sizeof(char));
                v3->label = v2->node->token;
             }
          }          
@@ -377,17 +383,21 @@ int construct_cfg(struct ast* node){
 
             if(v1->node->is_leaf)
             {
+               v1->label = (char*) malloc(12*sizeof(char));
                v1->label = v1->node->token;
             }
             if(v2->node->is_leaf)
             {
+               v2->label = (char*) malloc(12*sizeof(char));
                v2->label = v2->node->token;
             }
             if(v3->node->is_leaf)
             {
+               v3->label = (char*) malloc(12*sizeof(char));
                v3->label = v2->node->token;
             }
             
+            v->label = (char*) malloc(100*sizeof(char));
             //v->label = "If " + v1->node->id + " is true, then " +v->node->id + " := " + v2->node->id + ", else " + v->node->id + " := " + v3->node->id;
             sprintf(v->label, "If v%d is true, then v%d := v%d, else v%d := v%d", v1->node->id, v->node->id, v2->node->id, v->node->id, v3->node->id);
          }
@@ -413,6 +423,7 @@ int construct_cfg(struct ast* node){
 
             if(v1->node->is_leaf)
             {
+               v1->label = (char*) malloc(12*sizeof(char));
                v1->label = v1->node->token;
             }
          }
