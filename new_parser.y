@@ -20,7 +20,7 @@
 %union {int val; char* str;}
 %start program
 %token <str> NAME CONST 
-%token <str> LT GT EQ LTEQ GTEQ ADDOP MINOP DEFINE GETINT GETBOOL AND OR IF LET INTTYPE BOOLTYPE PRINT RPAREN LPAREN NOT MULTOP TRUECONST FALSECONST MAIN
+%token <str> LT GT EQ LTEQ GTEQ ADDOP MINOP DEFINE GETINT GETBOOL AND OR IF LET INTTYPE BOOLTYPE ASSERT RPAREN LPAREN NOT MULTOP TRUECONST FALSECONST MAIN
 %type <val> program type expr term fla 
 
 
@@ -55,11 +55,11 @@ program :   LPAREN DEFINE NAME type expr RPAREN program  {
                 insert_child($13);
                 $$ = insert_node("DEFINE-FUN",DEFINE);
                 };
-        |   LPAREN PRINT expr RPAREN {
+        |   LPAREN ASSERT expr RPAREN {
                 int main_loc = insert_node("MAIN",MAIN);
                 insert_child(main_loc);
                 insert_child($3);
-                $$ = insert_node("ENTRY",PRINT);
+                $$ = insert_node("ENTRY",ASSERT);
                 };
         ;
 type    :   INTTYPE {
