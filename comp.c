@@ -24,6 +24,7 @@ struct V{
    int status;
    struct ast* node;
    struct V* next;
+   char* label;
 };
 struct E{
    struct ast *u;
@@ -248,7 +249,14 @@ int construct_cfg(struct ast* node){
 
             remove_E(new_cfg, temp_E);  
             /* create label for v */
-
+            if(v1->node->is_leaf)
+            {
+               v1->label = v1->node->token;
+            }
+            if(v2->node->is_leaf)
+            {
+               v2->label = v2->node->token;
+            }
          }
          else if(v->node->ntoken == NOT){
             struct V* v1 = (struct V*) malloc(sizeof(struct V));
@@ -268,6 +276,15 @@ int construct_cfg(struct ast* node){
             add_E(e1, new_cfg);
 
             remove_E(new_cfg, temp_E);
+         
+            if(v1->node->is_leaf)
+            {
+               v1->label = v1->node->token;
+            }
+            if(v2->node->is_leaf)
+            {
+               v2->label = v2->node->token;
+            }
          }
          else if(v->node->ntoken == LET)
          {
@@ -304,6 +321,19 @@ int construct_cfg(struct ast* node){
             add_E(e1, new_cfg);
 
             remove_E(new_cfg, temp_E);
+
+            if(v1->node->is_leaf)
+            {
+               v1->label = v1->node->token;
+            }
+            if(v2->node->is_leaf)
+            {
+               v2->label = v2->node->token;
+            }
+            if(v3->node->is_leaf)
+            {
+               v3->label = v2->node->token;
+            }
          }          
          else if(v->node->ntoken == IF)
          {
@@ -344,6 +374,47 @@ int construct_cfg(struct ast* node){
             add_E(e1, new_cfg);
 
             remove_E(new_cfg, temp_E);
+
+            if(v1->node->is_leaf)
+            {
+               v1->label = v1->node->token;
+            }
+            if(v2->node->is_leaf)
+            {
+               v2->label = v2->node->token;
+            }
+            if(v3->node->is_leaf)
+            {
+               v3->label = v2->node->token;
+            }
+            
+            //v->label = "If " + v1->node->id + " is true, then " +v->node->id + " := " + v2->node->id + ", else " + v->node->id + " := " + v3->node->id;
+            sprintf(v->label, "If v%d is true, then v%d := v%d, else v%d := v%d", v1->node->id, v->node->id, v2->node->id, v->node->id, v3->node->id);
+         }
+         else if(v->node->ntoken == NOT)
+         {
+            struct V* v1 = (struct V*) malloc(sizeof(struct V));
+            v1->status = 0;
+            v1->node = get_child(v->node,1);
+            v1->next = NULL;
+            struct E* e1 = (struct E*) malloc(sizeof(struct E));
+            struct E* e2 = (struct E*) malloc(sizeof(struct E));
+            e1->u = u->node;
+            e1->v = v1->node;
+            e2->u = v1->node;
+            e2->v = v->node;
+            e1->next = e2;
+            e2->next = NULL;
+  
+            add_V(v1, new_cfg);
+            add_E(e1, new_cfg);
+
+            remove_E(new_cfg, temp_E);
+
+            if(v1->node->is_leaf)
+            {
+               v1->label = v1->node->token;
+            }
          }
 
       }
@@ -367,28 +438,40 @@ int print_cfg(){
    struct CFG* temp = cfg;
    struct V* temp_V = temp->v;
    struct E* temp_E = temp->e;
-
+   
+   FILE *fp;
    fp = fopen("cfg.dot", "w");
-   fprint(fp, "digraph print {\n");
+   fprintf(fp, "digraph print {\n");
 
    while(temp)
    {
       while(temp_V)
       {
          //if let or if
-         fprint(fp, "%d [label=\"v%d := %s\", fontname=\"monospace\"]\n", temp_V->node->id, temp_V->node->token);    //replace with temp_V->label
+         if(temp_V->node->ntoken == LET)
+         {
+            fprintf(fp, "%d [label=\" %s := v%d", temp_V->node->id, temp_V->label, temp_V->next->node->id);   
+         }
+         if(temp_V->node->ntoken == IF)
+         {
+            fprintf(fp, "%d [label=\"%s\"\n", temp_V->label);
+         }
+         else
+         {
+            fprintf(fp, "%d [label=\"v%d := %s\", fontname=\"monospace\"]\n", temp_V->node->id, temp_V->node->id, temp_V->node->token);    //replace with temp_V->label
+         }
          temp_V = temp_V->next;
       }
     
       while(temp_E)
       {
-         //<uID->vID>
+         fprintf(fp, "%d->%d\n", temp_E->u->id, temp_E->v->id);     //<uID->vID>
          temp_E = temp_E->next;
       }
       
       temp = temp->next;
    }
-   fprint(fp, "}\n");
+   fprintf(fp, "}\n");
    fclose(fp);
    system("dot -Tpdf cfg.dot -o cfg.pdf");
 
