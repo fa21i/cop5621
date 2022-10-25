@@ -12,4 +12,7 @@ new_parser.tab.h
 parse_tree.pdf
 ast.dot
 ast.pdf
-comp.exe
+comp
+cfg.dot
+cfg.pdf
+
