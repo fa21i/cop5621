@@ -38,6 +38,14 @@ struct CFG{
    struct ast* ex;
    struct CFG* next;
 };
+struct Line {
+   char* define;
+   char* assert;
+   struct Line* next;
+};
+struct SMT {
+   struct V* next;
+};
 /*struct Map{
    struct ast* key;
    struct ast* body;
@@ -46,6 +54,7 @@ struct CFG{
 };*/
 struct Map* map;
 struct CFG* cfg = NULL;
+struct Line* line = NULL;
 struct token tokens[250];
 char* args[20];
 int types[20];
@@ -80,7 +89,7 @@ bool hasNode(int id){
 
 int is_OP(int t){
    if(t == GT || t == EQ || t == LT || t == GTEQ || t == LTEQ || t == ADDOP
-      || t == MINOP || t == MULTOP || t == AND || t == OR)
+      || t == MINOP || t == MULTOP || t == DIVOP || t == MODOP || t == AND || t == OR)
       return 1;
    return 0;
 }
@@ -611,7 +620,7 @@ int declarations(struct ast* node)
          // get_child(node,1)->id,
          // get_child(node,3)->id);
 
-      if(let_expr==ADDOP||let_expr==MINOP||let_expr==MULTOP ||
+      if(let_expr==ADDOP||let_expr==MINOP||let_expr==MULTOP || let_expr==DIVOP || let_expr==MODOP ||
          let_expr==GETINT || let_expr==INTTYPE || let_expr==CONST)
          types[type_c++] = INTTYPE;
       else if(let_expr==TRUECONST || let_expr==FALSECONST ||
@@ -804,6 +813,8 @@ int type_checking(struct ast* node){
    else if (node->ntoken == ADDOP 
       || node->ntoken == MINOP 
       || node->ntoken == MULTOP
+      || node->ntoken == DIVOP
+      || node->ntoken == MODOP
       ){
    
       struct ast *child1 = get_child(node,1); 
@@ -909,28 +920,146 @@ int type_checking(struct ast* node){
    return 0;
 }
 
+struct E* find_E2(struct CFG* c, int id){
+   struct E* temp = c->e;
+
+   while(temp)
+   {
+      if(temp->u->id == id)
+         return temp;
+      temp = temp->next;
+   }
+   return NULL;
+}
+
+void insert_Line(struct Line **line, struct Line *l){
+   struct Line* temp = (*line);
+
+   if((*line) == NULL)
+   {
+      (*line) = l;
+   }
+   else {
+      while(temp->next)
+      {
+         temp = temp->next;
+      }
+      temp->next = l;
+   }
+}
+
+void construct_SMT(){
+   struct CFG* temp = cfg;   
+   struct V* temp_V = cfg->v;
+   struct E* temp_E;
+
+   temp_E = find_E2(temp, temp_V->node->id);
+   //GT || t == EQ || t == LT || t == GTEQ || t == LTEQ || t == ADDOP
+   //      || t == MINOP || t == MULTOP || t == AND || t == OR
+   while(temp_E)
+   { 
+      struct Line* l = (struct Line*) malloc(sizeof(struct Line));
+      temp_V = find_V(temp, temp_E->v->id);
+      l->define = (char*) malloc(256*sizeof(char));
+      l->assert = (char*) malloc(256*sizeof(char));
+      l->next = NULL;
+      sprintf(l->define, "(declare-fun v%d () %s)\n", temp_V->node->id, (tokens[temp_V->node->id].type == BOOLTYPE) ? "Bool" : "Int");
+      if(is_OP(temp_V->node->ntoken))
+      {
+         printf("in op\n");
+         //sprintf(l->assert, "should be op\n");
+         if(temp_V->node->ntoken == GTEQ)
+             sprintf(l->assert, "(assert (= v%d (>= v%d v%d)))\n", temp_V->node->id, get_child(temp_V->node, 1)->id, get_child(temp_V->node, 2)->id);
+         else if(temp_V->node->ntoken == LTEQ)
+             sprintf(l->assert, "(assert (= v%d (<= v%d v%d)))\n", temp_V->node->id, get_child(temp_V->node, 1)->id, get_child(temp_V->node, 2)->id);
+         else if(temp_V->node->ntoken == LT)
+             sprintf(l->assert, "(assert (= v%d (< v%d v%d)))\n", temp_V->node->id, get_child(temp_V->node, 1)->id, get_child(temp_V->node, 2)->id);
+         else if(temp_V->node->ntoken == GT)
+             sprintf(l->assert, "(assert (= v%d (> v%d v%d)))\n", temp_V->node->id, get_child(temp_V->node, 1)->id, get_child(temp_V->node, 2)->id);
+         else if(temp_V->node->ntoken == EQ)
+             sprintf(l->assert, "(assert (= v%d (= v%d v%d)))\n", temp_V->node->id, get_child(temp_V->node, 1)->id, get_child(temp_V->node, 2)->id);
+         else if(temp_V->node->ntoken == ADDOP)
+             sprintf(l->assert, "(assert (= v%d (+ v%d v%d)))\n", temp_V->node->id, get_child(temp_V->node, 1)->id, get_child(temp_V->node, 2)->id);
+         else if(temp_V->node->ntoken == MINOP)
+             sprintf(l->assert, "(assert (= v%d (- v%d v%d)))\n", temp_V->node->id, get_child(temp_V->node, 1)->id, get_child(temp_V->node, 2)->id);
+         else
+            sprintf(l->assert, "(assert (= v%d (%s v%d v%d)))\n", temp_V->node->id, temp_V->node->token, get_child(temp_V->node, 1)->id, get_child(temp_V->node, 2)->id);
+      }
+      else if(temp_V->node->ntoken == LET)
+      {
+         sprintf(l->assert, "(assert (= v%d v%d)\n", temp_V->node->id, get_child(temp_V->node, 3)->id);
+      }
+      else if(temp_V->node->ntoken == IF)
+      {
+         sprintf(l->assert, 
+      }
+      else
+      {
+         printf("in else\n");
+         sprintf(l->assert, "(assert (= v%d %s))\n", temp_V->node->id, temp_V->node->token);
+         //sprintf(l->assert, "should be let\n"); 
+      }
+      temp_E = find_E2(temp, temp_V->node->id);
+      //printf("<%d, %d>\n", temp_E->u->id, temp_E->v->id);
+      insert_Line(&line, l);
+   }
+
+}
+
+void print_SMT(){
+   
+   struct Line* l = line;
+   FILE* fp;
+   fp = fopen("bmc.smt2","w");
+   printf("1\n");
+   while(l)
+   {
+      printf("2\n");
+      if(l->define != NULL)
+         fprintf(fp, "%s", l->define);
+      l = l->next;
+   }
+   
+   fprintf(fp, "\n");
+   struct Line* l2 = line;
+   printf("3\n");
+   while(l2)
+   {
+      printf("4\n");
+      if(l2->assert != NULL)
+         fprintf(fp, "%s", l2->assert);
+      l2 = l2->next;
+   }
+   printf("5\n");
+   fclose(fp);
+}
+
+
 int main (int argc, char **argv) {
 
    int retval = yyparse();
 
+
+
+// type checking never actually happens!!!!!!
    if (retval == 0) {
       print_ast();
-      // int a = visit_ast(declarations);
+       int a = visit_ast(declarations);
       // if(a!=0){
       //    return 1;
       // }
-      // a = visit_ast(scope_checking);
+       a = visit_ast(scope_checking);
       // if(a!=0){
       //    return 1;
       // }
-      // a = visit_ast(type_checking);
+       a = visit_ast(type_checking);
       // if(a!=0){
       //    return 1;
       // }
       visit_ast(construct_cfg);
-      //print_cfg();
-      construct_smt(cfg);
-      print_smt();
+      print_cfg();
+      construct_SMT();
+      print_SMT();
       
       // print_char_array(args);
       // print_array(types);
