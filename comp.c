@@ -63,34 +63,6 @@ struct args {
    int id; 
 };
 
-// int construct_map(struct ast* node){
-//    if(node->ntoken==DEFINE){
-//       struct CFG* new_cfg;
-//       new_cfg->entry = get_child(node,1);
-      
-//       if(cfg == NULL){
-
-//       }
-//    }
-//    if(strcmp(n->type,"exit")==0){
-//       map->key = n;
-//       strcpy(map->value,"body");
-//       map->body =  n->node;
-//       map->next = NULL;
-//    }
-//    else if(get_child_num(n->node)==0){
-//       map->key = n;
-//       strcpy(map->value,"done");
-//       map->body =  n->node;
-//       map->next = NULL;
-//    }
-//    else{
-//       map->key = n;
-//       strcpy(map->value,"unknown");
-//       map->next = NULL;
-//    }
-//    return 0;
-// }
 bool hasNode(int id){
    struct CFG* temp;
    temp = cfg;
@@ -115,8 +87,11 @@ int is_OP(int t){
 
 int add_V(struct V* v, struct CFG* c){
    struct V* temp = c->v;
-   while(temp->next)
+   printf("check v:%s\n",temp->node->token);
+   while(temp->next){
       temp = temp->next;
+      printf("check v:%s\n",temp->node->token);
+   }
    temp->next = v;
    return 0;
 }
@@ -222,7 +197,7 @@ int construct_cfg(struct ast* node){
 
          if(v->node->is_leaf)
             continue; 
-         if(is_OP(v->node->ntoken) == 0)
+         if(is_OP(v->node->ntoken))
          {
             printf("op?\n");
             struct V* v1 = (struct V*) malloc(sizeof(struct V));
@@ -420,7 +395,7 @@ int construct_cfg(struct ast* node){
             sprintf(v->label, "NOT v%d", v1->node->id);
          }
       }
-     
+      new_cfg->next = NULL;
       if(cfg){
          struct CFG* temp = cfg;
          while (temp->next)
@@ -438,7 +413,7 @@ int construct_cfg(struct ast* node){
 
 int print_cfg(){
    struct CFG* temp = cfg;
-   
+
    
    FILE *fp;
    fp = fopen("cfg.dot", "w");
@@ -451,20 +426,25 @@ int print_cfg(){
       struct E* temp_E = temp->e;
       //printf("c\n");
       while(temp_V)
-      {//printf("v\n");
+      {
+
          //if let or if
          if(temp_V->node->ntoken == LET)
          {
-            fprintf(fp, "%d [label=\"1 %s\", fontname=\"monospace\"]\n", temp_V->node->id,  temp_V->label);   
+            fprintf(fp, "%d [label=\"%s\", fontname=\"monospace\"]\n", temp_V->node->id,  temp_V->label);   
          }
          else if(temp_V->node->ntoken == IF)
          {
-            fprintf(fp, "%d [label=\"2 if string -- %s\", fontname=\"monospace\"]\n", temp_V->node->id, temp_V->label);
+            fprintf(fp, "%d [label=\"IF v%d = true, then v%d := v%d, else v%d := v%d\", fontname=\"monospace\"]\n", temp_V->node->id,get_child(temp_V->node,1)->id, temp_V->node->id,get_child(temp_V->node,2)->id,temp_V->node->id,get_child(temp_V->node,3)->id);
          }
-         else
+         else if(is_OP(temp_V->node->ntoken)!=0)
          {
-            fprintf(fp, "%d [label=\"3 v%d := %s\", fontname=\"monospace\"]\n", temp_V->node->id, temp_V->node->id, temp_V->node->token);    //replace with temp_V->label
+            fprintf(fp, "%d [label=\"v%d := v%d %s v%d\", fontname=\"monospace\"]\n", temp_V->node->id,  temp_V->node->id, get_child(temp_V->node,1)->id, temp_V->node->token, get_child(temp_V->node,2)->id);    //replace with temp_V->label
          }
+         else{
+            fprintf(fp, "%d [label=\"v%d := %s\", fontname=\"monospace\"]\n", temp_V->node->id, temp_V->node->id, temp_V->node->token);    //replace with temp_V->label
+         }
+         
          temp_V = temp_V->next;
       }
     
