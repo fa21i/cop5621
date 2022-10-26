@@ -156,7 +156,7 @@ int remove_E(struct CFG* c, struct E* e){
 
 int construct_cfg(struct ast* node){
    //printf("node: %s\n",node->token);
-   if((node->ntoken==DEFINE || node->ntoken==PRINT) 
+   if((node->ntoken==DEFINE || node->ntoken==ASSERT) 
      /* && !hasNode(get_child(node,1)->id)*/){
       
       struct CFG* new_cfg = (struct CFG*) malloc(sizeof(struct CFG));
@@ -928,7 +928,9 @@ int main (int argc, char **argv) {
       //    return 1;
       // }
       visit_ast(construct_cfg);
-      print_cfg();
+      //print_cfg();
+      construct_smt(cfg);
+      print_smt();
       
       // print_char_array(args);
       // print_array(types);
