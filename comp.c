@@ -899,7 +899,14 @@ int type_checking(struct ast* node){
          return 1;
       }
    }
-   return 0;      
+   else if(node->ntoken == ASSERT) {
+      struct ast *child1 = get_child(node,1); 
+      if(tokens[child1->id].type != BOOLTYPE){
+         printf("Child of %s is not of type BOOL\n",node->token);
+         return 1;
+      } 
+   }
+   return 0;
 }
 
 int main (int argc, char **argv) {
