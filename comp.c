@@ -197,7 +197,7 @@ int construct_cfg(struct ast* node){
 
          if(v->node->is_leaf)
             continue; 
-         if(is_OP(v->node->ntoken) != 0)
+         if(is_OP(v->node->ntoken))
          {
             printf("op?\n");
             struct V* v1 = (struct V*) malloc(sizeof(struct V));
@@ -413,7 +413,7 @@ int construct_cfg(struct ast* node){
 
 int print_cfg(){
    struct CFG* temp = cfg;
-   
+
    
    FILE *fp;
    fp = fopen("cfg.dot", "w");
@@ -427,7 +427,7 @@ int print_cfg(){
       //printf("c\n");
       while(temp_V)
       {
-         printf("v: %d\n",temp_V->node->ntoken);
+
          //if let or if
          if(temp_V->node->ntoken == LET)
          {
@@ -435,12 +435,16 @@ int print_cfg(){
          }
          else if(temp_V->node->ntoken == IF)
          {
-            fprintf(fp, "%d [label=\"if string -- %s\", fontname=\"monospace\"]\n", temp_V->node->id, temp_V->label);
+            fprintf(fp, "%d [label=\"IF v%d = true, then v%d := v%d, else v%d := v%d\", fontname=\"monospace\"]\n", temp_V->node->id,get_child(temp_V->node,1)->id, temp_V->node->id,get_child(temp_V->node,2)->id,temp_V->node->id,get_child(temp_V->node,3)->id);
          }
-         else
+         else if(is_OP(temp_V->node->ntoken)!=0)
          {
+            fprintf(fp, "%d [label=\"v%d := v%d %s v%d\", fontname=\"monospace\"]\n", temp_V->node->id,  temp_V->node->id, get_child(temp_V->node,1)->id, temp_V->node->token, get_child(temp_V->node,2)->id);    //replace with temp_V->label
+         }
+         else{
             fprintf(fp, "%d [label=\"v%d := %s\", fontname=\"monospace\"]\n", temp_V->node->id, temp_V->node->id, temp_V->node->token);    //replace with temp_V->label
          }
+         
          temp_V = temp_V->next;
       }
     
