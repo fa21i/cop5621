@@ -44,6 +44,7 @@ struct Line {
    struct Line* next;
 };
 struct SMT {
+   struct V* v;
    struct V* next;
 };
 /*struct Map{
@@ -55,6 +56,7 @@ struct SMT {
 struct Map* map;
 struct CFG* cfg = NULL;
 struct Line* line = NULL;
+struct SMT* smt = NULL;
 struct token tokens[250];
 char* args[20];
 int types[20];
@@ -956,8 +958,22 @@ void construct_SMT(){
    temp_E = find_E2(temp, temp_V->node->id);
    //GT || t == EQ || t == LT || t == GTEQ || t == LTEQ || t == ADDOP
    //      || t == MINOP || t == MULTOP || t == AND || t == OR
+   struct SMT* s = (struct SMT*) malloc(sizeof(struct SMT));
+   struct SMT* temp = s;
+   s->v = find_V(temp, temp_E->v->id);
+   s->next = NULL;
+
    while(temp_E)
    { 
+      //need to add blocks to queue 1. add first block to queue as head -- {add it's children -- evaluate -- pop -- move to next}
+      for(int i = 0; i < get_child_num(s->v->node); i++)
+      {
+         while(temp)
+            temp = temp->next;
+         temp->next = get_child(s->v->node, i+1);  
+      }
+
+      
       struct Line* l = (struct Line*) malloc(sizeof(struct Line));
       temp_V = find_V(temp, temp_E->v->id);
       l->define = (char*) malloc(256*sizeof(char));
