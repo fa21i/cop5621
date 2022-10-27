@@ -1,5 +1,6 @@
 #include "y.tab.h"
 #include "ast.h"
+#include "scope.h"
 #define UNKNOWN_TYPE 999
 int yyparse();
 struct token{
@@ -908,15 +909,15 @@ int main (int argc, char **argv) {
 
    if (retval == 0) {
       print_ast();
-      // int a = visit_ast(declarations);
+      int a = visit_ast(declarations);
       // if(a!=0){
       //    return 1;
       // }
-      // a = visit_ast(scope_checking);
+      a = visit_ast(scope_checking);
       // if(a!=0){
       //    return 1;
       // }
-      // a = visit_ast(type_checking);
+      a = visit_ast(type_checking);
       // if(a!=0){
       //    return 1;
       // }
