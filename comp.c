@@ -950,6 +950,11 @@ void insert_Line(struct Line **line, struct Line *l){
    }
 }
 
+void pop(struct SMT* s){
+   s->v = s->next;
+   s->next = s->next->next->v;
+}
+
 void construct_SMT(){
    struct CFG* temp = cfg;   
    struct V* temp_V = cfg->v;
