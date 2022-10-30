@@ -1,1 +1,1 @@
-(assert (< (div 10 3) (let (x (- 5 5)) (mod x 2))))
+(assert (< (div 10 3) (let (x (- 4 5)) (mod x 2))))

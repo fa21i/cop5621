@@ -1008,10 +1008,18 @@ void construct_SMT(){
       {
          // sprintf(l->assert, 
       }
+      else if(temp_V->node->ntoken == NAME){
+         struct ast* parent = temp_V->node->parent;
+         while (parent->ntoken!=LET)
+         {
+            parent = parent->parent;
+         }
+         sprintf(l->assert, "(assert (= v%d v%d))\n", temp_V->node->id, get_child(parent, 2)->id);
+      }
       else
       {
          printf("in else\n");
-         sprintf(l->assert, "(assert (= v%d v%d))\n", temp_V->node->id, temp_V->node->id);
+         sprintf(l->assert, "(assert (= v%d %s))\n", temp_V->node->id, temp_V->node->token);
          //sprintf(l->assert, "should be let\n"); 
       }
       temp_E = find_E2(temp_cfg, temp_V->node->id);
