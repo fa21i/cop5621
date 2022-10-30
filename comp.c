@@ -1,5 +1,6 @@
 #include "y.tab.h"
 #include "ast.h"
+#include <string.h>
 #define UNKNOWN_TYPE 999
 int yyparse();
 struct token{
@@ -88,14 +89,12 @@ bool hasNode(int id){
    }
    return false;
 }
-
 int is_OP(int t){
    if(t == GT || t == EQ || t == LT || t == GTEQ || t == LTEQ || t == ADDOP
       || t == MINOP || t == MULTOP || t == DIVOP || t == MODOP || t == AND || t == OR)
       return 1;
    return 0;
 }
-
 int add_V(struct V* v, struct CFG* c){
    struct V* temp = c->v;
    printf("check v:%s\n",temp->node->token);
@@ -106,7 +105,6 @@ int add_V(struct V* v, struct CFG* c){
    temp->next = v;
    return 0;
 }
-
 int add_E(struct E* e, struct CFG* c){
    struct E* temp = c->e;
    while(temp->next)
@@ -114,7 +112,6 @@ int add_E(struct E* e, struct CFG* c){
    temp->next = e;
    return 0;
 }
-
 struct V* find_V(struct CFG* c, int id) {
    struct V *temp = c->v;  
    while(temp)
@@ -126,7 +123,6 @@ struct V* find_V(struct CFG* c, int id) {
    } 
    return NULL;
 }
-
 struct E* find_E(struct CFG* c){
    struct E* temp = c->e;
    while(temp)
@@ -141,7 +137,6 @@ struct E* find_E(struct CFG* c){
    }
    return NULL;
 }
-
 int remove_E(struct CFG* c, struct E* e){
    struct E* temp = c->e;
    struct E* prev;
@@ -164,7 +159,6 @@ int remove_E(struct CFG* c, struct E* e){
       temp = temp->next;
    }
 }
-
 int construct_cfg(struct ast* node){
    //printf("node: %s\n",node->token);
    if((node->ntoken==DEFINE || node->ntoken==ASSERT) 
@@ -421,7 +415,6 @@ int construct_cfg(struct ast* node){
    }
    return 0;
 }
-
 int print_cfg(){
    struct CFG* temp = cfg;
 
@@ -913,7 +906,8 @@ int type_checking(struct ast* node){
       }
    }
    else if(node->ntoken == ASSERT) {
-      struct ast *child1 = get_child(node,1); 
+      struct ast *child1 = get_child(node,2); 
+      printf("hey %s\n",node->token);
       if(tokens[child1->id].type != BOOLTYPE){
          printf("Child of %s is not of type BOOL\n",node->token);
          return 1;
@@ -952,20 +946,20 @@ void insert_Line(struct Line **line, struct Line *l){
 
 void pop(struct SMT* s){
    s->v = s->next;
-   s->next = s->next->next->v;
+   s->next = s->next->next;
 }
 
 void construct_SMT(){
-   struct CFG* temp = cfg;   
+   struct CFG* temp_cfg = cfg;   
    struct V* temp_V = cfg->v;
    struct E* temp_E;
 
-   temp_E = find_E2(temp, temp_V->node->id);
+   temp_E = find_E2(temp_cfg, temp_V->node->id);
    //GT || t == EQ || t == LT || t == GTEQ || t == LTEQ || t == ADDOP
    //      || t == MINOP || t == MULTOP || t == AND || t == OR
    struct SMT* s = (struct SMT*) malloc(sizeof(struct SMT));
-   struct SMT* temp = s;
-   s->v = find_V(temp, temp_E->v->id);
+   struct SMT* temp_smt = s;
+   s->v = find_V(temp_cfg, temp_E->v->id);
    s->next = NULL;
 
    while(temp_E)
@@ -973,14 +967,14 @@ void construct_SMT(){
       //need to add blocks to queue 1. add first block to queue as head -- {add it's children -- evaluate -- pop -- move to next}
       for(int i = 0; i < get_child_num(s->v->node); i++)
       {
-         while(temp)
-            temp = temp->next;
-         temp->next = get_child(s->v->node, i+1);  
+         while(temp_cfg)
+            temp_cfg = temp_cfg->next;
+         temp_cfg->next->v->node = get_child(s->v->node, i+1);  
       }
 
       
       struct Line* l = (struct Line*) malloc(sizeof(struct Line));
-      temp_V = find_V(temp, temp_E->v->id);
+      temp_V = find_V(temp_cfg, temp_E->v->id);
       l->define = (char*) malloc(256*sizeof(char));
       l->assert = (char*) malloc(256*sizeof(char));
       l->next = NULL;
@@ -1008,22 +1002,23 @@ void construct_SMT(){
       }
       else if(temp_V->node->ntoken == LET)
       {
-         sprintf(l->assert, "(assert (= v%d v%d)\n", temp_V->node->id, get_child(temp_V->node, 3)->id);
+         sprintf(l->assert, "(assert (= v%d v%d))\n", temp_V->node->id, get_child(temp_V->node, 3)->id);
       }
       else if(temp_V->node->ntoken == IF)
       {
-         sprintf(l->assert, 
+         // sprintf(l->assert, 
       }
       else
       {
          printf("in else\n");
-         sprintf(l->assert, "(assert (= v%d %s))\n", temp_V->node->id, temp_V->node->token);
+         sprintf(l->assert, "(assert (= v%d v%d))\n", temp_V->node->id, temp_V->node->id);
          //sprintf(l->assert, "should be let\n"); 
       }
-      temp_E = find_E2(temp, temp_V->node->id);
+      temp_E = find_E2(temp_cfg, temp_V->node->id);
       //printf("<%d, %d>\n", temp_E->u->id, temp_E->v->id);
       insert_Line(&line, l);
    }
+   
 
 }
 
@@ -1052,6 +1047,7 @@ void print_SMT(){
       l2 = l2->next;
    }
    printf("5\n");
+   fprintf(fp,"(check-sat)\n(get-model)\n");
    fclose(fp);
 }
 

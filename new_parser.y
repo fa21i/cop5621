@@ -13,14 +13,14 @@
         int i;
         char s[3];
         char * getStr(char* a){
-                return strdup(strtok(strtok(a," "),")"));
+                return strdup(strtok(strtok(a," "),""));
         }
 %}
 
 %union {int val; char* str;}
 %start program
 %token <str> NAME CONST 
-%token <str> LT GT EQ LTEQ GTEQ ADDOP MINOP DEFINE GETINT GETBOOL AND OR IF LET INTTYPE BOOLTYPE ASSERT RPAREN LPAREN NOT MULTOP MODOP DIV TRUECONST FALSECONST MAIN
+%token <str> LT GT EQ LTEQ GTEQ ADDOP MINOP DEFINE GETINT GETBOOL AND OR IF LET INTTYPE BOOLTYPE ASSERT RPAREN LPAREN NOT MULTOP DIVOP MODOP DIV TRUECONST FALSECONST MAIN
 %type <val> program type expr term fla 
 
 
