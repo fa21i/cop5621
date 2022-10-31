@@ -953,81 +953,104 @@ void construct_SMT(){
    struct CFG* temp_cfg = cfg;   
    struct V* temp_V = cfg->v;
    struct E* temp_E;
-
+   while(temp_cfg!=NULL){
+   temp_V = temp_cfg->v;
    temp_E = find_E2(temp_cfg, temp_V->node->id);
    //GT || t == EQ || t == LT || t == GTEQ || t == LTEQ || t == ADDOP
    //      || t == MINOP || t == MULTOP || t == AND || t == OR
-   struct SMT* s = (struct SMT*) malloc(sizeof(struct SMT));
-   struct SMT* temp_smt = s;
-   s->v = find_V(temp_cfg, temp_E->v->id);
-   s->next = NULL;
-
-   while(temp_E)
-   { 
-      //need to add blocks to queue 1. add first block to queue as head -- {add it's children -- evaluate -- pop -- move to next}
-      for(int i = 0; i < get_child_num(s->v->node); i++)
-      {
-         while(temp_cfg)
-            temp_cfg = temp_cfg->next;
-         temp_cfg->next->v->node = get_child(s->v->node, i+1);  
-      }
-
+   // struct SMT* s = (struct SMT*) malloc(sizeof(struct SMT));
+   // struct SMT* temp_smt = s;
+   // s->v = find_V(temp_cfg, temp_E->v->id);
+   // s->next = NULL;
       
-      struct Line* l = (struct Line*) malloc(sizeof(struct Line));
-      temp_V = find_V(temp_cfg, temp_E->v->id);
-      l->define = (char*) malloc(256*sizeof(char));
-      l->assert = (char*) malloc(256*sizeof(char));
-      l->next = NULL;
-      sprintf(l->define, "(declare-fun v%d () %s)\n", temp_V->node->id, (tokens[temp_V->node->id].type == BOOLTYPE) ? "Bool" : "Int");
-      if(is_OP(temp_V->node->ntoken))
-      {
-         printf("in op\n");
-         //sprintf(l->assert, "should be op\n");
-         if(temp_V->node->ntoken == GTEQ)
-             sprintf(l->assert, "(assert (= v%d (>= v%d v%d)))\n", temp_V->node->id, get_child(temp_V->node, 1)->id, get_child(temp_V->node, 2)->id);
-         else if(temp_V->node->ntoken == LTEQ)
-             sprintf(l->assert, "(assert (= v%d (<= v%d v%d)))\n", temp_V->node->id, get_child(temp_V->node, 1)->id, get_child(temp_V->node, 2)->id);
-         else if(temp_V->node->ntoken == LT)
-             sprintf(l->assert, "(assert (= v%d (< v%d v%d)))\n", temp_V->node->id, get_child(temp_V->node, 1)->id, get_child(temp_V->node, 2)->id);
-         else if(temp_V->node->ntoken == GT)
-             sprintf(l->assert, "(assert (= v%d (> v%d v%d)))\n", temp_V->node->id, get_child(temp_V->node, 1)->id, get_child(temp_V->node, 2)->id);
-         else if(temp_V->node->ntoken == EQ)
-             sprintf(l->assert, "(assert (= v%d (= v%d v%d)))\n", temp_V->node->id, get_child(temp_V->node, 1)->id, get_child(temp_V->node, 2)->id);
-         else if(temp_V->node->ntoken == ADDOP)
-             sprintf(l->assert, "(assert (= v%d (+ v%d v%d)))\n", temp_V->node->id, get_child(temp_V->node, 1)->id, get_child(temp_V->node, 2)->id);
-         else if(temp_V->node->ntoken == MINOP)
-             sprintf(l->assert, "(assert (= v%d (- v%d v%d)))\n", temp_V->node->id, get_child(temp_V->node, 1)->id, get_child(temp_V->node, 2)->id);
-         else
-            sprintf(l->assert, "(assert (= v%d (%s v%d v%d)))\n", temp_V->node->id, temp_V->node->token, get_child(temp_V->node, 1)->id, get_child(temp_V->node, 2)->id);
-      }
-      else if(temp_V->node->ntoken == LET)
-      {
-         sprintf(l->assert, "(assert (= v%d v%d))\n", temp_V->node->id, get_child(temp_V->node, 3)->id);
-      }
-      else if(temp_V->node->ntoken == IF)
-      {
-         // sprintf(l->assert, 
-      }
-      else if(temp_V->node->ntoken == NAME){
-         struct ast* parent = temp_V->node->parent;
-         while (parent->ntoken!=LET)
+      while(temp_E)
+      { 
+         //need to add blocks to queue 1. add first block to queue as head -- {add it's children -- evaluate -- pop -- move to next}
+         // for(int i = 0; i < get_child_num(s->v->node); i++)
+         // {
+         //    while(temp_cfg)
+         //       temp_cfg = temp_cfg->next;
+         //    temp_cfg->next->v->node = get_child(s->v->node, i+1);  
+         // }
+         struct Line* l = (struct Line*) malloc(sizeof(struct Line));
+         temp_V = find_V(temp_cfg, temp_E->v->id);
+         l->define = (char*) malloc(256*sizeof(char));
+         l->assert = (char*) malloc(256*sizeof(char));
+         l->next = NULL;
+         sprintf(l->define, "(declare-fun v%d () %s)\n", temp_V->node->id, (tokens[temp_V->node->id].type == BOOLTYPE) ? "Bool" : "Int");
+         if(is_OP(temp_V->node->ntoken))
          {
-            parent = parent->parent;
+            printf("in op\n");
+            //sprintf(l->assert, "should be op\n");
+            if(temp_V->node->ntoken == GTEQ)
+               sprintf(l->assert, "(assert (= v%d (>= v%d v%d)))\n", temp_V->node->id, get_child(temp_V->node, 1)->id, get_child(temp_V->node, 2)->id);
+            else if(temp_V->node->ntoken == LTEQ)
+               sprintf(l->assert, "(assert (= v%d (<= v%d v%d)))\n", temp_V->node->id, get_child(temp_V->node, 1)->id, get_child(temp_V->node, 2)->id);
+            else if(temp_V->node->ntoken == LT)
+               sprintf(l->assert, "(assert (= v%d (< v%d v%d)))\n", temp_V->node->id, get_child(temp_V->node, 1)->id, get_child(temp_V->node, 2)->id);
+            else if(temp_V->node->ntoken == GT)
+               sprintf(l->assert, "(assert (= v%d (> v%d v%d)))\n", temp_V->node->id, get_child(temp_V->node, 1)->id, get_child(temp_V->node, 2)->id);
+            else if(temp_V->node->ntoken == EQ)
+               sprintf(l->assert, "(assert (= v%d (= v%d v%d)))\n", temp_V->node->id, get_child(temp_V->node, 1)->id, get_child(temp_V->node, 2)->id);
+            else if(temp_V->node->ntoken == ADDOP)
+               sprintf(l->assert, "(assert (= v%d (+ v%d v%d)))\n", temp_V->node->id, get_child(temp_V->node, 1)->id, get_child(temp_V->node, 2)->id);
+            else if(temp_V->node->ntoken == MINOP)
+               sprintf(l->assert, "(assert (= v%d (- v%d v%d)))\n", temp_V->node->id, get_child(temp_V->node, 1)->id, get_child(temp_V->node, 2)->id);
+            else
+               sprintf(l->assert, "(assert (= v%d (%s v%d v%d)))\n", temp_V->node->id, temp_V->node->token, get_child(temp_V->node, 1)->id, get_child(temp_V->node, 2)->id);
          }
-         sprintf(l->assert, "(assert (= v%d v%d))\n", temp_V->node->id, get_child(parent, 2)->id);
-      }
-      else
-      {
-         printf("in else\n");
-         sprintf(l->assert, "(assert (= v%d %s))\n", temp_V->node->id, temp_V->node->token);
-         //sprintf(l->assert, "should be let\n"); 
-      }
-      temp_E = find_E2(temp_cfg, temp_V->node->id);
-      //printf("<%d, %d>\n", temp_E->u->id, temp_E->v->id);
-      insert_Line(&line, l);
-   }
-   
+         else if(temp_V->node->ntoken == LET)
+         {
+            printf("in let\n");
+            sprintf(l->assert, "(assert (= v%d v%d))\n", temp_V->node->id, get_child(temp_V->node, 3)->id);
+         }
+         else if(temp_V->node->ntoken == IF)
+         {
+            printf("in if\n");
+            sprintf(l->assert, "(assert (v%d (=> (v%d) (v%d) )))\n", temp_V->node->id, get_child(temp_V->node, 2)->id, get_child(temp_V->node, 3)->id);
+         }
+         else if(temp_V->node->ntoken == NAME){
+            printf("in name\n");
+            struct ast* parent = temp_V->node->parent;
+            while (parent->ntoken!=LET && parent->ntoken!=DEFINE){
+               parent = parent->parent;
+            }
+            if(parent->ntoken==LET){
+               sprintf(l->assert, "(assert (= v%d v%d))\n", temp_V->node->id, get_child(parent, 2)->id);
+            }
+            else if(parent->ntoken==DEFINE){
+               sprintf(l->assert, "(assert (= v%d v%d))\n", temp_V->node->id, get_child(parent, get_child_num(parent))->id);   
+            }
+         }
+         else if(temp_V->node->ntoken==TRUECONST )
+         {
+            printf("in else\n");
+            sprintf(l->assert, "(assert (= v%d %s))\n", temp_V->node->id, "true");
+            //sprintf(l->assert, "should be let\n"); 
+         }
+         else if(temp_V->node->ntoken==FALSECONST)
+         {
+            printf("in else\n");
+            sprintf(l->assert, "(assert (= v%d %s))\n", temp_V->node->id, "false");
+            //sprintf(l->assert, "should be let\n"); 
+         }
+         else
+         {
+            printf("in else\n");
+            sprintf(l->assert, "(assert (= v%d %s))\n", temp_V->node->id, temp_V->node->token);
+            //sprintf(l->assert, "should be let\n"); 
+         }
+         
+         temp_E = find_E2(temp_cfg, temp_V->node->id);
+         //printf("<%d, %d>\n", temp_E->u->id, temp_E->v->id);
+         insert_Line(&line, l);
 
+         // free(l);
+      }
+      printf("I am here: %s\n\n",temp_cfg->v->node->token);
+
+      temp_cfg = temp_cfg->next;
+   }
 }
 
 void print_SMT(){
@@ -1043,7 +1066,7 @@ void print_SMT(){
          fprintf(fp, "%s", l->define);
       l = l->next;
    }
-   
+   printf("here 2.5\n");
    fprintf(fp, "\n");
    struct Line* l2 = line;
    printf("3\n");

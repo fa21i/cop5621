@@ -1,1 +1,7 @@
-(assert (< (div 10 3) (let (x (- 4 5)) (mod x 2))))
+(define-fun f1 (i int) int (+ 4 1))
+(define-fun f2 (i int) int (+ (f1 1) (f1 2)))
+(define-fun f3 (i int) int (+ (f2 4) (f2 3)))
+(define-fun f4 (i int) int (+ (f3 5) (f3 6)))
+(define-fun v1 (v2 bool) bool (if true false true))
+
+(assert (< (div 10 5) (let (x (- 4 5)) (mod x 2))))
