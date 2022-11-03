@@ -44,6 +44,17 @@ struct CFG{
    char* value;
    struct Map* next;
 };*/
+struct BLK{
+   int id;
+   char* ins;
+   struct BLK* next;
+};
+struct IR{
+   struct BLK* blk;
+   struct IR* next;
+};
+
+struct IR* ir = NULL;
 struct Map* map;
 struct CFG* cfg = NULL;
 struct token tokens[250];
@@ -902,27 +913,74 @@ int type_checking(struct ast* node){
    return 0;      
 }
 
+int construct_ir(){
+   printf("here\n");
+   struct CFG* tempc = cfg;
+   struct V* tempv = tempc->next->v;
+   struct BLK* b = (struct BLK*) malloc(sizeof(struct BLK));
+   struct IR* i = (struct IR*) malloc(sizeof(struct IR));
+   /*while(tempv)
+   {
+      printf("tempv\n");
+
+      b->id = tempv->node->id;
+      b->ins = (char*) malloc(256*sizeof(char));
+      strcpy(b->ins, tempv->node->token);
+      printf("2\n");
+      b->next = NULL;
+
+      printf("uh oh\n");
+      tempv = tempv->next;
+   }*/
+
+   printf("tempv\n");
+
+   b->id = tempv->node->id;
+   b->ins = (char*) malloc(256*sizeof(char));
+   strcpy(b->ins, tempv->node->token);
+   printf("2\n");
+   b->next = NULL;
+
+   printf("uh oh\n");
+   tempv = tempv->next;
+
+   i->blk = b;
+   i->next = NULL;
+
+   ir = i;
+
+}
+
+void print_ir(){
+   FILE* fp;
+   fp = fopen("ir.txt", "w");
+   fprintf(fp, "bb%d\n\t%s\n\tbr bbX", ir->blk->id, ir->blk->ins);
+   fclose(fp);
+}
+
 int main (int argc, char **argv) {
 
    int retval = yyparse();
 
    if (retval == 0) {
       print_ast();
-      // int a = visit_ast(declarations);
+      int a = visit_ast(declarations);
       // if(a!=0){
       //    return 1;
       // }
-      // a = visit_ast(scope_checking);
+      a = visit_ast(scope_checking);
       // if(a!=0){
       //    return 1;
       // }
-      // a = visit_ast(type_checking);
+      a = visit_ast(type_checking);
       // if(a!=0){
       //    return 1;
       // }
       visit_ast(construct_cfg);
       print_cfg();
       
+      construct_ir();
+      print_ir();
       // print_char_array(args);
       // print_array(types);
       // print_scope(scope,0);
