@@ -924,7 +924,6 @@ int add_BLK(struct BLK* b, struct IR* i){
    }
    else{
       temp = b;
-      i->next = NULL;
    }
    return 0;
 }
@@ -933,15 +932,13 @@ int add_BLK(struct BLK* b, struct IR* i){
 int construct_ir(){
    printf("here\n");
    struct CFG* tempc = cfg;
-   struct V* tempv = tempc->next->v;
+   struct V* tempv = tempc->next->next->v;
    struct IR* i = (struct IR*) malloc(sizeof(struct IR));
 
    while(tempv)
    {
       struct BLK* b = (struct BLK*) malloc(sizeof(struct BLK));
-      struct BLK* tempb = b;
       printf("tempv\n");
-
       b->id = tempv->node->id;
       b->ins = (char*) malloc(256*sizeof(char));
       strcpy(b->ins, tempv->node->token);
@@ -952,8 +949,19 @@ int construct_ir(){
 
       tempv = tempv->next;
    }
+   i->next = NULL;
 
-   ir = i;
+   if(ir){
+         struct IR* tempir = ir;
+         while (tempir->next)
+         {
+            tempir = tempir->next;
+         }
+         tempir->next = i;
+      }
+      else{
+         ir = i;
+      }
 
 }
 
