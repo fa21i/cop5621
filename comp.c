@@ -913,14 +913,33 @@ int type_checking(struct ast* node){
    return 0;      
 }
 
+int add_BLK(struct BLK* b, struct IR* i){
+   struct BLK* temp = i->blk;
+   if(temp)
+   {
+      while(temp->next){
+         temp = temp->next;
+      }
+      temp->next = b;
+   }
+   else{
+      temp = b;
+      i->next = NULL;
+   }
+   return 0;
+}
+
+
 int construct_ir(){
    printf("here\n");
    struct CFG* tempc = cfg;
    struct V* tempv = tempc->next->v;
-   struct BLK* b = (struct BLK*) malloc(sizeof(struct BLK));
    struct IR* i = (struct IR*) malloc(sizeof(struct IR));
-   /*while(tempv)
+
+   while(tempv)
    {
+      struct BLK* b = (struct BLK*) malloc(sizeof(struct BLK));
+      struct BLK* tempb = b;
       printf("tempv\n");
 
       b->id = tempv->node->id;
@@ -928,24 +947,11 @@ int construct_ir(){
       strcpy(b->ins, tempv->node->token);
       printf("2\n");
       b->next = NULL;
-
+      add_BLK(b,i);
       printf("uh oh\n");
+
       tempv = tempv->next;
-   }*/
-
-   printf("tempv\n");
-
-   b->id = tempv->node->id;
-   b->ins = (char*) malloc(256*sizeof(char));
-   strcpy(b->ins, tempv->node->token);
-   printf("2\n");
-   b->next = NULL;
-
-   printf("uh oh\n");
-   tempv = tempv->next;
-
-   i->blk = b;
-   i->next = NULL;
+   }
 
    ir = i;
 
@@ -954,6 +960,9 @@ int construct_ir(){
 void print_ir(){
    FILE* fp;
    fp = fopen("ir.txt", "w");
+   printf("hello?\n");
+   printf("%d\n", ir->blk->id);
+   printf("%s\n", ir->blk->ins);
    fprintf(fp, "bb%d\n\t%s\n\tbr bbX", ir->blk->id, ir->blk->ins);
    fclose(fp);
 }
