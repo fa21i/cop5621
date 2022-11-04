@@ -45,7 +45,7 @@ struct CFG{
    struct Map* next;
 };*/
 struct BLK{
-   int id;
+   int bid;
    char* ins;
    struct BLK* next;
 };
@@ -932,14 +932,16 @@ int add_BLK(struct BLK* b, struct IR* i){
 int construct_ir(){
    printf("here\n");
    struct CFG* tempc = cfg;
-   struct V* tempv = tempc->next->next->v;
+   struct V* tempv = tempc->next->v;
    struct IR* i = (struct IR*) malloc(sizeof(struct IR));
+   i->blk = NULL;
+   i->next = NULL;
 
    while(tempv)
    {
       struct BLK* b = (struct BLK*) malloc(sizeof(struct BLK));
-      printf("tempv\n");
-      b->id = tempv->node->id;
+      b->bid = tempv->node->id;
+      printf("ID %d\n", b->bid);
       b->ins = (char*) malloc(256*sizeof(char));
       strcpy(b->ins, tempv->node->token);
       printf("2\n");
@@ -949,29 +951,38 @@ int construct_ir(){
 
       tempv = tempv->next;
    }
-   i->next = NULL;
 
    if(ir){
-         struct IR* tempir = ir;
-         while (tempir->next)
-         {
-            tempir = tempir->next;
-         }
-         tempir->next = i;
+      struct IR* tempir = ir;
+      while (tempir->next)
+      {
+         tempir = tempir->next;
       }
-      else{
-         ir = i;
-      }
-
+      tempir->next = i;
+   }
+   else{
+      ir = i;
+   }
+   return 0;
 }
 
 void print_ir(){
    FILE* fp;
    fp = fopen("ir.txt", "w");
    printf("hello?\n");
-   printf("%d\n", ir->blk->id);
-   printf("%s\n", ir->blk->ins);
-   fprintf(fp, "bb%d\n\t%s\n\tbr bbX", ir->blk->id, ir->blk->ins);
+   printf("a\n");
+   struct IR* a = ir;
+   printf("b\n");
+   struct BLK* b = ir->blk;
+   printf("c\n");
+   int c = ir->blk->bid;
+   printf("d\n");
+   if(ir->blk->bid)
+      printf("%d\n", ir->blk->bid);
+   if(ir->blk->ins){
+      printf("%s\n", ir->blk->ins);
+      fprintf(fp, "bb%d\n\t%s\n\tbr bbX", ir->blk->bid, ir->blk->ins);
+   }
    fclose(fp);
 }
 
