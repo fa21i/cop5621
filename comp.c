@@ -915,14 +915,17 @@ int type_checking(struct ast* node){
 
 int add_BLK(struct BLK* b, struct IR* i){
    struct BLK* temp = i->blk;
+   printf("maybe\n");
    if(temp)
    {
+      printf("fuck\n");
       while(temp->next){
          temp = temp->next;
       }
       temp->next = b;
    }
    else{
+      printf("shit\n");
       temp = b;
    }
    return 0;
