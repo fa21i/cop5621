@@ -1,0 +1,63 @@
+bb25
+	MAIN
+	br bbX
+bb24
+	IF
+	br bbX
+bb18
+	test
+	br bbX
+bb22
+	IF
+	br bbX
+bb23
+	5
+	br bbX
+bb19
+	const)
+	br bbX
+bb20
+	1
+	br bbX
+bb21
+	2
+	br bbX
+bb27
+	test
+	br bbX
+bb15
+	GT
+	br bbX
+bb11
+	1
+	br bbX
+bb14
+	PLUS
+	br bbX
+bb12
+	a
+	br bbX
+bb13
+	b
+	br bbX
+bb31
+	const
+	br bbX
+bb7
+	EQ
+	br bbX
+bb5
+	LET
+	br bbX
+bb6
+	2
+	br bbX
+bb4
+	c
+	br bbX
+bb2
+	1
+	br bbX
+bb3
+	c
+	br bbX

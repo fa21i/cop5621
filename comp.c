@@ -1120,27 +1120,38 @@ int add_BLK(struct BLK* b, struct IR* i){
 int construct_ir(){
    printf("here\n");
    struct CFG* tempc = cfg;
-   struct V* tempv = tempc->next->v;
+   struct V* tempv = tempc->v;
    struct IR* i = (struct IR*) malloc(sizeof(struct IR));
    i->blk = NULL;
    i->next = NULL;
 
-   while(tempv)
+   while (tempc)
    {
-      struct BLK* b = (struct BLK*) malloc(sizeof(struct BLK));
-      b->bid = tempv->node->id;
-      printf("ID %d\n", b->bid);
-      b->ins = (char*) malloc(256*sizeof(char));
-      strcpy(b->ins, tempv->node->token);
-      printf("2\n");
-      b->next = NULL;
-      add_BLK(b,i);
       
-      printf("uh oh: %p\n",i);
+      while(tempv)
+      {
+         struct BLK* b = (struct BLK*) malloc(sizeof(struct BLK));
+         b->bid = tempv->node->id;
+         printf("ID %d\n", b->bid);
+         b->ins = (char*) malloc(256*sizeof(char));
+         strcpy(b->ins, tempv->node->token);
+         printf("2\n");
+         b->next = NULL;
+         add_BLK(b,i);
+         
+         printf("uh oh: %p\n",i);
 
-      tempv = tempv->next;
+         tempv = tempv->next;
+      }
+      tempc = tempc->next;
+      printf("tempc\n");
+      if (tempc!=NULL)
+      {
+         tempv = tempc->v;
+         printf("tempv: %s\n",tempc->en->token);
+      }
    }
-
+   
    if(ir){
       struct IR* tempir = ir;
       while (tempir->next)
@@ -1163,14 +1174,25 @@ void print_ir(){
    printf("b\n");
    struct BLK* b = ir->blk;
    printf("c\n");
-   // int c = ir->blk->bid;
-   printf("d\n");
-   if(ir->blk->bid)
-      printf("%d\n", ir->blk->bid);
-   if(ir->blk->ins){
-      printf("%s\n", ir->blk->ins);
-      fprintf(fp, "bb%d\n\t%s\n\tbr bbX", ir->blk->bid, ir->blk->ins);
+   while(a){
+      b = a->blk;
+      while (b)
+      {
+         int c = b->bid;
+         printf("d\n");
+         if(c)
+            printf("%d\n", c);
+         if(b->ins){
+            printf("%s\n", b->ins);
+            fprintf(fp, "bb%d\n\t%s\n\tbr bbX\n", b->bid, b->ins);
+         }
+         b = b->next;
+      }
+      a=a->next;
    }
+      
+   
+   
    fclose(fp);
 }
 
