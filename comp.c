@@ -1121,13 +1121,15 @@ int construct_ir(){
    printf("here\n");
    struct CFG* tempc = cfg;
    struct V* tempv = tempc->v;
-   struct IR* i = (struct IR*) malloc(sizeof(struct IR));
-   i->blk = NULL;
-   i->next = NULL;
+   // struct IR* i = (struct IR*) malloc(sizeof(struct IR));
+   // i->blk = NULL;
+   // i->next = NULL;
 
    while (tempc)
    {
-      
+      struct IR* i = (struct IR*) malloc(sizeof(struct IR));
+      i->blk = NULL;
+      i->next = NULL;
       while(tempv)
       {
          struct BLK* b = (struct BLK*) malloc(sizeof(struct BLK));
@@ -1148,21 +1150,21 @@ int construct_ir(){
       if (tempc!=NULL)
       {
          tempv = tempc->v;
-         printf("tempv: %s\n",tempc->en->token);
+      }
+      // add to ir
+      struct IR* tempir = ir;
+      if(tempir){
+         while (tempir->next)
+         {
+            tempir = tempir->next;
+         }
+         tempir->next = i;
+      }
+      else{
+         ir = i;
       }
    }
    
-   if(ir){
-      struct IR* tempir = ir;
-      while (tempir->next)
-      {
-         tempir = tempir->next;
-      }
-      tempir->next = i;
-   }
-   else{
-      ir = i;
-   }
    return 0;
 }
 void print_ir(){
@@ -1175,6 +1177,7 @@ void print_ir(){
    struct BLK* b = ir->blk;
    printf("c\n");
    while(a){
+      fprintf(fp,"\nfunction %s\n",a->blk->ins);
       b = a->blk;
       while (b)
       {

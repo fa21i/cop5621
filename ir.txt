@@ -1,3 +1,5 @@
+
+function MAIN
 bb25
 	MAIN
 	br bbX
@@ -22,6 +24,8 @@ bb20
 bb21
 	2
 	br bbX
+
+function test
 bb27
 	test
 	br bbX
@@ -40,6 +44,8 @@ bb12
 bb13
 	b
 	br bbX
+
+function const
 bb31
 	const
 	br bbX
