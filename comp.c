@@ -74,6 +74,17 @@ struct args {
    char* root_fun;
    int id; 
 };
+struct BLK{
+   int bid;
+   char* ins;
+   struct BLK* next;
+};
+struct IR{
+   struct BLK* blk;
+   struct IR* next;
+};
+
+struct IR* ir = NULL;
 
 bool hasNode(int id){
    struct CFG* temp;
@@ -161,7 +172,7 @@ int remove_E(struct CFG* c, struct E* e){
 }
 int construct_cfg(struct ast* node){
    //printf("node: %s\n",node->token);
-   if((node->ntoken==DEFINE || node->ntoken==ASSERT) 
+   if((node->ntoken==DEFINE || node->ntoken==PRINT) 
      /* && !hasNode(get_child(node,1)->id)*/){
       
       struct CFG* new_cfg = (struct CFG*) malloc(sizeof(struct CFG));
@@ -301,8 +312,13 @@ int construct_cfg(struct ast* node){
             }
 
             v->label = (char*) malloc(50*sizeof(char));
-            //sprintf(v->label, "%s := v%d", v1->node->token, v2->node->id);
-            v->label = "Let goes here";
+            sprintf(v->label, "%s := v%d", v1->label, v2->node->id);
+            // char* vs1 = NULL;
+            // strcat(strcat(strcat(v1->label,vs1)," := "),v2->label);
+            // printf("vs1:=%s",vs1);
+            // v->label = v1->label;
+            
+            
          }          
          else if(v->node->ntoken == IF)
          {
@@ -905,7 +921,7 @@ int type_checking(struct ast* node){
          return 1;
       }
    }
-   else if(node->ntoken == ASSERT) {
+   else if(node->ntoken == PRINT) {
       struct ast *child1 = get_child(node,2); 
       printf("hey %s\n",node->token);
       if(tokens[child1->id].type != BOOLTYPE){
@@ -1082,12 +1098,86 @@ void print_SMT(){
    fclose(fp);
 }
 
+int add_BLK(struct BLK* b, struct IR* i){
+   struct BLK* temp = i->blk;
+   printf("maybe\n");
+   if(temp!=NULL)
+   {
+      printf("fuck\n");
+      while(temp->next){
+         temp = temp->next;
+      }
+      temp->next = b;
+   }
+   else{
+      printf("shit\n");
+      i->blk = b;
+      printf("shit2\n");
+   }
+   return 0;
+}
+
+int construct_ir(){
+   printf("here\n");
+   struct CFG* tempc = cfg;
+   struct V* tempv = tempc->next->v;
+   struct IR* i = (struct IR*) malloc(sizeof(struct IR));
+   i->blk = NULL;
+   i->next = NULL;
+
+   while(tempv)
+   {
+      struct BLK* b = (struct BLK*) malloc(sizeof(struct BLK));
+      b->bid = tempv->node->id;
+      printf("ID %d\n", b->bid);
+      b->ins = (char*) malloc(256*sizeof(char));
+      strcpy(b->ins, tempv->node->token);
+      printf("2\n");
+      b->next = NULL;
+      add_BLK(b,i);
+      
+      printf("uh oh: %p\n",i);
+
+      tempv = tempv->next;
+   }
+
+   if(ir){
+      struct IR* tempir = ir;
+      while (tempir->next)
+      {
+         tempir = tempir->next;
+      }
+      tempir->next = i;
+   }
+   else{
+      ir = i;
+   }
+   return 0;
+}
+void print_ir(){
+   FILE* fp;
+   fp = fopen("ir.txt", "w");
+   printf("hello?\n");
+   printf("a\n");
+   struct IR* a = ir;
+   printf("b\n");
+   struct BLK* b = ir->blk;
+   printf("c\n");
+   // int c = ir->blk->bid;
+   printf("d\n");
+   if(ir->blk->bid)
+      printf("%d\n", ir->blk->bid);
+   if(ir->blk->ins){
+      printf("%s\n", ir->blk->ins);
+      fprintf(fp, "bb%d\n\t%s\n\tbr bbX", ir->blk->bid, ir->blk->ins);
+   }
+   fclose(fp);
+}
+
 
 int main (int argc, char **argv) {
 
    int retval = yyparse();
-
-
 
 // type checking never actually happens!!!!!!
    if (retval == 0) {
@@ -1106,9 +1196,10 @@ int main (int argc, char **argv) {
       // }
       visit_ast(construct_cfg);
       print_cfg();
-      construct_SMT();
-      print_SMT();
-      
+      // construct_SMT();
+      // print_SMT();
+      construct_ir();
+      print_ir();
       // print_char_array(args);
       // print_array(types);
       // print_scope(scope,0);
