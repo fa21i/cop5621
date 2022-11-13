@@ -26,6 +26,7 @@ struct ast* get_root(struct ast* ast_node);
 struct ast* find_ast_node(int id);
 struct ast* get_child(struct ast* ast_node, int id);
 int get_child_num(struct ast* ast_node);
+int get_ast_size();
 int visit_ast(int (*f)(struct ast* ast_node));
 void print_ast(); //    run "dot -Tpdf ast.dot -o ast.pdf" to create a PDF. Requires a preinstalled graphviz package (https://graphviz.org/download/)
 void free_ast();

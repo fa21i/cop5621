@@ -23,7 +23,7 @@ void fill_ast_node(struct ast** t, int val, char* token, bool is_leaf, int ntoke
   (*t)->is_leaf = is_leaf;
   (*t)->ntoken = ntoken;
   if (ast_child_root != NULL){                          //if child doesnot exist,
-    (*t)->child = ast_child_root;                     //set current child root pointer to child field
+    (*t)->child = ast_child_root;                       //set current child root pointer to child field
     ast_child_root = NULL;                              //Set the child root to NULL as we intend to set a new list
     insert_parent(*t);
   } else {
@@ -86,10 +86,10 @@ void insert_children (int n, ...){
 }
 
 struct ast* find_ast_node(int id){
-  struct ast* temp_root = ast_list_root;
-  while(temp_root != NULL){
-    if (id == temp_root->id) return temp_root;
-    temp_root = temp_root->next;
+  struct ast* r = ast_list_root;
+  while(r != NULL){
+    if (id == r->id) return r;
+    r = r->next;
   }
   return NULL;
 }
@@ -134,26 +134,36 @@ int get_child_num(struct ast* ast_node){
   return child_num;
 }
 
+int get_ast_size(){
+  struct ast* r = ast_list_root;
+  int max = 0;
+  while(r != NULL){
+    if (r->id > max) max = r->id;
+    r = r->next;
+  }
+  return max;
+}
+
 int visit_ast(int (*f)(struct ast* ast_node)){
-  struct ast* temp_root = ast_list_root;
-  while(temp_root != NULL){
-    if (f (temp_root) != 0) return 1;
-    temp_root = temp_root->next;
+  struct ast* r = ast_list_root;
+  while(r != NULL){
+    if (f (r) != 0) return 1;
+    r = r->next;
   }
   return 0;
 }
 
 FILE *fp;
-int print(struct ast* temp_root) {
-  if (!temp_root->is_leaf){
-    fprintf(fp, "%d [label=\"%s\", fontname=\"monospace\", style=filled, fillcolor=mintcream, ordering=\"out\"];\n ", temp_root->id, temp_root->token);
+int print(struct ast* r) {
+  if (!r->is_leaf){
+    fprintf(fp, "%d [label=\"%s\", fontname=\"monospace\", style=filled, fillcolor=mintcream];\n ", r->id, r->token);
   } else {
-    fprintf(fp, "%d [label=\"%s\", fontname=\"monospace\", ordering=\"out\"];\n ", temp_root->id, temp_root->token);
+    fprintf(fp, "%d [label=\"%s\", fontname=\"monospace\"];\n ", r->id, r->token);
   }
-  if (temp_root->child != NULL){
-    struct ast_child* temp_ast_child_root = temp_root->child;
+  if (r->child != NULL){
+    struct ast_child* temp_ast_child_root = r->child;
     while(temp_ast_child_root != NULL){
-      fprintf(fp, "%d->%d\n ", temp_root->id, temp_ast_child_root->id->id);
+      fprintf(fp, "%d->%d\n ", r->id, temp_ast_child_root->id->id);
       temp_ast_child_root = temp_ast_child_root->next;
     }
   }
@@ -170,11 +180,11 @@ void print_ast(){
 }
 
 void free_ast() {
-  struct ast* temp_root = ast_list_root;
+  struct ast* r = ast_list_root;
   struct ast* current_root = NULL;
-  while(temp_root != NULL){
-    if (temp_root->child != NULL){
-      struct ast_child* temp_ast_child_root = temp_root->child;
+  while(r != NULL){
+    if (r->child != NULL){
+      struct ast_child* temp_ast_child_root = r->child;
       struct ast_child* current_child = NULL;
       while(temp_ast_child_root != NULL){
         current_child = temp_ast_child_root;
@@ -182,8 +192,8 @@ void free_ast() {
         free(current_child);
       }
     }
-    current_root = temp_root;
-    temp_root = temp_root->next;
+    current_root = r;
+    r = r->next;
     free(current_root);
   }
 }

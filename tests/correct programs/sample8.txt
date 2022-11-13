@@ -1,4 +1,0 @@
-(define-fun f1 (i int) bool (= i 1))
-(define-fun f2 (i bool) (j int) int i)
-(define-fun f3 (i int) (j int) bool i)
-(print(let (x (f3 (get-int) 5))(f2 (get-int) x)))
