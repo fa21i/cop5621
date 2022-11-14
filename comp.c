@@ -446,6 +446,10 @@ void print_cfg(struct cfg* r){
   system("dot -Tpdf cfg.dot -o cfg.pdf");
 }
 
+void clean(){
+  //take current ir and make it simplified
+}
+
 int main (int argc, char **argv) {
   int retval = yyparse();
   push_fun_str("GET-INT", INT, 0, NULL, &fun_r, &fun_t);
