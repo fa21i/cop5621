@@ -458,7 +458,8 @@ int main (int argc, char **argv) {
   to_cfg_rec();
   add_brs();
   print_cfg(cfg_r);
-  print_cfg_ir(cfg_r, sz, fun_r);
+  // print_cfg_ir(cfg_r, sz, fun_r);
+  print_cfg_ir_optim(cfg_r, sz, fun_r);
 
   // TODO: add CFG cleaning
   free_ast();
