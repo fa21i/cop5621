@@ -1,0 +1,8 @@
+ast.dot
+ast.pdf
+cfg.dot
+cfg.pdf
+ir.txt
+lex.yy.c
+y.tab.c
+y.tab.h
