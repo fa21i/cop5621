@@ -345,3 +345,79 @@ void print_cfg_ir(struct cfg* t, int sz, struct node_fun_str* fun_r) {
     fun_r = fun_r->next;
   }
 }
+
+void basic_optim(struct cfg* t, int sz, struct node_fun_str* fun_r){
+  //non branching blocks
+  //check successor -- check that successor doesn't have more than one parent -- merge
+  while (fun_r != NULL) {
+    fprintf (stderr, "\nfunction %s\n", fun_r->name);
+    for (int i = 0; i <= sz; i++) {
+      struct cfg *r = t;
+      while (r != NULL) {
+        struct cfg* c1; struct cfg* c2;
+        get_prev(t, r->src, &c1, &c2);
+        if (r->valid && (r->dst == i || (c1 == NULL && c2 == NULL))
+            && strcmp (fun_r->name, r->fun) == 0) {
+          if (1 == find_int(r->dst, printed_r)) {
+            push_int(r->dst, &printed_r, &printed_t);
+            if(i==0){
+              printf(stderr, "bb%d:\n", r->dst);
+            }
+
+            if(c1 != NULL && c2 == NULL)
+            {
+              //add instr of r to instr of c1, c1 br
+              
+            }
+
+            if (r->asgns != NULL) 
+            {
+              if (r->asgns->bin == 0) 
+              { //if const, not, inp, lhs == 0, lhs < 0)  
+                if (r->asgns->type == CONST)
+                  fprintf(stderr, "  v%d := %d\n", r->asgns->lhs, r->asgns->op1);
+                else if (r->asgns->type == NOT)
+                  fprintf(stderr, "  v%d := not v%d\n", r->asgns->lhs, r->asgns->op1);
+                else if (r->asgns->type == INP)
+                  fprintf(stderr, "  v%d := a%d\n", r->asgns->lhs, -r->asgns->op1);
+                else if (r->asgns->lhs == 0)
+                  fprintf(stderr, "  rv := v%d\n", r->asgns->op1);
+                else if (r->asgns->lhs < 0)
+                  fprintf(stderr, "  a%d := v%d\n", -r->asgns->lhs, r->asgns->op1);
+                else
+                  fprintf(stderr, "  v%d := v%d\n", r->asgns->lhs, r->asgns->op1);
+              } 
+              else if (r->asgns->bin == 1) 
+              { //if is binary operation
+              } 
+              else if (r->asgns->bin == 2) 
+              { //call, print, rv
+              } 
+            }
+            if (r->br != NULL) {
+              if (r->br->succ1 != 0) {
+                if (r->br->cond == 0)
+                  fprintf(stderr, "  br bb%d\n", r->br->succ1);
+                else
+                  fprintf(stderr, "  br v%d bb%d bb%d\n", r->br->cond, r->br->succ1, r->br->succ2);
+              }  
+            }
+          }
+        }
+        r=r->next;
+      }       
+    }
+    fun_r = fun_r->next;
+  }
+}
+
+void dup_optim(){
+  //two blocks have save set of instructions
+  //check through blocks for same instr
+}
+
+void unr_optim(){
+  //branching br with always true/false
+  //check for br with guard -- check through instr for conditionality
+  // -- find where block meets back up -- delete unreachable code
+}
