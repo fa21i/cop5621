@@ -44,3 +44,5 @@ void get_prev(struct cfg* t, int dst, struct cfg** c1, struct cfg** c2);
 void push_cfg (int src, int dst, bool valid, bool final, struct asgn_instr* asgns, struct br_instr* br, struct cfg** r, struct cfg** t);
 void push_ncfg (int src, int dst, bool valid, bool final, struct asgn_instr* asgns, struct br_instr* br, char* fun, struct cfg** r, struct cfg** t);
 void print_cfg_ir(struct cfg* r, int sz, struct node_fun_str* fun_r);
+
+void optim(struct cfg* r, int sz, struct node_fun_str* fun_r);
