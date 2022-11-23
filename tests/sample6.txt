@@ -1,0 +1,4 @@
+(define-fun t1 int true)
+(define-fun t2 int (and (t1) 
+    (= (get-int) (get-int))))
+(print (t2))

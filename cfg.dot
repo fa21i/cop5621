@@ -1,0 +1,37 @@
+digraph print {
+1 [label="const"];
+3 [label="c := v4"];
+4 [label="v4 := 1"];
+5 [label="v5 := c"];
+6 [label="v6 := v5"];
+7 [label="v7 := 2"];
+8 [label="v8 := v6 EQ v7"];
+9 [label="test"];
+13 [label="v13 := 1"];
+14 [label="v14 := a"];
+15 [label="v15 := b"];
+16 [label="v16 := v14 PLUS v15"];
+17 [label="v17 := v13 GT v16"];
+18 [label="main"];
+19 [label="v19 := 1"];
+20 [label="v20 := 2"];
+21 [label="v21 := test (v19, v20)"];
+22 [label="v22 := const ()"];
+23 [label="v23 := 1"];
+24 [label="v24 := 2"];
+25 [label="IF v22 = true, then v25 := v23, else v25 := v24"];
+26 [label="v26 := 5"];
+27 [label="IF v21 = true, then v27 := v25, else v27 := v26"];
+28 [label="EXIT"];
+29 [label="EXIT"];
+30 [label="EXIT"];
+9->29
+27->28
+21->27
+25->27
+1->30
+18->21
+21->22
+22->25
+22->25
+}
