@@ -1,7 +1,9 @@
 #include "y.tab.h"
 #include "ast.h"
 #include "cfg.h"
+#define NOVALUE -9999
 int yyparse();
+
 
 // symbol table
 struct node_fun_str* fun_r = NULL;
@@ -447,6 +449,11 @@ void print_cfg(struct cfg* r){
 
 int main (int argc, char **argv) {
   int opt = 0;
+
+  int register_values[50];
+  for(int i = 0; i < 50; i++){register_values[i] = NOVALUE;}
+
+  
   if (argc > 1){
     if (strcmp("--opt", argv[1]) == 0){
       if (argc == 2) opt = 999;
@@ -475,8 +482,8 @@ int main (int argc, char **argv) {
     to_cont = cfg_compact(cfg_r);
     if (opt > 1) to_cont |= cfg_unreach(cfg_r);
     if (opt > 2) to_cont |= cfg_dupl(cfg_r);
-    if (opt > 3) to_cont |= opt_cp(cfg_r);
-    if (opt > 4) to_cont |= opt_arithm(cfg_r);
+    if (opt > 3) to_cont |= opt_cp(cfg_r,register_values);
+    if (opt > 4) to_cont |= opt_arithm(cfg_r,register_values);
   }
   print_cfg(cfg_r);
   print_cfg_ir(cfg_r, sz, fun_r);

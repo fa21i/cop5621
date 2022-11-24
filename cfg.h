@@ -57,7 +57,7 @@ bool find_uses (struct cfg* t, int v);
 bool cfg_compact(struct cfg* t);
 bool cfg_unreach(struct cfg* t);
 bool cfg_dupl(struct cfg* t);
-bool opt_cp (struct cfg* t);
-bool opt_arithm (struct cfg* t);
+bool opt_cp (struct cfg* t,int register_values[]);
+bool opt_arithm (struct cfg* t,int register_values[]);
 bool opt_remove (struct cfg* t);
 
