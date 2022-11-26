@@ -500,11 +500,15 @@ bool opt_cp (struct cfg* t,int register_values[]){
           }
           else if (a->type == NOT){
             fprintf(stderr, "  v%d := not v%d\n", a->lhs, a->op1);  // applying boolean negation
-            if(a->op1)                                              
+            int x = register_values[a->op1];
+            if(x!=NOVALUE && x==true){
               a->op1 = false;
-            else
+              a->type = CONST;
+            }
+            else if (x!=NOVALUE && x==false){
               a->op1 = true;
-            a->type = CONST;
+              a->type = CONST;
+            }
           }
           else if (a->type == INP){
             fprintf(stderr, "  v%d := a%d\n", a->lhs, -a->op1);     // assigning a value from input register to a virtual register            
@@ -739,7 +743,7 @@ bool opt_arithm (struct cfg* t, int register_values[]){
           // TODO: add some code here
           if (a->type == CONST){
             if (a->lhs==0){
-              fprintf(stderr, "  rv := %d\n", a->op1); 
+              fprintf(stderr, "  rv := %d\n", a->op1);
             }
             else if(a->lhs<0){
               fprintf(stderr, "  a%d := %d\n",-a->lhs, a->op1); 
@@ -751,6 +755,16 @@ bool opt_arithm (struct cfg* t, int register_values[]){
           }
           else if (a->type == NOT){
             fprintf(stderr, "  v%d := not v%d\n", a->lhs, a->op1);  // applying boolean negation
+            int x = a->lhs;
+            if(char_v[a->op1]!=NULL && char_v[a->op1]->type==NOT){
+              a->op1 = char_v[a->op1]->op1;
+            }
+            else if(char_v[a->op1]!=NULL && char_v[a->op1]->type==GT){
+              a = char_v[a->op1];
+              a->type = LE;
+              a->bin = 1;
+              a->lhs = x;
+            }
             char_v[a->lhs] = a;
           }
           else if (a->type == INP){
@@ -765,7 +779,7 @@ bool opt_arithm (struct cfg* t, int register_values[]){
           else{
             fprintf(stderr, "  v%d := v%d\n", a->lhs, a->op1);      // assigning a value from virtual register to another virtual register
             char_v[a->lhs] = a;
-          }  
+          }
         }
         else if (a->bin == 1) {
           // this is binary instruction
@@ -861,9 +875,17 @@ bool opt_arithm (struct cfg* t, int register_values[]){
             }else if (char_v[a->op2]->type==NOT && char_v[a->op2]->op1==a->op1){
               a->op1 = 0;
               a->type = CONST;
+            }else if(char_v[a->op2]!=NULL && char_v[a->op1]!=NULL
+              && char_v[a->op1]->op1==char_v[a->op2]->op1
+              && char_v[a->op1]->op2==char_v[a->op2]->op2
+              && ((char_v[a->op1]->type==GE && char_v[a->op2]->type==LE)
+                ||(char_v[a->op1]->type==LE && char_v[a->op2]->type==GE))){
+              
+              a->type = EQ;
+              a->op1 = char_v[a->op1]->op1;
+              a->op2 = char_v[a->op1]->op2;
             }
-            
-            
+            char_v[a->lhs] = a;
           }
           else if (a->type == OR){
             fprintf(stderr, "  v%d := v%d or v%d\n", a->lhs, a->op1, a->op2);
@@ -891,8 +913,13 @@ bool opt_arithm (struct cfg* t, int register_values[]){
               a->op1 = char_v[a->op1]->op1;
               a->bin = 0;
               a->type = 0;
+            }else if (char_v[a->op1]->type==NOT && char_v[a->op1]->op1==a->op2){
+              a->op1 = 1;
+              a->type = CONST;
+            }else if (char_v[a->op2]->type==NOT && char_v[a->op2]->op1==a->op1){
+              a->op1 = 1;
+              a->type = CONST;
             }
-            
           }
         }
         else {
