@@ -481,25 +481,25 @@ bool opt_cp (struct cfg* t,int register_values[]){
     if (e->valid){    // skip the ones that are not valid
       // struct asgn_instr* a = get_last_asgn (e->asgns);    // start scanning instructions backwards
       struct asgn_instr* a = e->asgns;    // start scanning instructions forward
-      fprintf(stderr,"func: %s\n", e->fun);
+      // fprintf(stderr,"func: %s\n", e->fun);
       while (a != NULL){
         if (a->bin == 0) {
           // this is unary instruction
           // TODO: add some code here
           if (a->type == CONST){
             if (a->lhs==0){
-              fprintf(stderr, "  rv := %d\n", a->op1); 
+              // fprintf(stderr, "  rv := %d\n", a->op1); 
             }
             else if(a->lhs<0){
-              fprintf(stderr, "  a%d := %d\n",-a->lhs, a->op1); 
+              // fprintf(stderr, "  a%d := %d\n",-a->lhs, a->op1); 
             }
             else{
-              fprintf(stderr, "  v%d := %d\n", a->lhs, a->op1);       // assigning a numeric constant to virtual register
+              // fprintf(stderr, "  v%d := %d\n", a->lhs, a->op1);       // assigning a numeric constant to virtual register
               register_values[a->lhs] = a->op1;
             }
           }
           else if (a->type == NOT){
-            fprintf(stderr, "  v%d := not v%d\n", a->lhs, a->op1);  // applying boolean negation
+            // fprintf(stderr, "  v%d := not v%d\n", a->lhs, a->op1);  // applying boolean negation
             int x = register_values[a->op1];
             if(x!=NOVALUE && x==true){
               a->op1 = false;
@@ -511,7 +511,7 @@ bool opt_cp (struct cfg* t,int register_values[]){
             }
           }
           else if (a->type == INP){
-            fprintf(stderr, "  v%d := a%d\n", a->lhs, -a->op1);     // assigning a value from input register to a virtual register            
+            // fprintf(stderr, "  v%d := a%d\n", a->lhs, -a->op1);     // assigning a value from input register to a virtual register            
             int x = register_values[-a->op1];
             if (x != NOVALUE)
             {
@@ -521,7 +521,7 @@ bool opt_cp (struct cfg* t,int register_values[]){
             }
           }
           else if (a->lhs == 0){
-            fprintf(stderr, "  rv := v%d\n", a->op1);               // assigning a value from virtual register to output register
+            // fprintf(stderr, "  rv := v%d\n", a->op1);               // assigning a value from virtual register to output register
             int x = register_values[a->op1];
             if (x != NOVALUE){
               a->op1 = x;
@@ -529,7 +529,7 @@ bool opt_cp (struct cfg* t,int register_values[]){
             }
           }
           else if (a->lhs < 0){
-            fprintf(stderr, "  a%d := v%d\n", -a->lhs, a->op1);     // assigning a value from virtual register to input register
+            // fprintf(stderr, "  a%d := v%d\n", -a->lhs, a->op1);     // assigning a value from virtual register to input register
             int x = register_values[a->op1];
             if (x != NOVALUE)
             {
@@ -539,7 +539,7 @@ bool opt_cp (struct cfg* t,int register_values[]){
             }
           }
           else{
-            fprintf(stderr, "  v%d := v%d\n", a->lhs, a->op1);      // assigning a value from virtual register to another virtual register
+            // fprintf(stderr, "  v%d := v%d\n", a->lhs, a->op1);      // assigning a value from virtual register to another virtual register
             int x = register_values[a->op1];
             if (x != NOVALUE)
             {
@@ -553,7 +553,7 @@ bool opt_cp (struct cfg* t,int register_values[]){
           // this is binary instruction
           // TODO: add some code here
           if (a->type == EQ){
-            fprintf(stderr, "  v%d := v%d = v%d\n", a->lhs, a->op1, a->op2);
+            // fprintf(stderr, "  v%d := v%d = v%d\n", a->lhs, a->op1, a->op2);
             int x = register_values[a->op1];
             int y = register_values[a->op2];
             if (x!=NOVALUE && y!=NOVALUE){
@@ -567,7 +567,7 @@ bool opt_cp (struct cfg* t,int register_values[]){
             }
           }
           else if (a->type == LT){
-            fprintf(stderr, "  v%d := v%d < v%d\n", a->lhs, a->op1, a->op2);
+            // fprintf(stderr, "  v%d := v%d < v%d\n", a->lhs, a->op1, a->op2);
             int x = register_values[a->op1];
             int y = register_values[a->op2];
             if (x!=NOVALUE && y!=NOVALUE){
@@ -581,7 +581,7 @@ bool opt_cp (struct cfg* t,int register_values[]){
             }
           }
           else if (a->type == PLUS){
-            fprintf(stderr, "  v%d := v%d + v%d\n", a->lhs, a->op1, a->op2);
+            // fprintf(stderr, "  v%d := v%d + v%d\n", a->lhs, a->op1, a->op2);
             int x = register_values[a->op1];
             int y = register_values[a->op2];
             if (x!=NOVALUE && y!=NOVALUE){
@@ -593,7 +593,7 @@ bool opt_cp (struct cfg* t,int register_values[]){
             }
           }
           else if (a->type == MINUS){
-            fprintf(stderr, "  v%d := v%d - v%d\n", a->lhs, a->op1, a->op2);
+            // fprintf(stderr, "  v%d := v%d - v%d\n", a->lhs, a->op1, a->op2);
             int x = register_values[a->op1];
             int y = register_values[a->op2];
             if (x!=NOVALUE && y!=NOVALUE){
@@ -604,7 +604,7 @@ bool opt_cp (struct cfg* t,int register_values[]){
             }
           }
           else if (a->type == AND){
-            fprintf(stderr, "  v%d := v%d and v%d\n", a->lhs, a->op1, a->op2);
+            // fprintf(stderr, "  v%d := v%d and v%d\n", a->lhs, a->op1, a->op2);
             int x = register_values[a->op1];
             int y = register_values[a->op2];
             if (x!=NOVALUE && y!=NOVALUE){
@@ -618,7 +618,7 @@ bool opt_cp (struct cfg* t,int register_values[]){
             }
           }
           else if (a->type == LE){
-            fprintf(stderr, "  v%d := v%d <= v%d\n", a->lhs, a->op1, a->op2);
+            // fprintf(stderr, "  v%d := v%d <= v%d\n", a->lhs, a->op1, a->op2);
             int x = register_values[a->op1];
             int y = register_values[a->op2];
             if (x!=NOVALUE && y!=NOVALUE){
@@ -632,7 +632,7 @@ bool opt_cp (struct cfg* t,int register_values[]){
             }
           }
           else if (a->type == MULT){
-            fprintf(stderr, "  v%d := v%d * v%d\n", a->lhs, a->op1, a->op2);
+            // fprintf(stderr, "  v%d := v%d * v%d\n", a->lhs, a->op1, a->op2);
             int x = register_values[a->op1];
             int y = register_values[a->op2];
             if (x!=NOVALUE && y!=NOVALUE){
@@ -644,7 +644,7 @@ bool opt_cp (struct cfg* t,int register_values[]){
             }
           }
           else if (a->type == DIV){
-            fprintf(stderr, "  v%d := v%d div v%d\n", a->lhs, a->op1, a->op2);
+            // fprintf(stderr, "  v%d := v%d div v%d\n", a->lhs, a->op1, a->op2);
             int x = register_values[a->op1];
             int y = register_values[a->op2];
             if (x!=NOVALUE && y!=NOVALUE){
@@ -655,7 +655,7 @@ bool opt_cp (struct cfg* t,int register_values[]){
             }
           }
           else if (a->type == MOD){
-            fprintf(stderr, "  v%d := v%d mod v%d\n", a->lhs, a->op1, a->op2);
+            // fprintf(stderr, "  v%d := v%d mod v%d\n", a->lhs, a->op1, a->op2);
             int x = register_values[a->op1];
             int y = register_values[a->op2];
             if (x!=NOVALUE && y!=NOVALUE){
@@ -667,7 +667,7 @@ bool opt_cp (struct cfg* t,int register_values[]){
             
           }
           else if (a->type == GT){
-            fprintf(stderr, "  v%d := v%d > v%d\n", a->lhs, a->op1, a->op2);
+            // fprintf(stderr, "  v%d := v%d > v%d\n", a->lhs, a->op1, a->op2);
             int x = register_values[a->op1];
             int y = register_values[a->op2];
             if (x!=NOVALUE && y!=NOVALUE){
@@ -681,7 +681,7 @@ bool opt_cp (struct cfg* t,int register_values[]){
             }
           }
           else if (a->type == GE){
-            fprintf(stderr, "  v%d := v%d >= v%d\n", a->lhs, a->op1, a->op2);
+            // fprintf(stderr, "  v%d := v%d >= v%d\n", a->lhs, a->op1, a->op2);
             int x = register_values[a->op1];
             int y = register_values[a->op2];
             if (x!=NOVALUE && y!=NOVALUE){
@@ -695,7 +695,7 @@ bool opt_cp (struct cfg* t,int register_values[]){
             }
           }
           else if (a->type == OR){
-            fprintf(stderr, "  v%d := v%d or v%d\n", a->lhs, a->op1, a->op2);
+            // fprintf(stderr, "  v%d := v%d or v%d\n", a->lhs, a->op1, a->op2);
             int x = register_values[a->op1];
             int y = register_values[a->op2];
             if (x!=NOVALUE && y!=NOVALUE){
@@ -743,18 +743,18 @@ bool opt_arithm (struct cfg* t, int register_values[]){
           // TODO: add some code here
           if (a->type == CONST){
             if (a->lhs==0){
-              fprintf(stderr, "  rv := %d\n", a->op1);
+              // fprintf(stderr, "  rv := %d\n", a->op1);
             }
             else if(a->lhs<0){
-              fprintf(stderr, "  a%d := %d\n",-a->lhs, a->op1); 
+              // fprintf(stderr, "  a%d := %d\n",-a->lhs, a->op1); 
             }
             else{
-              fprintf(stderr, "  v%d := %d\n", a->lhs, a->op1);       // assigning a numeric constant to virtual register
+              // fprintf(stderr, "  v%d := %d\n", a->lhs, a->op1);       // assigning a numeric constant to virtual register
               char_v[a->lhs] = a;
             }
           }
           else if (a->type == NOT){
-            fprintf(stderr, "  v%d := not v%d\n", a->lhs, a->op1);  // applying boolean negation
+            // fprintf(stderr, "  v%d := not v%d\n", a->lhs, a->op1);  // applying boolean negation
             int x = a->lhs;
             if(char_v[a->op1]!=NULL && char_v[a->op1]->type==NOT){
               a->op1 = char_v[a->op1]->op1;
@@ -768,16 +768,16 @@ bool opt_arithm (struct cfg* t, int register_values[]){
             char_v[a->lhs] = a;
           }
           else if (a->type == INP){
-            fprintf(stderr, "  v%d := a%d\n", a->lhs, -a->op1);     // assigning a value from input register to a virtual register
+            // fprintf(stderr, "  v%d := a%d\n", a->lhs, -a->op1);     // assigning a value from input register to a virtual register
           }
           else if (a->lhs == 0){
-            fprintf(stderr, "  rv := v%d\n", a->op1);               // assigning a value from virtual register to output register
+            // fprintf(stderr, "  rv := v%d\n", a->op1);               // assigning a value from virtual register to output register
           }
           else if (a->lhs < 0){
-            fprintf(stderr, "  a%d := v%d\n", -a->lhs, a->op1);     // assigning a value from virtual register to input register
+            // fprintf(stderr, "  a%d := v%d\n", -a->lhs, a->op1);     // assigning a value from virtual register to input register
           }
           else{
-            fprintf(stderr, "  v%d := v%d\n", a->lhs, a->op1);      // assigning a value from virtual register to another virtual register
+            // fprintf(stderr, "  v%d := v%d\n", a->lhs, a->op1);      // assigning a value from virtual register to another virtual register
             char_v[a->lhs] = a;
           }
         }
@@ -785,7 +785,7 @@ bool opt_arithm (struct cfg* t, int register_values[]){
           // this is binary instruction
           // TODO: add some code here
           if (a->type == PLUS){
-            fprintf(stderr, "  v%d := v%d + v%d\n", a->lhs, a->op1, a->op2);
+            // fprintf(stderr, "  v%d := v%d + v%d\n", a->lhs, a->op1, a->op2);
             int x = register_values[a->op1];
             int y = register_values[a->op2];
             if (x == 0){
@@ -799,7 +799,7 @@ bool opt_arithm (struct cfg* t, int register_values[]){
             }
           }
           else if (a->type == MINUS){
-            fprintf(stderr, "  v%d := v%d - v%d\n", a->lhs, a->op1, a->op2);
+            // fprintf(stderr, "  v%d := v%d - v%d\n", a->lhs, a->op1, a->op2);
             int x = register_values[a->op1];
             int y = register_values[a->op2];
             if(y==0){
@@ -814,7 +814,7 @@ bool opt_arithm (struct cfg* t, int register_values[]){
             }
           }
           else if (a->type == MULT){
-            fprintf(stderr, "  v%d := v%d * v%d\n", a->lhs, a->op1, a->op2);
+            // fprintf(stderr, "  v%d := v%d * v%d\n", a->lhs, a->op1, a->op2);
             int x = register_values[a->op1];
             int y = register_values[a->op2];
             if(x==1){
@@ -833,7 +833,7 @@ bool opt_arithm (struct cfg* t, int register_values[]){
             }
           }
           else if (a->type == DIV){
-            fprintf(stderr, "  v%d := v%d div v%d\n", a->lhs, a->op1, a->op2);
+            // fprintf(stderr, "  v%d := v%d div v%d\n", a->lhs, a->op1, a->op2);
             int x = register_values[a->op1];
             int y = register_values[a->op2];
             if(y==1){
@@ -848,7 +848,7 @@ bool opt_arithm (struct cfg* t, int register_values[]){
             }
           }
           else if (a->type == AND){
-            fprintf(stderr, "  v%d := v%d and v%d\n", a->lhs, a->op1, a->op2);
+            // fprintf(stderr, "  v%d := v%d and v%d\n", a->lhs, a->op1, a->op2);
             int x = register_values[a->op1];
             int y = register_values[a->op2];
             if(y==0 || x==0){
@@ -888,7 +888,7 @@ bool opt_arithm (struct cfg* t, int register_values[]){
             char_v[a->lhs] = a;
           }
           else if (a->type == OR){
-            fprintf(stderr, "  v%d := v%d or v%d\n", a->lhs, a->op1, a->op2);
+            // fprintf(stderr, "  v%d := v%d or v%d\n", a->lhs, a->op1, a->op2);
             int x = register_values[a->op1];
             int y = register_values[a->op2];
             if(y==1 || x==1){
