@@ -2,8 +2,8 @@ CC	= gcc
 YACC= yacc
 LEX	= lex
 
-comp:	y.tab.c lex.yy.c ast.c containers.c cfg.c comp.c
-	$(CC) lex.yy.c y.tab.c ast.c containers.c cfg.c comp.c -o comp
+comp:	y.tab.c lex.yy.c ast.c containers.c cfg.c reg.c comp.c
+	$(CC) lex.yy.c y.tab.c ast.c containers.c cfg.c reg.c comp.c -o comp
 
 y.tab.c: lab_yacc.y
 	$(YACC) -d lab_yacc.y

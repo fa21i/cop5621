@@ -1,0 +1,6 @@
+struct range{
+    int start;
+    int end;
+};
+bool register_allocation (struct cfg* t);
+void print_reg_smt();

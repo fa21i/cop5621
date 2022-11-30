@@ -1,6 +1,7 @@
 #include "y.tab.h"
 #include "ast.h"
 #include "cfg.h"
+#include "reg.h"
 #define NOVALUE -9999
 int yyparse();
 
@@ -476,16 +477,18 @@ int main (int argc, char **argv) {
   add_brs();
   get_bb_ids(cfg_r);
 
-  bool to_cont = true;
-  while (opt && to_cont)
-  {
-    to_cont = cfg_compact(cfg_r);
-    if (opt > 1) to_cont |= cfg_unreach(cfg_r);
-    if (opt > 2) to_cont |= cfg_dupl(cfg_r);
-    if (opt > 3) to_cont |= opt_cp(cfg_r,register_values);
-    if (opt > 4) to_cont |= opt_arithm(cfg_r,register_values);
-  }
+  // bool to_cont = true;
+  // while (opt && to_cont)
+  // {
+  //   to_cont = cfg_compact(cfg_r);
+  //   if (opt > 1) to_cont |= cfg_unreach(cfg_r);
+  //   if (opt > 2) to_cont |= cfg_dupl(cfg_r);
+  //   if (opt > 3) to_cont |= opt_cp(cfg_r,register_values);
+  //   if (opt > 4) to_cont |= opt_arithm(cfg_r,register_values);
+  // }
   print_cfg(cfg_r);
+  register_allocation(cfg_r);
+  print_reg_smt();
   print_cfg_ir(cfg_r, sz, fun_r);
 
   // TODO: add CFG cleaning
