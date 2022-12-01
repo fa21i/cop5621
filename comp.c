@@ -448,6 +448,8 @@ void print_cfg(struct cfg* r){
   // system("dot -Tpdf cfg.dot -o cfg.pdf");
 }
 
+
+
 int main (int argc, char **argv) {
   int opt = 0;
 
@@ -489,7 +491,9 @@ int main (int argc, char **argv) {
   print_cfg(cfg_r);
   register_allocation(cfg_r);
   print_reg_smt();
-  print_cfg_ir(cfg_r, sz, fun_r);
+  // int* reg = traverse_reg_txt();
+  // change_register_values(cfg_r, sz, fun_r,reg);
+  // print_cfg_ir(cfg_r, sz, fun_r);
 
   // TODO: add CFG cleaning
   free_ast();

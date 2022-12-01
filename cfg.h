@@ -61,3 +61,4 @@ bool opt_cp (struct cfg* t,int register_values[]);
 bool opt_arithm (struct cfg* t,int register_values[]);
 bool opt_remove (struct cfg* t);
 
+void change_register_values(struct cfg* t, int sz, struct node_fun_str* fun_r,int* reg);

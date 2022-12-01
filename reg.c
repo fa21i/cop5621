@@ -49,9 +49,23 @@ bool register_allocation (struct cfg* t){
             }
 
         }
-        else {
           // this is a call instruction. do nothing here
-
+        else if (a->bin == 2) {
+          if (a->lhs != 0 && strcmp(a->fun, "print") != 0){
+            printf("lhs: %d %d\n",a->lhs,e->id);
+            if (reg[a->lhs]==NULL && a->lhs>0){
+              struct range* r = (struct range*)malloc(sizeof(struct range));
+              r->start = e->id;
+              r->end = e->id;
+              reg[a->lhs] = r;
+            }
+            else{
+              reg[a->lhs]->start = e->id;
+              reg[a->lhs]->end = e->id;
+            }
+            
+          }
+          
         }
         a = a->next;  // go to the next instruction
       }
@@ -87,9 +101,37 @@ void print_reg_smt(){
       }
     }
   }
-  
   fprintf(fp,"\n(minimize K)\n(check-sat)\n(get-objectives)\n(get-model)\n");
   fclose(fp);
   // system("dot -Tpdf cfg.dot -o cfg.pdf");
 
+}
+
+int* traverse_reg_txt(){
+  int* reg=(int*) calloc(50, sizeof(char*)); 
+  for (int i = 0; i < 50; i++)
+  {
+    reg[i] = -9999;
+  }
+  
+  FILE* ptr;
+    char ch;
+    ptr = fopen("reg.txt", "r");
+ 
+    if (NULL == ptr) {
+        printf("file can't be opened \n");
+    }
+ 
+    printf("content of this file are \n");
+    int v=0, g=0;
+    while (fscanf(ptr," (define-fun x%d () Int\n %d)\n", &v, &g) == 2) reg[v] = g;
+    for (int i = 0; i < 50; i++)
+    {
+      if(reg[i]!=-9999){
+        printf("reg[%d] = %d\n",i,reg[i]);
+      }
+    }
+    
+    fclose(ptr);
+    return reg;
 }

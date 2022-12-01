@@ -1027,3 +1027,48 @@ void print_cfg_ir(struct cfg* t, int sz, struct node_fun_str* fun_r) {
     fun_r = fun_r->next;
   }
 }
+
+void change_register_values(struct cfg* t, int sz, struct node_fun_str* fun_r, int* reg){
+  struct cfg *r = t;
+  while (r != NULL) {
+    if (r->valid){
+      struct asgn_instr* a = r->asgns;
+      while (a != NULL) { 
+        printf("--> reg[%d]: %d\n",a->lhs,reg[a->lhs]);
+        if (a->bin == 0) {
+          if (a->type == CONST){
+            if (a->lhs > 0){
+              a->lhs = reg[a->lhs];
+            }
+          }
+          else if (a->type == NOT){
+            a->lhs = reg[a->lhs];
+            a->op1 = reg[a->op1];
+          }
+          else if (a->type == INP)
+            a->lhs = reg[a->lhs];
+          else if (a->lhs == 0)
+            a->op1 = reg[a->op1];
+          else if (a->lhs < 0)
+            a->op1 = reg[a->op1];
+          else{
+            a->lhs = reg[a->lhs];
+            a->op1 = reg[a->op1];
+          }
+        }
+        else if (a->bin == 1) {              
+          a->lhs = reg[a->lhs];
+          a->op1 = reg[a->op1];
+          a->op2 = reg[a->op2];
+        }
+        else if (a->bin == 2) {
+          // if (a->lhs != 0 && strcmp(a->fun, "print") != 0)
+          //   a->lhs = reg[a->lhs];
+          // };
+        };
+        a = a->next;
+      }
+    }
+    r = r->next;
+  }
+}
