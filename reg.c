@@ -3,6 +3,56 @@
 #include "y.tab.h"
 struct range* reg[50] = {NULL};
 
+void append(struct range* r, int id){
+  struct range* t = r;
+  while (t->next!=NULL)
+  {
+    t = t->next;
+  }
+  struct range* r1 = (struct range*)malloc(sizeof(struct range));
+  r1->bb = id;
+  r1->next = NULL;
+  t->next = r1;
+}
+
+bool contains(struct range* r, int id){
+  struct range* t = r;
+  while (t->next!=NULL)
+  {
+    if (t->bb == id)
+    {
+      return true;
+    }
+    t = t->next;
+  }
+  return false;
+}
+
+void add_reg(struct cfg* t, int bb, int id, struct range* rr){
+  struct cfg* e = t;
+  struct range* r = rr;
+  // printf("here\n");
+  while(e != NULL){ 
+    if(e->valid){
+      // printf("here %d\n",e->id);
+      if(e->id == bb){
+        if (e->br==NULL || id == e->br->succ1){
+          // printf("here1\n");
+          break;
+        }
+        else if (e->br!=NULL)
+        {
+          // printf("here2\n");
+          if(contains(rr,e->br->succ1)==false)
+            append(rr,e->br->succ1);
+          // add_reg(t,e->br->succ1,id,rr);
+        }
+      }
+    }
+    e = e->next;
+  }
+}
+
 bool register_allocation (struct cfg* t){
   bool found = false;
   struct cfg* e = t;
@@ -10,104 +60,39 @@ bool register_allocation (struct cfg* t){
   while (e != NULL){  // loop for all basic blocks
     if (e->valid){    // skip the ones that are not valid
       // printf("Func name: %s\n",e->fun);
-      struct asgn_instr* a = e->asgns;    // start scanning instructions forward
-      while (a != NULL){
-        if (a->bin == 0) {
-          printf("/////////////e->id: %d\n",e->id);
-          // this is unary instruction
-          // TODO: add some code here
-          if (a->lhs>0){
-            if (reg[a->lhs]==NULL && a->lhs>0){
-              struct range* r = (struct range*)malloc(sizeof(struct range));
-              r->start = e->id;
-              r->end = e->id;
-              reg[a->lhs] = r;
-            }
-            else if(reg[a->lhs]!=NULL){
-              if(e->id < reg[a->lhs]->start)
-                reg[a->lhs]->start = e->id;
-              if(e->id > reg[a->lhs]->end)
-                reg[a->lhs]->end = e->id;
-            }
-            if(a->type!=INP && a->type!=CONST && reg[a->op1]!=NULL){
-              if(e->id < reg[a->lhs]->start)
-                reg[a->lhs]->start = e->id;
-              if(e->id > reg[a->lhs]->end)
-                reg[a->op1]->end = e->id;
-            }
+      struct asgn_instr* a = e->asgns;    // start scanning instructions forward      
+      while (a != NULL){        
+        if (a->lhs > 0)
+        {
+          struct range* r = (struct range*)malloc(sizeof(struct range));
+          if (e->br->cond == a->lhs)
+          {
+            r->bb = e->id;
+            r->next = NULL;
+            reg[a->lhs] = r;
+          }
+          else{
+            r->bb = e->br->succ1;
+            r->next = NULL;
+            reg[a->lhs] = r;
+            add_reg(t,e->br->succ1,a->lhs,reg[a->lhs]);
           }
         }
-        else if (a->bin == 1) {
-          // this is binary instruction
-          // TODO: add some code here
-            if (reg[a->lhs]==NULL && a->lhs>0){
-                struct range* r = (struct range*)malloc(sizeof(struct range));
-                printf("printing e->id: %d\n",e->id);
-                r->start = e->id;
-                r->end = e->id;
-                reg[a->lhs] = r;
-            }
-            else if(reg[a->lhs]!=NULL){
-              if(e->id > reg[a->lhs]->end)
-                reg[a->lhs]->end = e->id;
-              if(e->id < reg[a->lhs]->start)
-                reg[a->lhs]->start = e->id;
-            }
-            printf("====> e->id: %d, reg_op1[%d]: some\n",e->id,a->op1);
-            if (reg[a->op1]==NULL)
-            {
-              struct range* r = (struct range*)malloc(sizeof(struct range));
-              r->start = e->id;
-              r->end = e->id;
-              reg[a->op1] = r;
-            }
-            else{
-              if(e->id < reg[a->op1]->start)
-                reg[a->op1]->start = e->id;
-              if(e->id > reg[a->op1]->end)
-                reg[a->op1]->end = e->id;
-            }
-            if (reg[a->op2]==NULL)
-            {
-              struct range* r = (struct range*)malloc(sizeof(struct range));
-              r->start = e->id;
-              r->end = e->id;
-              reg[a->op2] = r;
-            }
-            else{
-              if(e->id < reg[a->op2]->start)
-                reg[a->op2]->start = e->id;
-              if(e->id > reg[a->op2]->end)
-                reg[a->op2]->end = e->id;
-            }
-
-        }
-          // this is a call instruction. do nothing here
-        else if (a->bin == 2) {
-          if (a->lhs != 0 && strcmp(a->fun, "print") != 0){
-            printf("lhs: %d %d\n",a->lhs,e->id);
-            if (reg[a->lhs]==NULL && a->lhs>0){
-              struct range* r = (struct range*)malloc(sizeof(struct range));
-              r->start = e->id;
-              r->end = e->id;
-              reg[a->lhs] = r;
-            }
-            else{
-              if(e->id < reg[a->lhs]->start)
-                reg[a->lhs]->start = e->id;
-              if(e->id > reg[a->lhs]->end)
-                reg[a->lhs]->end = e->id;
-            }
-            
-          }
-          
-        }
+        
         a = a->next;  // go to the next instruction
       }
     }
     e = e->next;    // go to the next basic block
   }
   return found;     // return this boolean value. if anything was optimized in the code above, then `found` should be `true`
+}
+void print_all_bb_id(struct range* r, int vid){
+  struct range* e = r;
+  while (e!=NULL)
+  {
+    printf("reg[%d]->bb: %d\n",vid,e->bb);
+    e = e->next;
+  }
 }
 
 void print_reg_smt(){
@@ -126,18 +111,23 @@ void print_reg_smt(){
   printf("=======================================================\n");
   for (int i = 0; i < 50; i++)
   {
-    if (reg[i]!=NULL) printf("reg[%d] = start:%d , end:%d \n",i,reg[i]->start,reg[i]->end);
+    if (reg[i]!=NULL) print_all_bb_id(reg[i],i);
     for (int j = i; j < 50; j++)
     {
-      
       if (reg[i]!=NULL && reg[j]!=NULL)
       {
-        // printf("reg_i[%d]=%p ,reg_j[%d]=%p \n",i,reg[i],j,reg[j]);
-        // printf("reg[%d] = start:%d , end:%d \n\n",j,reg[j]->start,reg[j]->end);
-        if (i!=j && reg[i]->start>=reg[j]->start && reg[i]->end<=reg[j]->end)
+        if (i!=j)
         {
-          // printf("reg[%d] = start:%d , end:%d \n",i,reg[i]->start,reg[i]->end);
-          fprintf(fp, "(assert (not (= x%d x%d)))\n",i,j);
+          struct range* r = reg[i];
+          while (r!=NULL)
+          {
+            if (contains(reg[j],r->bb))
+            {
+              fprintf(fp, "(assert (not (= x%d x%d)))\n",i,j);
+              break;
+            }
+            r = r->next;
+          }
         }
       }
     }
@@ -145,7 +135,7 @@ void print_reg_smt(){
   printf("=======================================================\n");
   fprintf(fp,"\n(minimize K)\n(check-sat)\n(get-objectives)\n(get-model)\n");
   fclose(fp);
-  system("z3 reg.smt | grep \"define-fun x\" -A 1 | grep -v \"\\-\\-\" > reg.txt");
+  // system("z3 reg.smt | grep \"define-fun x\" -A 1 | grep -v \"\\-\\-\" > reg.txt");
 
 }
 

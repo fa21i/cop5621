@@ -1,6 +1,6 @@
 struct range{
-    int start;
-    int end;
+    int bb;
+    struct range* next;
 };
 bool register_allocation (struct cfg* t);
 void print_reg_smt();
