@@ -1,0 +1,39 @@
+digraph print {
+1 [label="main"];
+2 [label="v2 := GET-BOOL ()"];
+3 [label="v3 := 1"];
+4 [label="v4 := 2"];
+5 [label="IF v2 = true, then v5 := v3, else v5 := v4"];
+6 [label="v6 := GET-BOOL ()"];
+7 [label="v7 := 3"];
+8 [label="v8 := 4"];
+9 [label="IF v6 = true, then v9 := v7, else v9 := v8"];
+10 [label="v10 := v5 MINUS v9"];
+11 [label="v11 := GET-BOOL ()"];
+12 [label="v12 := 5"];
+13 [label="v13 := 6"];
+14 [label="IF v11 = true, then v14 := v12, else v14 := v13"];
+15 [label="v15 := v10 PLUS v14"];
+16 [label="EXIT"];
+15->16
+14->15
+9->10
+10->17
+11->12
+11->13
+12->14
+13->14
+1->18
+2->3
+2->4
+3->5
+4->5
+5->19
+6->7
+6->8
+7->9
+8->9
+17->11
+18->2
+19->6
+}

@@ -1,0 +1,1 @@
+(print (+ (- (if (get-bool) 1 2) (if (get-bool) 3 4)) (if (get-bool) 5 6)))

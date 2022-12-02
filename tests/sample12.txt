@@ -1,0 +1,1 @@
+(define-fun const (a bool) bool (= (let (c (not a)) (not c)) 2)) (define-fun test (a int) (b int) bool (not (> 1 (and a b)))) (print (if (test 1 2) (if (const) 1 2) 5))
