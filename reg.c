@@ -3,6 +3,17 @@
 #include "y.tab.h"
 struct range* reg[50] = {NULL};
 
+void print_all_bb_id(struct range* r, int vid){
+  struct range* e = r;
+  printf("reg[%d]->bb: ",vid);
+  while (e!=NULL)
+  {
+    printf("%d ",e->bb);
+    e = e->next;
+  }
+  printf("\n\n");
+}
+
 void append(struct range* r, int id){
   struct range* t = r;
   while (t->next!=NULL)
@@ -15,11 +26,12 @@ void append(struct range* r, int id){
   t->next = r1;
 }
 
-bool contains(struct range* r, int id){
+bool contains(struct range* r, int bbid){
   struct range* t = r;
-  while (t->next!=NULL)
+  while (t!=NULL)
   {
-    if (t->bb == id)
+    // printf("range check: %d compare %d\n",t->bb,bbid);
+    if (t->bb == bbid)
     {
       return true;
     }
@@ -36,16 +48,37 @@ void add_reg(struct cfg* t, int bb, int id, struct range* rr){
     if(e->valid){
       // printf("here %d\n",e->id);
       if(e->id == bb){
-        if (e->br==NULL || id == e->br->succ1){
+        if (e->br==NULL || id == e->br->cond){
           // printf("here1\n");
           break;
         }
-        else if (e->br!=NULL)
+        if(e->asgns!=NULL){
+          if (e->asgns->bin==0 && e->asgns->op1==id)
+          {
+            break;
+          }
+          if (e->asgns->bin==1 && (e->asgns->op1==id||e->asgns->op2==id))
+          {
+            break;
+          }
+        }
+        if (e->br!=NULL)
         {
-          // printf("here2\n");
-          if(contains(rr,e->br->succ1)==false)
+          // printf("bb%d %d %d\n",e->id,e->br->succ1,e->br->succ2);
+          if(contains(rr,e->br->succ1)==false){
             append(rr,e->br->succ1);
-          // add_reg(t,e->br->succ1,id,rr);
+            add_reg(t,e->br->succ1,id,rr);
+          }
+          if(e->br->succ2>0 && contains(rr,e->br->succ2)==false){
+            append(rr,e->br->succ2);
+            add_reg(t,e->br->succ2,id,rr);
+          }
+          // printf("value of succ2: %d\n",e->br->succ2);
+          // if (e->br->succ1>0)
+          //   add_reg(t,e->br->succ1,id,rr);
+          // if (e->br->succ2>0)
+          //   add_reg(t,e->br->succ2,id,rr);        
+          
         }
       }
     }
@@ -85,14 +118,6 @@ bool register_allocation (struct cfg* t){
     e = e->next;    // go to the next basic block
   }
   return found;     // return this boolean value. if anything was optimized in the code above, then `found` should be `true`
-}
-void print_all_bb_id(struct range* r, int vid){
-  struct range* e = r;
-  while (e!=NULL)
-  {
-    printf("reg[%d]->bb: %d\n",vid,e->bb);
-    e = e->next;
-  }
 }
 
 void print_reg_smt(){

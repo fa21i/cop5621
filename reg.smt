@@ -23,6 +23,10 @@
 (declare-fun x15 () Int)
 (assert (> x15 0))
 (assert (<= x15 K))
+(assert (not (= x5 x6)))
+(assert (not (= x5 x9)))
+(assert (not (= x10 x11)))
+(assert (not (= x10 x14)))
 
 (minimize K)
 (check-sat)
