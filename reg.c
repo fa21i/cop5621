@@ -160,7 +160,7 @@ void print_reg_smt(){
   printf("=======================================================\n");
   fprintf(fp,"\n(minimize K)\n(check-sat)\n(get-objectives)\n(get-model)\n");
   fclose(fp);
-  // system("z3 reg.smt | grep \"define-fun x\" -A 1 | grep -v \"\\-\\-\" > reg.txt");
+  system("z3 reg.smt | grep \"define-fun x\" -A 1 | grep -v \"\\-\\-\" > reg.txt");
 
 }
 
