@@ -185,10 +185,10 @@ int* traverse_reg_txt(){
     for (int i = 0; i < 50; i++)
     {
       if(reg[i]!=-9999){
-        printf("reg[%d] = %d\n",i,reg[i]);
+        printf("reg[%d] = v%d\n",i,reg[i]);
       }
     }
-    
+    printf("=======================================================\n");
     fclose(ptr);
     return reg;
 }

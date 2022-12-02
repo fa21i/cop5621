@@ -1035,7 +1035,7 @@ void change_register_values(struct cfg* t, int sz, struct node_fun_str* fun_r, i
     if (r->valid){
       struct asgn_instr* a = r->asgns;
       while (a != NULL) { 
-        printf("--> reg[%d]: %d\n",a->lhs,reg[a->lhs]);
+        // printf("--> reg[%d]: %d\n",a->lhs,reg[a->lhs]);
         if (a->bin == 0) {
           if (a->type == CONST){
             if (a->lhs > 0){
