@@ -1,1 +1,0 @@
-(print (let (bla (get-int)) (+ x 1 )))
