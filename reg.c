@@ -76,7 +76,7 @@ bool register_allocation (struct cfg* t){
 }
 
 void print_reg_smt(){
-  FILE* fp;
+  FILE *fp;
   fp = fopen("reg.smt", "w");
   fprintf(fp, "(declare-fun K () Int)\n");
   for (int i = 0; i < 50; i++)
@@ -103,7 +103,7 @@ void print_reg_smt(){
   }
   fprintf(fp,"\n(minimize K)\n(check-sat)\n(get-objectives)\n(get-model)\n");
   fclose(fp);
-  // system("dot -Tpdf cfg.dot -o cfg.pdf");
+  system("z3 reg.smt | grep \"define-fun x\" -A 1 | grep -v \"\\-\\-\" > reg.txt");
 
 }
 

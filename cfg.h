@@ -42,8 +42,8 @@ void clean_asgns (struct asgn_instr** r);
 
 struct cfg {int id; int src; int dst; bool valid; bool final; struct cfg* next; struct asgn_instr* asgns; struct br_instr* br; char* fun; };
 
-struct node_int* bbs_r;
-struct node_int* bbs_t;
+extern struct node_int* bbs_r;
+extern struct node_int* bbs_t;
 void get_bb_ids(struct cfg* t);
 
 void get_next(struct cfg* t, int src, int *n1, int *n2);

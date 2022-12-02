@@ -8,7 +8,8 @@
 #include "cfg.h"
 #include "y.tab.h"
 #define NOVALUE -9999
-
+struct node_int* bbs_r;
+struct node_int* bbs_t;
 void push_istr (int c1, char* c2, struct node_istr** r, struct node_istr** t){
   if (*r == NULL) {                          //If root node is null
     *r = (struct node_istr*)malloc(sizeof(struct node_istr)); //Create a new node
