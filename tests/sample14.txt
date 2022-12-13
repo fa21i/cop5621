@@ -1,0 +1,1 @@
+(print (if (get-bool) (if true (if true 1 2) 2) 2))

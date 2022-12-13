@@ -6,6 +6,7 @@
  **/
 
 #include "containers.h"
+#include "ast.h"
 
 void push_int (int i, struct node_int** r, struct node_int** t){
   if (*r == NULL){   // If root is null - empty list

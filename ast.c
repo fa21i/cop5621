@@ -6,6 +6,7 @@
  **/
 
 #include "ast.h"
+#include "containers.h"
 
 void insert_parent(struct ast* p) {
   struct ast_child* temp_ast_child_root = p->child;

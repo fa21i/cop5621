@@ -1,7 +1,10 @@
 #include "y.tab.h"
-#include "ast.h"
 #include "cfg.h"
 #include "reg.h"
+#include "bblock.h"
+#include "assembly.h"
+#include "symbol.h"
+#include "containers.h"
 #define NOVALUE -9999
 int yyparse();
 
@@ -20,7 +23,30 @@ int sz;
 
 
 // semantic checks
+bool is_fla (struct ast* node){
+  int t = node->ntoken;
+  if (t == TRUE || t == FALSE || t == EQ || t == LE || t == LT || t == GT || t == GE || t == NOT || t == AND || t == OR) return true;
+  if (t == VARID) {
+    struct node_var_str* tmp = find_var_str(node->id, node->token, vars_r);
+    if (tmp != NULL && BOOLID == tmp->type) return true;
+  }
+  if (t == CALL){
+    struct node_fun_str* tmp = find_fun_str(node->token, fun_r);
+    if (tmp != NULL && BOOL == tmp->type) return true;
+  }
+  if (t == IF) return is_fla (get_child(node, 2));
+  if (t == LET) return is_fla (get_child(node, 3));
+  return false;
+}
+int isFunction(int token){
+	if (token == FUNID ||token == FUNID  ) return 1;
+	return 0;
+}
+int isParameter(int token){
 
+	if (token == INT ||token == BOOL  ) return 1;
+	return 0;
+}
 bool is_term (struct ast* node){
   int t = node->ntoken;
   if (t == CONST || t == PLUS || t == MINUS || t == MULT || t == DIV || t == MOD) return true;
@@ -37,21 +63,28 @@ bool is_term (struct ast* node){
   return false;
 }
 
-bool is_fla (struct ast* node){
-  int t = node->ntoken;
-  if (t == TRUE || t == FALSE || t == EQ || t == LE || t == LT || t == GT || t == GE || t == NOT || t == AND || t == OR) return true;
-  if (t == VARID) {
-    struct node_var_str* tmp = find_var_str(node->id, node->token, vars_r);
-    if (tmp != NULL && BOOLID == tmp->type) return true;
-  }
-  if (t == CALL){
-    struct node_fun_str* tmp = find_fun_str(node->token, fun_r);
-    if (tmp != NULL && BOOL == tmp->type) return true;
-  }
-  if (t == IF) return is_fla (get_child(node, 2));
-  if (t == LET) return is_fla (get_child(node, 3));
-  return false;
+int checkResultType(struct ast* body){
+	if (body->ntoken == IF){
+		struct ast* tmp = body->child->next->id;
+		return checkResultType(tmp);
+	}else if (body->ntoken == CALL || body->ntoken == ID){
+		struct symbol* var = lookup(body->token, body->id);
+		if (var!=NULL) return var->returnType;
+		else return 0 ;
+	}else if(body->ntoken == LET){
+		struct ast* tmp = body->child->next->next->id;
+		return checkResultType(tmp);
+	}else{
+		if (is_fla(body->ntoken)){
+			return BOOL;
+		}else if (is_term(body->ntoken)){
+			return INT;
+		}
+	}
+		return 0 ;
 }
+
+
 
 int get_fun_var_types(struct ast* node){
   if (node->ntoken == FUNID){
@@ -335,8 +368,8 @@ void to_cfg_rec()
         if (node->ntoken == IF){
           int cur = get_child(node, 1)->id;
           push_ncfg(interm, cur, true, false, NULL, NULL, r->fun, &cfg_r, &cfg_t);
-          push_cfg(cur,  get_child(node, 2)->id, true, false, NULL, NULL, &cfg_r, &cfg_t);
-          push_cfg(cur,  get_child(node, 3)->id, true, false, NULL, NULL, &cfg_r, &cfg_t);
+          push_cfg(cur, get_child(node, 2)->id, true, false, NULL, NULL, &cfg_r, &cfg_t);
+          push_cfg(cur, get_child(node, 3)->id, true, false, NULL, NULL, &cfg_r, &cfg_t);
           push_cfg(get_child(node, 2)->id, r->dst, true, true, NULL, NULL, &cfg_r, &cfg_t);
           push_cfg(get_child(node, 3)->id, r->dst, true, true,NULL, NULL,  &cfg_r, &cfg_t);
         }
@@ -488,12 +521,17 @@ int main (int argc, char **argv) {
   //   if (opt > 4) to_cont |= opt_arithm(cfg_r,register_values);
   // }
   print_cfg(cfg_r);
-  register_allocation(cfg_r);
-  print_reg_smt();
-  int* reg = traverse_reg_txt();
-  change_register_values(cfg_r, sz, fun_r,reg);
-  print_cfg_ir(cfg_r, sz, fun_r);
-
+  // register_allocation(cfg_r);
+  // print_reg_smt();
+  // int* reg = traverse_reg_txt();
+  // change_register_values(cfg_r, sz, fun_r,reg);
+  // print_cfg_ir(cfg_r, sz, fun_r);
+  int valid = visit_cfg(validateCFGforAssembly);
+  if (valid==0){
+    createAssemblyFile();
+    visit_cfg(printAssembly);
+    finishAssembly();
+  }
   // TODO: add CFG cleaning
   free_ast();
   return retval;

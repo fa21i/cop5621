@@ -11,8 +11,8 @@
 #include <string.h>
 #include <stdarg.h>
 
-struct node_int { int id; struct node_int* next; };
-struct node_str { char* id; struct node_str* next; };
+extern struct node_int { int id; struct node_int* next; };
+extern struct node_str { char* id; struct node_str* next; };
 
 void push_str (char* c, struct node_str** r, struct node_str** t);
 char* pop_str (struct node_str** r, struct node_str** t);

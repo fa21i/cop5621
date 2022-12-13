@@ -5,8 +5,9 @@
  * (c) FSU
  **/
 
-#include "cfg.h"
+#include "containers.h"
 #include "y.tab.h"
+#include "cfg.h"
 #define NOVALUE -9999
 struct node_int* bbs_r;
 struct node_int* bbs_t;
