@@ -9,7 +9,6 @@
 
 #include "y.tab.h"
 #include "containers.h"
-#include "ast.h"
 #include "symbol.h"
 #include "bblock.h"
 #include "comp.h"

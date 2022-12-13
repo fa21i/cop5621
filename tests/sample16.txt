@@ -1,0 +1,4 @@
+(define-fun (name (v1 int)) bool
+  (if (> v1 2) (> v1 10) (> v1 20) ) )
+
+(eval (name 10))

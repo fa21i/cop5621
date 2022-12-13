@@ -1,0 +1,4 @@
+(define-fun (name (v1 bool) (v2 bool) ) int
+  (if (not (and v1 v2)) (+ 2 2 ) (- 2 2) ) )
+
+(eval (name false true))

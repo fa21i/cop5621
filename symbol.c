@@ -2,12 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <string.h>
 #include "y.tab.h" 
-#include "cfg.h"
 #include "containers.h"
 #include "bblock.h"
 #include "symbol.h"
-#include <string.h>
+
 
 struct symbol*  createSymbol(char* name, int type, int returnType, int scopeStartNode, int scopeEndNode){
 	struct symbol* node =  calloc(1,sizeof(struct symbol));

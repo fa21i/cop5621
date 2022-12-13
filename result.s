@@ -29,3 +29,26 @@ print:
   call printf
   popq %rbp
   ret
+
+
+name:
+.bbname:
+  pushq %rbp
+  movq  %rsp, %rbp
+  subq  $64, %rsp
+  jmp .bb3 
+
+.bb1: 
+  jmp .bb3 
+
+.bb2: 
+  jmp .bb3 
+
+.bb3: 
+
+
+main:
+.bb0:
+  pushq %rbp
+  movq  %rsp, %rbp
+  subq  $64, %rsp

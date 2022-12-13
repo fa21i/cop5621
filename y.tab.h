@@ -39,91 +39,91 @@
    /* Put the tokens into the symbol table, so that GDB and other debuggers
       know about them.  */
    enum yytokentype {
-     PLUS = 258,
-     MINUS = 259,
-     DIV = 260,
-     MOD = 261,
-     MULT = 262,
-     EQ = 263,
-     LT = 264,
-     GT = 265,
-     GE = 266,
-     LE = 267,
-     NOT = 268,
-     OR = 269,
-     AND = 270,
-     IF = 271,
-     LET = 272,
-     LPAR = 273,
-     RPAR = 274,
-     GETINT = 275,
-     GETBOOL = 276,
-     DEFFUN = 277,
-     TRUE = 278,
-     FALSE = 279,
-     INT = 280,
-     BOOL = 281,
-     ERR = 282,
-     PRINT = 283,
-     EVAL = 284,
-     CALL = 285,
-     FUNID = 286,
-     REGID = 287,
-     INP = 288,
-     ID = 289,
-     CONST = 290,
-     BOOLID = 291,
-     INTID = 292,
-     LETID = 293,
-     VARID = 294
+     VARIABLE = 258,
+     CALL = 259,
+     INT_FUNCTION = 260,
+     BOOL_FUNCTION = 261,
+     INT_PARAMETER = 262,
+     BOOL_PARAMETER = 263,
+     FUNID = 264,
+     NUMBER = 265,
+     NEGATIVE = 266,
+     OPEN_BRACKET = 267,
+     CLOSE_BRACKET = 268,
+     FUNCTION_DEF = 269,
+     GET_INT = 270,
+     GET_BOOL = 271,
+     EVAL = 272,
+     PRINT = 273,
+     LET = 274,
+     IF = 275,
+     NOT = 276,
+     INT = 277,
+     BOOL = 278,
+     TRUE = 279,
+     FALSE = 280,
+     PLUS = 281,
+     MINUS = 282,
+     DIV = 283,
+     MOD = 284,
+     MULT = 285,
+     IDENTIFIER = 286,
+     NOT_DEFINED = 287,
+     EQUAL = 288,
+     LESS_THAN = 289,
+     GREATER_THAN = 290,
+     GREATER_EQUAL = 291,
+     LESS_EQUAL = 292,
+     AND = 293,
+     OR = 294
    };
 #endif
 /* Tokens.  */
-#define PLUS 258
-#define MINUS 259
-#define DIV 260
-#define MOD 261
-#define MULT 262
-#define EQ 263
-#define LT 264
-#define GT 265
-#define GE 266
-#define LE 267
-#define NOT 268
-#define OR 269
-#define AND 270
-#define IF 271
-#define LET 272
-#define LPAR 273
-#define RPAR 274
-#define GETINT 275
-#define GETBOOL 276
-#define DEFFUN 277
-#define TRUE 278
-#define FALSE 279
-#define INT 280
-#define BOOL 281
-#define ERR 282
-#define PRINT 283
-#define EVAL 284
-#define CALL 285
-#define FUNID 286
-#define REGID 287
-#define INP 288
-#define ID 289
-#define CONST 290
-#define BOOLID 291
-#define INTID 292
-#define LETID 293
-#define VARID 294
+#define VARIABLE 258
+#define CALL 259
+#define INT_FUNCTION 260
+#define BOOL_FUNCTION 261
+#define INT_PARAMETER 262
+#define BOOL_PARAMETER 263
+#define FUNID 264
+#define NUMBER 265
+#define NEGATIVE 266
+#define OPEN_BRACKET 267
+#define CLOSE_BRACKET 268
+#define FUNCTION_DEF 269
+#define GET_INT 270
+#define GET_BOOL 271
+#define EVAL 272
+#define PRINT 273
+#define LET 274
+#define IF 275
+#define NOT 276
+#define INT 277
+#define BOOL 278
+#define TRUE 279
+#define FALSE 280
+#define PLUS 281
+#define MINUS 282
+#define DIV 283
+#define MOD 284
+#define MULT 285
+#define IDENTIFIER 286
+#define NOT_DEFINED 287
+#define EQUAL 288
+#define LESS_THAN 289
+#define GREATER_THAN 290
+#define GREATER_EQUAL 291
+#define LESS_EQUAL 292
+#define AND 293
+#define OR 294
 
 
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 11 "lab_yacc.y"
-{int val; char* str;}
+#line 19 "lab_yacc.y"
+{int num; char* str; struct list* arg;}
 /* Line 1529 of yacc.c.  */
 #line 129 "y.tab.h"
 	YYSTYPE;

@@ -4,8 +4,6 @@
 #include "symbol.h"
 #include "comp.h"
 #include "ssa.h"
-#include "ast.h"
-#include "cfg2.h"
 
 struct FunctionBlock* currentFunction;
 struct basic_block* currentBlock;
@@ -162,13 +160,13 @@ int create_cfg(struct ast* tmp){
         struct statment_value* start =createStatment(currentBlock,  ST_REG, tmp, shouldNotUpdateReg(tmp));
         struct statment_value* end = createStatment(currentBlock, ST_PARAM, tmp, shouldNotUpdateReg(tmp));
         AddStatement(currentFunction, currentBlock, start,end, tmp, shouldNotUpdateReg(tmp));
-    }else if(tmp->ntoken == CONST ||tmp->ntoken == TRUE ||tmp->ntoken == FALSE){
+    }else if(tmp->ntoken == NUMBER ||tmp->ntoken == NEGATIVE ||tmp->ntoken == TRUE ||tmp->ntoken == FALSE){
         struct statment_value* start= createStatment(currentBlock,  ST_REG, tmp, shouldNotUpdateReg(tmp));
         struct statment_value* end = createStatment(currentBlock,  ST_CONST, tmp, shouldNotUpdateReg(tmp));
         AddStatement(currentFunction, currentBlock, start,end, tmp, shouldNotUpdateReg(tmp));
         
-    }else if(tmp->ntoken == EQ ||tmp->ntoken == LT ||tmp->ntoken == GT
-        ||tmp->ntoken == GE ||tmp->ntoken == LE
+    }else if(tmp->ntoken == EQUAL ||tmp->ntoken == LESS_THAN ||tmp->ntoken == GREATER_THAN
+        ||tmp->ntoken == GREATER_EQUAL ||tmp->ntoken == LESS_EQUAL
         ||tmp->ntoken == AND ||tmp->ntoken == OR
         ||tmp->ntoken == NOT||tmp->ntoken == PLUS
         ||tmp->ntoken == MINUS ||tmp->ntoken == DIV  
@@ -211,7 +209,7 @@ int create_cfg(struct ast* tmp){
             struct statment_value* end = createStatment(currentBlock,  ST_OP, tmp, shouldNotUpdateReg(tmp));
             AddStatement(currentFunction, currentBlock, start,end, tmp, shouldNotUpdateReg(tmp));
         }
-    }else if (tmp->ntoken == ID){
+    }else if (tmp->ntoken == VARIABLE){
         struct symbol* var = lookup(tmp->token, tmp->id);
         if (var!=NULL){
             struct statment_value* start;
@@ -258,6 +256,9 @@ int create_cfg(struct ast* tmp){
     return 0;
 }
 }
+
+
+
 
 void printSTvalue(struct statment_value* statment){
     if (statment==NULL) return;

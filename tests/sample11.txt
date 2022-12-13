@@ -1,3 +1,1 @@
-(define-fun f1 (i int) bool (= i (+ 2 3)))
-(define-fun f2 (i bool) (j int) int (if (if (f1 j) (not i) (get-bool)) (if (get-bool) (- j 5) 0) 0))
-(print (let (x (* 2 (f2 true 1))) (if (get-bool) x 2)))
+(define-fun f1 (i int) bool (= i (+ 2 3)))(define-fun f2 (i bool) (j int) int (if (if (f1 j) (not i) (get-bool)) (if (get-bool) (- j 5) 0) 0))(print (let (x (* 2 (f2 true 1))) (if (get-bool) x 2)))

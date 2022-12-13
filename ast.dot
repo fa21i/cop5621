@@ -1,0 +1,33 @@
+digraph print {
+ 1 [label="name", fontname="monospace"];
+ 2 [label="v1", fontname="monospace"];
+ 3 [label="v1", fontname="monospace"];
+ 4 [label="2", fontname="monospace"];
+ 5 [label="GREATER_THAN", fontname="monospace", style=filled, fillcolor=mintcream];
+ 5->3
+ 5->4
+ 6 [label="v1", fontname="monospace"];
+ 7 [label="10", fontname="monospace"];
+ 8 [label="GREATER_THAN", fontname="monospace", style=filled, fillcolor=mintcream];
+ 8->6
+ 8->7
+ 9 [label="v1", fontname="monospace"];
+ 10 [label="20", fontname="monospace"];
+ 11 [label="GREATER_THAN", fontname="monospace", style=filled, fillcolor=mintcream];
+ 11->9
+ 11->10
+ 12 [label="IF", fontname="monospace", style=filled, fillcolor=mintcream];
+ 12->5
+ 12->8
+ 12->11
+ 13 [label="FUNCTION_DEF", fontname="monospace", style=filled, fillcolor=mintcream];
+ 13->1
+ 13->2
+ 13->12
+ 14 [label="10", fontname="monospace"];
+ 15 [label="name", fontname="monospace", style=filled, fillcolor=mintcream];
+ 15->14
+ 16 [label="EVAL", fontname="monospace", style=filled, fillcolor=mintcream];
+ 16->15
+ }
+ 

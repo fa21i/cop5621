@@ -1,109 +1,124 @@
 %{
-void yyerror (char *s);
-int yylex();
-#include "ast.h"
-#include "containers.h"
+  #include "containers.h"
+  #include "lab_lex.h"
+  #include "yacc.h"
+  struct argument{
+  	int ast_node;
+  	struct argument* next;
+  }argument;
+  struct list{
+  	struct argument* first;
+  	struct argument* last;
+  }list;
+  void insertchildrenInOrder(struct list* arg);
+// yylval.num = strtoimax(yytext,&endptr2,10);}
+%} 
 
-struct node_int* tmp_r;
-struct node_int* tmp_t;
-%}
+%token VARIABLE CALL INT_FUNCTION BOOL_FUNCTION INT_PARAMETER BOOL_PARAMETER FUNID NUMBER NEGATIVE OPEN_BRACKET CLOSE_BRACKET FUNCTION_DEF GET_INT GET_BOOL EVAL PRINT LET IF NOT INT BOOL TRUE FALSE PLUS MINUS DIV MOD MULT IDENTIFIER NOT_DEFINED EQUAL LESS_THAN GREATER_THAN GREATER_EQUAL LESS_EQUAL AND OR 
 
-%union {int val; char* str;}
-%start program
-%token PLUS MINUS DIV MOD MULT EQ LT GT GE LE NOT OR AND IF LET LPAR RPAR GETINT GETBOOL DEFFUN TRUE FALSE 
-INT BOOL ERR PRINT EVAL CALL FUNID REGID INP
-%token<str> ID CONST BOOLID INTID LETID VARID
-%type<val> expr funid letid intid boolid type vars exprs
+%union {int num; char* str; struct list* arg;} 
+%start PROGRAM
 
-%%
-program : LPAR funid expr RPAR {
-  insert_children (2, $2, $3);
-  insert_node("ENTRY", PRINT);}
-| LPAR DEFFUN funid vars type expr RPAR program {
-  insert_child($3);
-  for (int i = 0; i < $4; i++) insert_child(pop_int(&tmp_r, &tmp_t));
-  insert_children (2, $5, $6);
-  insert_node("DEF-FUN", DEFFUN);
-};
+%type<num>  INT BOOL funid EXP EVAL TYPE var
+%type<str>  IDENTIFIER NUMBER NEGATIVE
+%type<arg> PARAMETER ALLOWED_MULTI_TERM
 
-type : INT { $$ = insert_node("ret INT", INT);}
-| BOOL { $$ = insert_node("ret BOOL", BOOL);};
+/* Rule Section */
+%% 
+ PROGRAM: function PROGRAM
+ 	|OPEN_BRACKET PRINT EXP CLOSE_BRACKET {insert_child($3);  insert_node("PRINT", PRINT, lineNumber);}
+	| OPEN_BRACKET EVAL EXP CLOSE_BRACKET{insert_child($3); insert_node("EVAL",EVAL, lineNumber); };
 
-funid : ID { $$ = insert_node($1, FUNID);}
-| PRINT { $$ = insert_node("main", FUNID);}
 
-letid : ID { $$ = insert_node($1, LETID);};
-intid : ID { $$ = insert_node($1, INTID);};
-boolid : ID { $$ = insert_node($1, BOOLID);};
-
-vars : LPAR intid INT RPAR vars {push_int ($2, &tmp_r, &tmp_t); $$ = $5 + 1;}
-| LPAR boolid BOOL RPAR vars { push_int ($2, &tmp_r, &tmp_t); $$ = $5 + 1;}
-| {$$ = 0;};
-
-exprs : expr exprs { push_int ($1, &tmp_r, &tmp_t); $$ = $2 + 1;}
-| {$$ = 0;};
-
-expr : CONST { $$ = insert_node ($1, CONST);}
-| TRUE{ $$ = insert_node("TRUE", TRUE);}
-| FALSE { $$ = insert_node("FALSE", FALSE);}
-| ID { $$ = insert_node($1, VARID);}
-| LPAR PLUS expr expr exprs RPAR {
-  insert_children (2, $3, $4);
-  for (int i = 0; i < $5; i++) insert_child(pop_int(&tmp_r, &tmp_t));
-  $$ = insert_node("PLUS", PLUS);}
-| LPAR MINUS expr expr RPAR {
-  insert_children (2, $3, $4);
-  $$ = insert_node("MINUS", MINUS);}
-| LPAR MULT expr expr exprs RPAR {
-  insert_children (2, $3, $4);
-  for (int i = 0; i < $5; i++) insert_child(pop_int(&tmp_r, &tmp_t));
-  $$ = insert_node("MULT", MULT);}
-| LPAR DIV expr expr RPAR {
-  insert_children (2, $3, $4);
-  $$ = insert_node("DIV", DIV);}
-| LPAR MOD expr expr RPAR {
-  insert_children (2, $3, $4);
-  $$ = insert_node("MOD", MOD);}
-| LPAR EQ expr expr RPAR {
-  insert_children (2, $3, $4);
-  $$ = insert_node("EQ", EQ);}
-| LPAR LT expr expr RPAR {
-  insert_children (2, $3, $4);
-  $$ = insert_node("LT", LT);}
-| LPAR LE expr expr RPAR {
-  insert_children (2, $3, $4);
-  $$ = insert_node("LE", LE);}
-| LPAR GE expr expr RPAR {
-  insert_children (2, $3, $4);
-  $$ = insert_node("GE", GE);}
-| LPAR GT expr expr RPAR {
-  insert_children (2, $3, $4);
-  $$ = insert_node("GT", GT);}
-| LPAR AND expr expr exprs RPAR {
-  insert_children (2, $3, $4);
-  for (int i = 0; i < $5; i++) insert_child(pop_int(&tmp_r, &tmp_t));
-  $$ = insert_node("AND", AND);}
-| LPAR OR expr expr exprs RPAR {
-  insert_children (2, $3, $4);
-  for (int i = 0; i < $5; i++) insert_child(pop_int(&tmp_r, &tmp_t));
-  $$ = insert_node("OR", OR);}
-| LPAR NOT expr RPAR {
-  insert_child ($3);
-  $$ = insert_node("NOT", NOT);}
-| LPAR IF expr expr expr RPAR {
-  insert_children (3, $3, $4, $5);
-  $$ = insert_node("IF", IF);}
-| LPAR LET LPAR letid expr RPAR expr RPAR {
-  insert_children (3, $4, $5, $7);
-  $$ = insert_node("LET", LET);}
-| LPAR ID exprs RPAR {
-  for (int i = 0; i < $3; i++) insert_child(pop_int(&tmp_r, &tmp_t));
-  $$ = insert_node($2, CALL);}
-| LPAR GETINT RPAR {
-  $$ = insert_node("GET-INT", CALL);}
-| LPAR GETBOOL RPAR {
-  $$ = insert_node("GET-BOOL", CALL);}
+function: OPEN_BRACKET FUNCTION_DEF OPEN_BRACKET funid PARAMETER CLOSE_BRACKET TYPE EXP CLOSE_BRACKET  {
+  insert_child($4); 
+  insertchildrenInOrder($5); 
+  insert_child($8); 
+  if ($7==INT){
+  	insert_node("FUNCTION_DEF",  INT_FUNCTION, lineNumber);
+  } else if ($7==BOOL) {
+  	insert_node("FUNCTION_DEF",  BOOL_FUNCTION, lineNumber);
+  }
+}
+PARAMETER:	{$$ = NULL;}
+	| PARAMETER OPEN_BRACKET IDENTIFIER TYPE CLOSE_BRACKET{
+		if($$==NULL){
+			$$ =  calloc(1,sizeof(struct list));
+			$$->first = $$->last = calloc(1,sizeof(struct argument));
+		}else{
+			$$->last->next= calloc(1,sizeof(struct argument));
+			$$->last= $$->last->next;
+		}
+		if ($4==INT){
+			$$->last->ast_node = insert_node($3, INT_PARAMETER, lineNumber);
+		}else if( $4==BOOL ){
+			$$->last->ast_node = insert_node($3, BOOL_PARAMETER, lineNumber);
+		}
+	}
 ;
-%%
+TYPE: 	
+      INT { $$ = INT;}
+      |BOOL {$$ = BOOL;}
+;
+EXP: OPEN_BRACKET PLUS EXP EXP ALLOWED_MULTI_TERM CLOSE_BRACKET {insert_children(2,$3,$4); insertchildrenInOrder($5); $$ =  insert_node("PLUS",PLUS, lineNumber);}
+ 	| OPEN_BRACKET MULT EXP EXP ALLOWED_MULTI_TERM CLOSE_BRACKET {insert_children(2,$3,$4); insertchildrenInOrder($5); $$ = insert_node("MULT",MULT, lineNumber);}
 
-void yyerror (char *s) {fprintf (stderr, "%s\n", s);}             /* if any error occurs print it */
+ 	| OPEN_BRACKET MINUS EXP EXP CLOSE_BRACKET {insert_children(2,$3,$4); $$ = insert_node("MINUS",MINUS, lineNumber);}
+	| OPEN_BRACKET DIV EXP EXP CLOSE_BRACKET {insert_children(2,$3,$4); $$ = insert_node("DIV",DIV, lineNumber);}
+ 	| OPEN_BRACKET MOD EXP EXP CLOSE_BRACKET {insert_children(2,$3,$4); $$ = insert_node("MOD",MOD, lineNumber);}
+	| OPEN_BRACKET GET_INT CLOSE_BRACKET {$$ = insert_node("get-int",CALL, lineNumber);}
+	| NUMBER { $$ = insert_node($1,NUMBER, lineNumber);} 
+    	| NEGATIVE {$$ = insert_node($1, NEGATIVE, lineNumber);}
+	
+    | OPEN_BRACKET EQUAL EXP EXP CLOSE_BRACKET {insert_children(2,$3,$4); $$ = insert_node("EQUAL",EQUAL, lineNumber);}
+	| OPEN_BRACKET LESS_THAN EXP EXP CLOSE_BRACKET {insert_children(2,$3,$4); $$ = insert_node("LESS_THAN",LESS_THAN, lineNumber);}
+	| OPEN_BRACKET GREATER_THAN EXP EXP  CLOSE_BRACKET {insert_children(2,$3,$4); $$ = insert_node("GREATER_THAN", GREATER_THAN, lineNumber);}
+	| OPEN_BRACKET GREATER_EQUAL EXP EXP  CLOSE_BRACKET {insert_children(2,$3,$4); $$ = insert_node("GREATER_EQUAL", GREATER_EQUAL, lineNumber);}
+	| OPEN_BRACKET LESS_EQUAL EXP EXP  CLOSE_BRACKET {insert_children(2,$3,$4); $$ = insert_node("LESS_EQUAL",LESS_EQUAL, lineNumber);}
+
+	| OPEN_BRACKET AND EXP EXP ALLOWED_MULTI_TERM  CLOSE_BRACKET {insert_children(2,$3,$4); insertchildrenInOrder($5); $$ = insert_node("AND",AND, lineNumber);}
+	| OPEN_BRACKET OR EXP EXP ALLOWED_MULTI_TERM  CLOSE_BRACKET {insert_children(2,$3,$4); insertchildrenInOrder($5); $$ = insert_node("OR",OR, lineNumber);}
+	| OPEN_BRACKET NOT EXP CLOSE_BRACKET {insert_child($3); $$ = insert_node("NOT",NOT, lineNumber);}
+	| OPEN_BRACKET GET_BOOL CLOSE_BRACKET {$$ = insert_node("get-bool",CALL, lineNumber);}
+
+	| OPEN_BRACKET IF EXP EXP EXP CLOSE_BRACKET {insert_children(3,$3,$4,$5); $$ = insert_node("IF",IF, lineNumber);}
+	| OPEN_BRACKET IDENTIFIER ALLOWED_MULTI_TERM CLOSE_BRACKET {insertchildrenInOrder($3); $$ = insert_node($2,CALL, lineNumber); }
+	| OPEN_BRACKET LET OPEN_BRACKET var EXP CLOSE_BRACKET EXP CLOSE_BRACKET {insert_children(3,$4,$5,$7 );$$= insert_node("LET",LET, lineNumber);}
+	| TRUE {$$ = insert_node("TRUE",TRUE, lineNumber);}
+	| FALSE {$$ = insert_node("FALSE",FALSE, lineNumber);}
+    | var
+ 
+; 
+var: IDENTIFIER {$$ = insert_node($1, VARIABLE, lineNumber);};
+
+funid: IDENTIFIER {$$ = insert_node($1, FUNID, lineNumber);};
+
+ALLOWED_MULTI_TERM:  {$$ = NULL;}
+	|ALLOWED_MULTI_TERM EXP{
+		if($$==NULL){
+			$$ =  calloc(1,sizeof(struct list));
+			$$->first = $$->last = calloc(1,sizeof(struct argument));
+		}else{
+			$$->last->next= calloc(1,sizeof(struct argument));
+			$$->last= $$->last->next;
+		}
+		$$->last->ast_node = $2;
+	}
+	;
+%% 
+void insertchildrenInOrder(struct list* arg){
+	while(arg!=NULL && arg->first!=NULL){
+  		insert_child(arg->first->ast_node);
+  		struct argument* temp = arg->first;
+  		arg->first = arg->first->next;
+  		free(temp);
+	}
+	if (arg!=NULL)
+		 free(arg);
+}
+
+void yyerror(char* s) 
+{  printf("%s in line : %d\n", s ,lineNumber);}
+
+
+

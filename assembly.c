@@ -1,8 +1,10 @@
   #include "y.tab.h"
-  #include "ast.h"
+  #include "containers.h"
   #include "symbol.h"
   #include "bblock.h"
   #include "comp.h"
+  #include "ssa.h"
+  #include "optim.h"
 
   char* s_argument[6] = {"%rsi", "%rdi", "%rdx", "%rcx", "%r8", "%r9"};
   char* base = "  .section  .rodata\nmsg0:\n  .string \"%d\"\nmsg1:\n  .string \"%d\\n\"\n  .text\n  .globl  main\n  .type   main, @function\n\nget_int:\n.bbg:\n  pushq %rbp\n  movq  %rsp, %rbp\n  subq  $16, %rsp\n  leaq  -8(%rbp), %rax\n  movq  %rax, %rsi\n  movq  $msg0, %rdi\n  movq  $0, %rax\n  call scanf\n  movq  -8(%rbp), %rax\n  leave\n  ret\n\n\nprint:\n.bbp:\n  pushq %rbp\n  movq $msg1, %rdi\n  call printf\n  popq %rbp\n  ret";
@@ -151,21 +153,21 @@ void print_three_lines_operation(struct FunctionBlock* root,  struct statment_va
 	       	}else if(RHS->token==OR){
        			print_three_lines_operation(root, LHS,RHS,"orq");
 	       	}
-		}else if(RHS->token==EQ||RHS->token==LT||RHS->token==LE||RHS->token==GT||RHS->token==GE){
+		}else if(RHS->token==EQUAL||RHS->token==LESS_THAN||RHS->token==LESS_EQUAL||RHS->token==GREATER_THAN||RHS->token==GREATER_EQUAL){
 			fprintf(fp,"  movq");
     		print_from_mem_to_reg(root, RHS->op_values_next, "rbx");
        		fprintf(fp,"  cmpq");
     		print_from_mem_to_reg(root, RHS->op_values_next->op_values_next, "rbx");
     		char* comp_op;
-    		if (RHS->token==EQ){
+    		if (RHS->token==EQUAL){
     			comp_op = "sete";
-    		}else if (RHS->token==LT){
+    		}else if (RHS->token==LESS_THAN){
     			comp_op = "setl";
-    		}else if (RHS->token==LE){
+    		}else if (RHS->token==LESS_EQUAL){
     			comp_op = "setle";
-    		}else if (RHS->token==GT){
+    		}else if (RHS->token==GREATER_THAN){
     			comp_op = "setg";
-    		}else if (RHS->token==GE){
+    		}else if (RHS->token==GREATER_EQUAL){
     			comp_op = "setge";
     		}
        		fprintf(fp,"  %s %%al\n  movzbl %%al, %%rbx", comp_op);
